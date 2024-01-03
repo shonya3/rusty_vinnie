@@ -48,8 +48,8 @@ async fn event_handler(
         }
         serenity::FullEvent::Message { new_message: msg } => {
             if let Some(emoji) = match msg.content.as_str() {
-                "jaba" => Some(VinnieEmoji::Jaba),
-                "nivazmojna" => Some(VinnieEmoji::Nivazmojna),
+                m if m.contains(":jaba:") => Some(VinnieEmoji::Jaba),
+                m if m.contains(":nivazmojna:") => Some(VinnieEmoji::Nivazmojna),
                 m if m.contains("утр") => Some(VinnieEmoji::Utrechka),
                 _ => None,
             } {
