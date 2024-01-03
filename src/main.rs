@@ -53,7 +53,7 @@ async fn event_handler(
                 m if m.contains("утр") => Some(VinnieEmoji::Utrechka),
                 _ => None,
             } {
-                if let Err(err) = msg.react(ctx, emoji.id()).await {
+                if let Err(err) = msg.react(ctx, emoji).await {
                     eprintln!("Emoji reaction error: {err}");
                 };
             }
@@ -84,5 +84,11 @@ impl VinnieEmoji {
             },
             VinnieEmoji::Utrechka => ReactionType::Unicode(String::from("🤓")),
         }
+    }
+}
+
+impl From<VinnieEmoji> for ReactionType {
+    fn from(value: VinnieEmoji) -> Self {
+        value.id()
     }
 }
