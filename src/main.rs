@@ -47,12 +47,24 @@ async fn event_handler(
             println!("Logged in as {}", data_about_bot.user.name);
         }
         serenity::FullEvent::Message { new_message: msg } => {
-            if let Some(emoji) = match msg.content.as_str() {
-                m if m.contains(":jaba:") => Some(VinnieEmoji::Jaba),
-                m if m.contains(":nivazmojna:") => Some(VinnieEmoji::Nivazmojna),
-                m if m.contains("утр") => Some(VinnieEmoji::Utrechka),
-                _ => None,
-            } {
+            let mut emojis: Vec<VinnieEmoji> = vec![];
+
+            let m = msg.content.as_str();
+
+            if m.contains("jab") || m.contains("жаб") {
+                emojis.push(VinnieEmoji::Jaba);
+            };
+
+            if m.contains("нивазможн") || m.contains("невозможн") || m.contains("nivazmojn")
+            {
+                emojis.push(VinnieEmoji::Nivazmojna);
+            };
+
+            if m.contains("утр") {
+                emojis.push(VinnieEmoji::Utrechka);
+            };
+
+            for emoji in emojis {
                 if let Err(err) = msg.react(ctx, emoji).await {
                     eprintln!("Emoji reaction error: {err}");
                 };
