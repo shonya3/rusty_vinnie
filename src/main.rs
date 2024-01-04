@@ -1,7 +1,7 @@
 use std::env::var;
 
 use dotenv::dotenv;
-use poise::serenity_prelude::{self as serenity, EmojiId, ReactionType};
+use poise::serenity_prelude::{self as serenity, CacheHttp, EmojiId, ReactionType};
 
 // Types used by all command functions
 type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -45,6 +45,13 @@ async fn event_handler(
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             println!("Logged in as {}", data_about_bot.user.name);
+            // for guild in ctx.cache.guilds() {
+            //     for emoji in guild.emojis(&ctx).await.unwrap() {
+            //         if emoji.name == "zdruste" {
+            //             dbg!(&emoji);
+            //         }
+            //     }
+            // }
         }
         serenity::FullEvent::Message { new_message: msg } => {
             let mut emojis: Vec<VinnieEmoji> = vec![];
@@ -64,6 +71,10 @@ async fn event_handler(
                 emojis.push(VinnieEmoji::Utrechka);
             };
 
+            if m.contains("rust") || m.contains("раст") {
+                emojis.push(VinnieEmoji::Zdruste);
+            };
+
             for emoji in emojis {
                 if let Err(err) = msg.react(ctx, emoji).await {
                     eprintln!("Emoji reaction error: {err}");
@@ -79,6 +90,7 @@ pub enum VinnieEmoji {
     Jaba,
     Nivazmojna,
     Utrechka,
+    Zdruste,
 }
 
 impl VinnieEmoji {
@@ -95,6 +107,11 @@ impl VinnieEmoji {
                 name: Some(String::from("nivazmojna")),
             },
             VinnieEmoji::Utrechka => ReactionType::Unicode(String::from("🤓")),
+            VinnieEmoji::Zdruste => ReactionType::Custom {
+                animated: false,
+                id: EmojiId::new(1082770484036374639),
+                name: Some(String::from("zdruste")),
+            },
         }
     }
 }
