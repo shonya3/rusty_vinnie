@@ -7,6 +7,13 @@ pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNew
     FreshNewsUrl::get(lang).await
 }
 
+pub async fn get_fresh_threads(
+    not_older_than_minutes: i64,
+    lang: WebsiteLanguage,
+) -> Result<Vec<NewsThreadInfo>, Error> {
+    NewsThreadInfo::get(not_older_than_minutes, lang).await
+}
+
 pub enum WebsiteLanguage {
     Ru,
     En,
@@ -15,9 +22,9 @@ pub enum WebsiteLanguage {
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct NewsThreadInfo {
-    url: String,
+    pub url: String,
     #[serde(rename = "postedDateISO")]
-    posted_date: DateTime<Utc>,
+    pub posted_date: DateTime<Utc>,
 }
 
 impl NewsThreadInfo {
