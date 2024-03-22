@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
 
 pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNewsUrl>, Error> {
@@ -7,6 +8,13 @@ pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNew
 pub enum WebsiteLanguage {
     Ru,
     En,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewsThreadInfo {
+    url: String,
+    posted_minutes_ago: u32,
 }
 
 #[derive(Debug, PartialEq)]
@@ -56,8 +64,8 @@ impl FreshNewsUrl {
 
     pub async fn fetch(lang: WebsiteLanguage) -> Result<Self, Error> {
         let script = format!(
-            "(el) => {{{} return getFreshNewsUrl()}}",
-            include_str!("../getFreshNewsUrl.js")
+            "(el) => {{{} return getThreadsInfo()}}",
+            include_str!("../getThreadsInfo.js")
         );
 
         let playwright = playwright::Playwright::initialize().await.unwrap();

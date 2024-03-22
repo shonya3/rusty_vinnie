@@ -515,6 +515,8 @@ name = "fresh_news"
 version = "0.1.0"
 dependencies = [
  "playwright",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
