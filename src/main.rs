@@ -48,6 +48,8 @@ async fn event_handler(
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             println!("Logged in as {}", data_about_bot.user.name);
+
+            poe_newsletter::spin_news_loop(ctx.clone()).await;
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(&ctx, &msg).await,
         _ => {}
