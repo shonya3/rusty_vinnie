@@ -1,5 +1,6 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::{path::PathBuf, sync::Arc};
 
 pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNewsUrl>, Error> {
@@ -24,28 +25,39 @@ impl NewsThreadInfo {
         Self { url, posted_date }
     }
 
-    // pub async fn get(
-    //     not_older_than_minutes: u32,
-    //     lang: WebsiteLanguage,
-    // ) -> Result<Vec<Self>, Error> {
-    //     let saved = Self::read_saved()?;
-    //     let fetched = Self::fetch(lang).await?;
+    pub async fn get(
+        not_older_than_minutes: i64,
+        lang: WebsiteLanguage,
+    ) -> Result<Vec<Self>, Error> {
+        let saved = Self::read_saved()?;
+        let fetched = Self::fetch(lang).await?;
 
-    //     let fetched: Vec<Self> = fetched
-    //         .into_iter()
-    //         .filter(|info| info.posted_minutes_ago < not_older_than_minutes)
-    //         .collect();
+        let actual: Vec<Self> = fetched
+            .into_iter()
+            .filter(|info| {
+                info.age().num_minutes() <= not_older_than_minutes && !saved.contains(&info)
+            })
+            .collect();
 
-    //     todo!()
-    // }
+        Self::save(&actual)?;
+
+        Ok(actual)
+    }
+
+    pub fn age(&self) -> TimeDelta {
+        Utc::now() - self.posted_date
+    }
 
     pub fn path() -> Result<PathBuf, std::io::Error> {
         let dir = std::env::current_dir()?.join("data");
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?;
         };
-
-        Ok(dir.join("threadsInfo.json"))
+        let file_path = dir.join("threadsInfo.json");
+        if !file_path.exists() {
+            std::fs::write(&file_path, &json!([]).to_string())?;
+        }
+        Ok(file_path)
     }
 
     pub fn read_saved() -> Result<Vec<Self>, std::io::Error> {
