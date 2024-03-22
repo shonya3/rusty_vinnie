@@ -18,7 +18,9 @@ pub async fn spin_news_loop(ctx: impl CacheHttp + 'static) {
                     .collect::<Vec<_>>();
 
                 for task in tasks {
-                    task.await.unwrap();
+                    if let Err(err) = task.await {
+                        eprintln!("{err:?}");
+                    }
                 }
             }
             Err(err) => eprintln!("{err:?}"),
