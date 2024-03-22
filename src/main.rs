@@ -1,7 +1,10 @@
+mod message_handler;
+
 use std::env::var;
 
 use dotenv::dotenv;
-use poise::serenity_prelude::{self as serenity, CacheHttp, EmojiId, ReactionType};
+use message_handler::handle_message;
+use poise::serenity_prelude::{self as serenity};
 
 // Types used by all command functions
 type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -45,79 +48,9 @@ async fn event_handler(
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             println!("Logged in as {}", data_about_bot.user.name);
-            // for guild in ctx.cache.guilds() {
-            //     for emoji in guild.emojis(&ctx).await.unwrap() {
-            //         if emoji.name == "zdruste" {
-            //             dbg!(&emoji);
-            //         }
-            //     }
-            // }
         }
-        serenity::FullEvent::Message { new_message: msg } => {
-            let mut emojis: Vec<VinnieEmoji> = vec![];
-
-            let m = msg.content.as_str();
-
-            if m.contains("jab") || m.contains("жаб") {
-                emojis.push(VinnieEmoji::Jaba);
-            };
-
-            if m.contains("нивазможн") || m.contains("невозможн") || m.contains("nivazmojn")
-            {
-                emojis.push(VinnieEmoji::Nivazmojna);
-            };
-
-            if m.contains("утр") {
-                emojis.push(VinnieEmoji::Utrechka);
-            };
-
-            if m.contains("rust") || m.contains("раст") {
-                emojis.push(VinnieEmoji::Zdruste);
-            };
-
-            for emoji in emojis {
-                if let Err(err) = msg.react(ctx, emoji).await {
-                    eprintln!("Emoji reaction error: {err}");
-                };
-            }
-        }
+        serenity::FullEvent::Message { new_message: msg } => handle_message(&ctx, &msg).await,
         _ => {}
     }
     Ok(())
-}
-
-pub enum VinnieEmoji {
-    Jaba,
-    Nivazmojna,
-    Utrechka,
-    Zdruste,
-}
-
-impl VinnieEmoji {
-    pub fn id(&self) -> ReactionType {
-        match self {
-            VinnieEmoji::Jaba => ReactionType::Custom {
-                animated: false,
-                id: EmojiId::new(637684829114204175),
-                name: Some(String::from("jaba")),
-            },
-            VinnieEmoji::Nivazmojna => ReactionType::Custom {
-                animated: false,
-                id: EmojiId::new(850123166923882558),
-                name: Some(String::from("nivazmojna")),
-            },
-            VinnieEmoji::Utrechka => ReactionType::Unicode(String::from("🤓")),
-            VinnieEmoji::Zdruste => ReactionType::Custom {
-                animated: false,
-                id: EmojiId::new(1082770484036374639),
-                name: Some(String::from("zdruste")),
-            },
-        }
-    }
-}
-
-impl From<VinnieEmoji> for ReactionType {
-    fn from(value: VinnieEmoji) -> Self {
-        value.id()
-    }
 }
