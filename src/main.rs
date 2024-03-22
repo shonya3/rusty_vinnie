@@ -1,10 +1,10 @@
 mod message_handler;
-
-use std::env::var;
+mod poe_newsletter;
 
 use dotenv::dotenv;
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity};
+use std::env::var;
 
 // Types used by all command functions
 type Error = Box<dyn std::error::Error + Send + Sync>;
