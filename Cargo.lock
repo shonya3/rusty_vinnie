@@ -514,6 +514,7 @@ dependencies = [
 name = "fresh_news"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "playwright",
  "serde",
  "serde_json",

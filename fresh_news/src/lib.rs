@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
 
@@ -10,11 +11,104 @@ pub enum WebsiteLanguage {
     En,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct NewsThreadInfo {
     url: String,
-    posted_minutes_ago: u32,
+    posted_date: DateTime<Utc>,
+}
+
+impl NewsThreadInfo {
+    pub const fn new(url: String, posted_date: DateTime<Utc>) -> Self {
+        Self { url, posted_date }
+    }
+
+    // pub async fn get(
+    //     not_older_than_minutes: u32,
+    //     lang: WebsiteLanguage,
+    // ) -> Result<Vec<Self>, Error> {
+    //     let saved = Self::read_saved()?;
+    //     let fetched = Self::fetch(lang).await?;
+
+    //     let fetched: Vec<Self> = fetched
+    //         .into_iter()
+    //         .filter(|info| info.posted_minutes_ago < not_older_than_minutes)
+    //         .collect();
+
+    //     todo!()
+    // }
+
+    pub fn path() -> Result<PathBuf, std::io::Error> {
+        let dir = std::env::current_dir()?.join("data");
+        if !dir.exists() {
+            std::fs::create_dir_all(&dir)?;
+        };
+
+        Ok(dir.join("threadsInfo.json"))
+    }
+
+    pub fn read_saved() -> Result<Vec<Self>, std::io::Error> {
+        let path = Self::path()?;
+        let json = std::fs::read_to_string(path)?;
+        if json.is_empty() {
+            return Ok(vec![]);
+        }
+        Ok(serde_json::from_str(&json)?)
+    }
+
+    pub fn save(threads_info: &[Self]) -> Result<(), Error> {
+        let json = serde_json::to_string(&threads_info)?;
+        Ok(std::fs::write(Self::path()?, json)?)
+    }
+
+    pub async fn fetch(lang: WebsiteLanguage) -> Result<Vec<Self>, Error> {
+        let script = format!(
+            "(el) => {{{} return getThreadsInfo()}}",
+            include_str!("../getThreadsInfo.js")
+        );
+
+        let playwright = playwright::Playwright::initialize().await.unwrap();
+        playwright.install_chromium().unwrap();
+        let chrome = playwright.chromium();
+        let browser = chrome.launcher().headless(true).launch().await?;
+        let context = browser
+            .context_builder()
+            .clear_user_agent()
+            .build()
+            .await
+            .unwrap();
+
+        let announcements_url = match lang {
+            WebsiteLanguage::Ru => "https://ru.pathofexile.com/forum/view-forum/news",
+            WebsiteLanguage::En => "https://www.pathofexile.com/forum/view-forum/news",
+        };
+
+        let page = context.new_page().await.unwrap();
+        page.goto_builder(announcements_url).goto().await?;
+
+        #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
+        #[serde(rename_all = "camelCase")]
+        pub struct JSNewsThreadInfo {
+            url: String,
+            #[serde(rename = "postedDateISO")]
+            posted_date: String,
+        }
+
+        let js_threads_info: Vec<JSNewsThreadInfo> = page.evaluate(&script, ()).await?;
+        let threads_info = js_threads_info
+            .into_iter()
+            .map(|JSNewsThreadInfo { url, posted_date }| {
+                Self::new(
+                    url,
+                    DateTime::parse_from_rfc3339(&posted_date)
+                        .unwrap()
+                        .with_timezone(&Utc),
+                )
+            })
+            .collect();
+
+        Ok(threads_info)
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -64,8 +158,8 @@ impl FreshNewsUrl {
 
     pub async fn fetch(lang: WebsiteLanguage) -> Result<Self, Error> {
         let script = format!(
-            "(el) => {{{} return getThreadsInfo()}}",
-            include_str!("../getThreadsInfo.js")
+            "(el) => {{{} return getFreshNewsUrl()}}",
+            include_str!("../getFreshNewsUrl.js")
         );
 
         let playwright = playwright::Playwright::initialize().await.unwrap();
@@ -95,8 +189,10 @@ impl FreshNewsUrl {
 
 #[derive(Debug)]
 pub enum Error {
+    Serde(serde_json::Error),
     Io(std::io::Error),
     Playwright(Arc<playwright::Error>),
+    DateParse(chrono::ParseError),
 }
 
 impl From<std::io::Error> for Error {
@@ -108,5 +204,17 @@ impl From<std::io::Error> for Error {
 impl From<Arc<playwright::Error>> for Error {
     fn from(value: Arc<playwright::Error>) -> Self {
         Self::Playwright(value)
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
+        Self::Serde(value)
+    }
+}
+
+impl From<chrono::ParseError> for Error {
+    fn from(value: chrono::ParseError) -> Self {
+        Self::DateParse(value)
     }
 }
