@@ -1,0 +1,11 @@
+[package]
+name = "playground"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = {workspace = true}
+fresh_news = {path = "../fresh_news"}

@@ -1,8 +1,11 @@
 [workspace]
 resolver = "2"
-members = ["bot", "fresh_news"]
+members = ["bot", "fresh_news", "playground"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/shonya3/rusty_vinnie"
+
+[workspace.dependencies]
+tokio = { version = "1", features = ["full"] }
