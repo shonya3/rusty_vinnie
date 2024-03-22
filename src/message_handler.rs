@@ -4,7 +4,7 @@ use poise::serenity_prelude::{EmojiId, Message, ReactionType};
 pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
     let mut emojis: Vec<VinnieEmoji> = vec![];
 
-    let m = msg.content.as_str();
+    let m = msg.content.to_lowercase();
 
     if m.contains("jab") || m.contains("жаб") {
         emojis.push(VinnieEmoji::Jaba);
