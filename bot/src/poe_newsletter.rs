@@ -10,12 +10,12 @@ pub async fn spin_news_loop(ctx: impl CacheHttp + 'static) {
         interval.tick().await;
         match fresh_news::get_fresh_threads(INTERVAL_MINS, fresh_news::WebsiteLanguage::En).await {
             Ok(threads) => {
-                let mut tasks = vec![];
-                threads.into_iter().for_each(|thread| {
-                    let task =
-                        channel_id.send_message(&ctx, CreateMessage::new().content(thread.url));
-                    tasks.push(task);
-                });
+                let tasks = threads
+                    .into_iter()
+                    .map(|thread| {
+                        channel_id.send_message(&ctx, CreateMessage::new().content(thread.url))
+                    })
+                    .collect::<Vec<_>>();
 
                 for task in tasks {
                     task.await.unwrap();
