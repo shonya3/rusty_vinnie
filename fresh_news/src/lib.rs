@@ -15,6 +15,7 @@ pub enum WebsiteLanguage {
 #[serde(rename_all = "camelCase")]
 pub struct NewsThreadInfo {
     url: String,
+    #[serde(rename = "postedDateISO")]
     posted_date: DateTime<Utc>,
 }
 
@@ -94,19 +95,7 @@ impl NewsThreadInfo {
             posted_date: String,
         }
 
-        let js_threads_info: Vec<JSNewsThreadInfo> = page.evaluate(&script, ()).await?;
-        let threads_info = js_threads_info
-            .into_iter()
-            .map(|JSNewsThreadInfo { url, posted_date }| {
-                Self::new(
-                    url,
-                    DateTime::parse_from_rfc3339(&posted_date)
-                        .unwrap()
-                        .with_timezone(&Utc),
-                )
-            })
-            .collect();
-
+        let threads_info: Vec<Self> = page.evaluate(&script, ()).await?;
         Ok(threads_info)
     }
 }
