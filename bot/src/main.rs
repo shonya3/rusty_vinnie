@@ -1,3 +1,4 @@
+mod commands;
 mod message_handler;
 mod poe_newsletter;
 
@@ -7,9 +8,9 @@ use poise::serenity_prelude::{self as serenity};
 use std::env::var;
 
 // Types used by all command functions
-type Error = Box<dyn std::error::Error + Send + Sync>;
+pub type Error = Box<dyn std::error::Error + Send + Sync>;
 #[allow(unused)]
-type Context<'a> = poise::Context<'a, Data, Error>;
+pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {}
@@ -23,11 +24,17 @@ async fn main() {
         serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT;
 
     let framework = poise::Framework::builder()
-        .setup(move |_ctx, _ready, _framework| Box::pin(async move { Ok(Data {}) }))
+        .setup(move |ctx, _ready, framework| {
+            Box::pin(async move {
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                Ok(Data {})
+            })
+        })
         .options(poise::FrameworkOptions {
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
+            commands: vec![commands::patchnotes()],
             ..Default::default()
         })
         .build();
