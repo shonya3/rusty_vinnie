@@ -33,6 +33,37 @@ function postedDateISO(tr) {
 		throw new Error('No post date');
 	}
 
+	// You can't construct the Date from ru localestring, need to parse it first (example: "26 марта 2024 г., 5:10:44")
+	if (document.querySelector('html')?.lang === 'ru-RU') {
+		const dateString = postDate.textContent;
+		// Split the date string and extract day, month, year, hour, minute, second
+		const parts = dateString.match(/(\d{1,2})\s+(.*?)\s+(\d{4})\s+г\.,\s+(\d{1,2}):(\d{2}):(\d{2})/);
+		if (!parts) {
+			throw new Error('Could not parse RU date string');
+		}
+
+		// Extracted parts
+		const day = parseInt(parts[1]);
+		const monthPart = parts[2];
+		if (typeof monthPart !== 'string') {
+			throw new Error(`Could not parse month part: ${monthPart} in dateString: ${dateString}`);
+		}
+		const lowercasedMonthPart = monthPart.toLowerCase();
+		const month = ['янв', 'фев', 'мар', 'апр', 'ма', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'].findIndex(m =>
+			lowercasedMonthPart.startsWith(m)
+		);
+		const year = parseInt(parts[3]);
+		const hour = parseInt(parts[4]);
+		const minute = parseInt(parts[5]);
+		const second = parseInt(parts[6]);
+
+		try {
+			return new Date(year, month, day, hour, minute, second).toISOString();
+		} catch (err) {
+			throw new Error(`Could not parse Ru date string ${err?.message}`);
+		}
+	}
+
 	const date = new Date(postDate.textContent);
 	return date.toISOString();
 }
