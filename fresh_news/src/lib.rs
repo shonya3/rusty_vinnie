@@ -9,9 +9,9 @@ pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNew
 
 pub async fn get_fresh_threads(
     not_older_than_minutes: i64,
-    lang: WebsiteLanguage,
+    lang: &WebsiteLanguage,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
-    NewsThreadInfo::get(not_older_than_minutes, lang).await
+    NewsThreadInfo::get(not_older_than_minutes, &lang).await
 }
 
 pub enum WebsiteLanguage {
@@ -34,10 +34,10 @@ impl NewsThreadInfo {
 
     pub async fn get(
         not_older_than_minutes: i64,
-        lang: WebsiteLanguage,
+        lang: &WebsiteLanguage,
     ) -> Result<Vec<Self>, Error> {
         let saved = Self::read_saved()?;
-        let fetched = Self::fetch(lang).await?;
+        let fetched = Self::fetch(&lang).await?;
 
         let actual: Vec<Self> = fetched
             .into_iter()
@@ -81,7 +81,7 @@ impl NewsThreadInfo {
         Ok(std::fs::write(Self::path()?, json)?)
     }
 
-    pub async fn fetch(lang: WebsiteLanguage) -> Result<Vec<Self>, Error> {
+    pub async fn fetch(lang: &WebsiteLanguage) -> Result<Vec<Self>, Error> {
         let script = format!(
             "(el) => {{{} return getThreadsInfo()}}",
             include_str!("../getThreadsInfo.js")

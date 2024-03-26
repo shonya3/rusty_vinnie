@@ -3,9 +3,12 @@ mod message_handler;
 mod poe_newsletter;
 
 use dotenv::dotenv;
+use fresh_news::WebsiteLanguage;
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity};
 use std::env::var;
+
+use crate::poe_newsletter::spin_news_loop;
 
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -56,7 +59,10 @@ async fn event_handler(
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             println!("Logged in as {}", data_about_bot.user.name);
 
-            poe_newsletter::spin_news_loop(ctx.clone()).await;
+            tokio::join!(
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::En),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru)
+            );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(&ctx, &msg).await,
         _ => {}
