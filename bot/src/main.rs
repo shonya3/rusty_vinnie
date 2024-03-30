@@ -3,7 +3,7 @@ mod message_handler;
 mod poe_newsletter;
 
 use dotenv::dotenv;
-use fresh_news::WebsiteLanguage;
+use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity};
 use std::env::var;
@@ -60,8 +60,10 @@ async fn event_handler(
             println!("Logged in as {}", data_about_bot.user.name);
 
             tokio::join!(
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::En),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru)
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::PatchNotes),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::PatchNotes),
             );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(&ctx, &msg).await,

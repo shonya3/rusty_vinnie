@@ -10,8 +10,23 @@ pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNew
 pub async fn get_fresh_threads(
     not_older_than_minutes: i64,
     lang: &WebsiteLanguage,
+    subforum: &Subforum,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
-    NewsThreadInfo::get(not_older_than_minutes, &lang).await
+    NewsThreadInfo::get(not_older_than_minutes, &lang, &subforum).await
+}
+
+pub enum Subforum {
+    News,
+    PatchNotes,
+}
+
+impl std::fmt::Display for Subforum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Subforum::News => f.write_str("news"),
+            Subforum::PatchNotes => f.write_str("patch-notes"),
+        }
+    }
 }
 
 pub enum WebsiteLanguage {
@@ -44,9 +59,10 @@ impl NewsThreadInfo {
     pub async fn get(
         not_older_than_minutes: i64,
         lang: &WebsiteLanguage,
+        subforum: &Subforum,
     ) -> Result<Vec<Self>, Error> {
-        let saved = Self::read_saved(&lang)?;
-        let fetched = Self::fetch(&lang).await?;
+        let saved = Self::read_saved(&lang, &subforum)?;
+        let fetched = Self::fetch(&lang, &subforum).await?;
 
         let actual: Vec<Self> = fetched
             .into_iter()
@@ -55,7 +71,7 @@ impl NewsThreadInfo {
             })
             .collect();
 
-        Self::save(&actual, &lang)?;
+        Self::save(&actual, &lang, &subforum)?;
 
         Ok(actual)
     }
@@ -64,20 +80,23 @@ impl NewsThreadInfo {
         Utc::now() - self.posted_date
     }
 
-    pub fn path(lang: &WebsiteLanguage) -> Result<PathBuf, std::io::Error> {
+    pub fn path(lang: &WebsiteLanguage, subforum: &Subforum) -> Result<PathBuf, std::io::Error> {
         let dir = std::env::current_dir()?.join("data");
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?;
         };
-        let file_path = dir.join(format!("threadsInfo-{lang}.json"));
+        let file_path = dir.join(format!("threadsInfo-{subforum}-{lang}.json"));
         if !file_path.exists() {
             std::fs::write(&file_path, &json!([]).to_string())?;
         }
         Ok(file_path)
     }
 
-    pub fn read_saved(lang: &WebsiteLanguage) -> Result<Vec<Self>, std::io::Error> {
-        let path = Self::path(&lang)?;
+    pub fn read_saved(
+        lang: &WebsiteLanguage,
+        subforum: &Subforum,
+    ) -> Result<Vec<Self>, std::io::Error> {
+        let path = Self::path(&lang, &subforum)?;
         let json = std::fs::read_to_string(path)?;
         if json.is_empty() {
             return Ok(vec![]);
@@ -85,12 +104,16 @@ impl NewsThreadInfo {
         Ok(serde_json::from_str(&json)?)
     }
 
-    pub fn save(threads_info: &[Self], lang: &WebsiteLanguage) -> Result<(), Error> {
+    pub fn save(
+        threads_info: &[Self],
+        lang: &WebsiteLanguage,
+        subforum: &Subforum,
+    ) -> Result<(), Error> {
         let json = serde_json::to_string(&threads_info)?;
-        Ok(std::fs::write(Self::path(&lang)?, json)?)
+        Ok(std::fs::write(Self::path(&lang, &subforum)?, json)?)
     }
 
-    pub async fn fetch(lang: &WebsiteLanguage) -> Result<Vec<Self>, Error> {
+    pub async fn fetch(lang: &WebsiteLanguage, subforum: &Subforum) -> Result<Vec<Self>, Error> {
         let script = format!(
             "(el) => {{{} return getThreadsInfo()}}",
             include_str!("../getThreadsInfo.js")
@@ -108,12 +131,16 @@ impl NewsThreadInfo {
             .unwrap();
 
         let announcements_url = match lang {
-            WebsiteLanguage::Ru => "https://ru.pathofexile.com/forum/view-forum/news",
-            WebsiteLanguage::En => "https://www.pathofexile.com/forum/view-forum/news",
+            WebsiteLanguage::Ru => {
+                format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
+            }
+            WebsiteLanguage::En => {
+                format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
+            }
         };
 
         let page = context.new_page().await.unwrap();
-        page.goto_builder(announcements_url).goto().await?;
+        page.goto_builder(&announcements_url).goto().await?;
 
         #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
         #[serde(rename_all = "camelCase")]
