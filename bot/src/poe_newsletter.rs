@@ -1,7 +1,7 @@
 use fresh_news::WebsiteLanguage;
 use poise::serenity_prelude::{CacheHttp, ChannelId, CreateMessage};
 use std::time::Duration;
-pub const INTERVAL_MINS: i64 = 5;
+pub const INTERVAL_MINS: i64 = 60;
 
 pub async fn spin_news_loop(ctx: impl CacheHttp + 'static, lang: &WebsiteLanguage) {
     let mut interval = tokio::time::interval(Duration::from_secs(60 * INTERVAL_MINS as u64));

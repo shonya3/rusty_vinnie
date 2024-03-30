@@ -19,6 +19,15 @@ pub enum WebsiteLanguage {
     En,
 }
 
+impl std::fmt::Display for WebsiteLanguage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WebsiteLanguage::Ru => f.write_str("ru"),
+            WebsiteLanguage::En => f.write_str("en"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct NewsThreadInfo {
@@ -36,7 +45,7 @@ impl NewsThreadInfo {
         not_older_than_minutes: i64,
         lang: &WebsiteLanguage,
     ) -> Result<Vec<Self>, Error> {
-        let saved = Self::read_saved()?;
+        let saved = Self::read_saved(&lang)?;
         let fetched = Self::fetch(&lang).await?;
 
         let actual: Vec<Self> = fetched
@@ -46,7 +55,7 @@ impl NewsThreadInfo {
             })
             .collect();
 
-        Self::save(&actual)?;
+        Self::save(&actual, &lang)?;
 
         Ok(actual)
     }
@@ -55,20 +64,20 @@ impl NewsThreadInfo {
         Utc::now() - self.posted_date
     }
 
-    pub fn path() -> Result<PathBuf, std::io::Error> {
+    pub fn path(lang: &WebsiteLanguage) -> Result<PathBuf, std::io::Error> {
         let dir = std::env::current_dir()?.join("data");
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?;
         };
-        let file_path = dir.join("threadsInfo.json");
+        let file_path = dir.join(format!("threadsInfo-{lang}.json"));
         if !file_path.exists() {
             std::fs::write(&file_path, &json!([]).to_string())?;
         }
         Ok(file_path)
     }
 
-    pub fn read_saved() -> Result<Vec<Self>, std::io::Error> {
-        let path = Self::path()?;
+    pub fn read_saved(lang: &WebsiteLanguage) -> Result<Vec<Self>, std::io::Error> {
+        let path = Self::path(&lang)?;
         let json = std::fs::read_to_string(path)?;
         if json.is_empty() {
             return Ok(vec![]);
@@ -76,9 +85,9 @@ impl NewsThreadInfo {
         Ok(serde_json::from_str(&json)?)
     }
 
-    pub fn save(threads_info: &[Self]) -> Result<(), Error> {
+    pub fn save(threads_info: &[Self], lang: &WebsiteLanguage) -> Result<(), Error> {
         let json = serde_json::to_string(&threads_info)?;
-        Ok(std::fs::write(Self::path()?, json)?)
+        Ok(std::fs::write(Self::path(&lang)?, json)?)
     }
 
     pub async fn fetch(lang: &WebsiteLanguage) -> Result<Vec<Self>, Error> {
