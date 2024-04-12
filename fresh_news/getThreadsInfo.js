@@ -5,6 +5,7 @@
  * @typedef {{
  *  postedDateISO: string; // The date and time the thread was posted in ISO 8601 format.
  *  url: string; // The URL of the news thread.
+ *  title: string
  * }} NewsThreadInfo
  */
 
@@ -18,7 +19,11 @@ function getThreadsInfo() {
 	const rows = document.querySelectorAll('table tbody tr');
 
 	return Array.from(rows).map(
-		/** @returns {NewsThreadInfo} */ row => ({ url: getThreadUrl(row), postedDateISO: postedDateISO(row) })
+		/** @returns {NewsThreadInfo} */ row => ({
+			title: getThreadTitle(row),
+			url: getThreadUrl(row),
+			postedDateISO: postedDateISO(row),
+		})
 	);
 }
 
@@ -79,4 +84,13 @@ function getThreadUrl(tr) {
 		throw new Error('Error occurred when extracting the thread URL.');
 	}
 	return href;
+}
+
+/**
+ * Retrieves the title of a forum thread based on the provided HTML table row element.
+ * @param {HTMLTableRowElement} tr - The HTML table row element representing the forum thread.
+ * @returns {string} - The URL of the forum thread.
+ */
+function getThreadTitle(tr) {
+	return tr.querySelector('.title a')?.textContent?.trim() ?? '';
 }

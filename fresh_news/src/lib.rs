@@ -49,11 +49,16 @@ pub struct NewsThreadInfo {
     pub url: String,
     #[serde(rename = "postedDateISO")]
     pub posted_date: DateTime<Utc>,
+    pub title: String,
 }
 
 impl NewsThreadInfo {
-    pub const fn new(url: String, posted_date: DateTime<Utc>) -> Self {
-        Self { url, posted_date }
+    pub const fn new(url: String, posted_date: DateTime<Utc>, title: String) -> Self {
+        Self {
+            url,
+            posted_date,
+            title,
+        }
     }
 
     pub async fn get(
@@ -141,14 +146,6 @@ impl NewsThreadInfo {
 
         let page = context.new_page().await.unwrap();
         page.goto_builder(&announcements_url).goto().await?;
-
-        #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
-        #[serde(rename_all = "camelCase")]
-        pub struct JSNewsThreadInfo {
-            url: String,
-            #[serde(rename = "postedDateISO")]
-            posted_date: String,
-        }
 
         let threads_info: Vec<Self> = page.evaluate(&script, ()).await?;
         Ok(threads_info)
