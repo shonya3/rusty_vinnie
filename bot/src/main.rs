@@ -57,7 +57,11 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
-            println!("Logged in as {}", data_about_bot.user.name);
+            println!(
+                "{}: Logged in as {}",
+                chrono::Local::now().format("%a %T").to_string(),
+                data_about_bot.user.name
+            );
 
             tokio::join!(
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News),

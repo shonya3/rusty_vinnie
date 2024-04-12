@@ -11,3 +11,4 @@ poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}
 rand = "0.8.5"
 tokio = { workspace = true }
 fresh_news = {path = "../fresh_news"}
+chrono = { workspace = true }

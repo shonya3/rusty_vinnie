@@ -18,6 +18,10 @@ pub async fn spin_news_loop(
                 let tasks = threads
                     .into_iter()
                     .map(|thread| {
+                        println!(
+                            "{} {thread:#?}",
+                            chrono::Local::now().format("%a %T").to_string(),
+                        );
                         channel_id.send_message(&ctx, CreateMessage::new().content(thread.url))
                     })
                     .collect::<Vec<_>>();
