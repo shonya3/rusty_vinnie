@@ -1,14 +1,14 @@
 use fresh_news::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{CacheHttp, ChannelId, CreateMessage};
 use std::time::Duration;
-pub const INTERVAL_MINS: i64 = 60;
+pub const INTERVAL_MINS: i64 = 10;
 
 pub async fn spin_news_loop(
     ctx: impl CacheHttp + 'static,
     lang: &WebsiteLanguage,
     subforum: &Subforum,
 ) {
-    let mut interval = tokio::time::interval(Duration::from_secs(60 * INTERVAL_MINS as u64));
+    let mut interval = tokio::time::interval(Duration::from_secs(INTERVAL_MINS as u64));
     let channel_id = ChannelId::new(356013349496029184);
 
     loop {
