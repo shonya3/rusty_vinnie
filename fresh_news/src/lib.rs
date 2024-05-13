@@ -12,7 +12,7 @@ pub async fn get_fresh_threads(
     lang: &WebsiteLanguage,
     subforum: &Subforum,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
-    NewsThreadInfo::get(not_older_than_minutes, &lang, &subforum).await
+    NewsThreadInfo::get(not_older_than_minutes, lang, subforum).await
 }
 
 pub enum Subforum {
@@ -66,17 +66,17 @@ impl NewsThreadInfo {
         lang: &WebsiteLanguage,
         subforum: &Subforum,
     ) -> Result<Vec<Self>, Error> {
-        let saved = Self::read_saved(&lang, &subforum)?;
-        let fetched = Self::fetch(&lang, &subforum).await?;
+        let saved = Self::read_saved(lang, subforum)?;
+        let fetched = Self::fetch(lang, subforum).await?;
 
         let actual: Vec<Self> = fetched
             .into_iter()
             .filter(|info| {
-                info.age().num_minutes() <= not_older_than_minutes && !saved.contains(&info)
+                info.age().num_minutes() <= not_older_than_minutes && !saved.contains(info)
             })
             .collect();
 
-        Self::save(&actual, &lang, &subforum)?;
+        Self::save(&actual, lang, subforum)?;
 
         Ok(actual)
     }
@@ -92,7 +92,7 @@ impl NewsThreadInfo {
         };
         let file_path = dir.join(format!("threadsInfo-{subforum}-{lang}.json"));
         if !file_path.exists() {
-            std::fs::write(&file_path, &json!([]).to_string())?;
+            std::fs::write(&file_path, json!([]).to_string())?;
         }
         Ok(file_path)
     }
@@ -101,7 +101,7 @@ impl NewsThreadInfo {
         lang: &WebsiteLanguage,
         subforum: &Subforum,
     ) -> Result<Vec<Self>, std::io::Error> {
-        let path = Self::path(&lang, &subforum)?;
+        let path = Self::path(lang, subforum)?;
         let json = std::fs::read_to_string(path)?;
         if json.is_empty() {
             return Ok(vec![]);
@@ -115,7 +115,7 @@ impl NewsThreadInfo {
         subforum: &Subforum,
     ) -> Result<(), Error> {
         let json = serde_json::to_string(&threads_info)?;
-        Ok(std::fs::write(Self::path(&lang, &subforum)?, json)?)
+        Ok(std::fs::write(Self::path(lang, subforum)?, json)?)
     }
 
     pub async fn fetch(lang: &WebsiteLanguage, subforum: &Subforum) -> Result<Vec<Self>, Error> {
@@ -190,7 +190,7 @@ impl FreshNewsUrl {
     pub fn read_saved() -> Result<Option<Self>, std::io::Error> {
         let path = Self::path()?;
 
-        Ok(std::fs::read_to_string(path).map(|url| Self::new(url)).ok())
+        Ok(std::fs::read_to_string(path).map(Self::new).ok())
     }
 
     pub fn save(&self) -> Result<(), Error> {

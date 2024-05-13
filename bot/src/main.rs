@@ -59,7 +59,7 @@ async fn event_handler(
         serenity::FullEvent::Ready { data_about_bot, .. } => {
             println!(
                 "{}: Logged in as {}",
-                chrono::Local::now().format("%a %T").to_string(),
+                chrono::Local::now().format("%a %T"),
                 data_about_bot.user.name
             );
 
@@ -70,7 +70,7 @@ async fn event_handler(
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::PatchNotes),
             );
         }
-        serenity::FullEvent::Message { new_message: msg } => handle_message(&ctx, &msg).await,
+        serenity::FullEvent::Message { new_message: msg } => handle_message(ctx, msg).await,
         _ => {}
     }
     Ok(())

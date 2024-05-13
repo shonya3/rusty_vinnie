@@ -17,15 +17,12 @@ pub async fn spin_news_loop(
 
     loop {
         interval.tick().await;
-        match fresh_news::get_fresh_threads(INTERVAL_MINS, &lang, &subforum).await {
+        match fresh_news::get_fresh_threads(INTERVAL_MINS, lang, subforum).await {
             Ok(threads) => {
                 let tasks = threads
                     .into_iter()
                     .map(|thread| {
-                        println!(
-                            "{} {thread:#?}",
-                            chrono::Local::now().format("%a %T").to_string(),
-                        );
+                        println!("{} {thread:#?}", chrono::Local::now().format("%a %T"),);
                         channel_id.send_message(&ctx, CreateMessage::new().content(thread.url))
                     })
                     .collect::<Vec<_>>();
