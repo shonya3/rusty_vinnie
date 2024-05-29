@@ -16,6 +16,7 @@ pub async fn spin_news_loop(
     let channel_id = ChannelId::new(356013349496029184);
 
     loop {
+        println!("{} {lang}:{subforum}", chrono::Local::now().format("%a %T"));
         interval.tick().await;
         match fresh_news::get_fresh_threads(INTERVAL_MINS, lang, subforum).await {
             Ok(threads) => {
