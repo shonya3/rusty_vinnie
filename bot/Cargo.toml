@@ -12,5 +12,3 @@ rand = "0.8.5"
 tokio = { workspace = true }
 fresh_news = {path = "../fresh_news"}
 chrono = { workspace = true }
-shuttle-runtime = "0.45.0"
-shuttle-serenity = "0.45.0"
