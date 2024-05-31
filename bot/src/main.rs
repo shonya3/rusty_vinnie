@@ -37,7 +37,7 @@ async fn main(
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![commands::patchnotes()],
+            commands: vec![commands::patchnotes(), commands::news()],
             ..Default::default()
         })
         .build();
