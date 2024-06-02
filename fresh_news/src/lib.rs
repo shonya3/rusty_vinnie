@@ -148,6 +148,8 @@ impl NewsThreadInfo {
         page.goto_builder(&announcements_url).goto().await?;
 
         let threads_info: Vec<Self> = page.evaluate(&script, ()).await?;
+        context.close().await?;
+        browser.close().await?;
         Ok(threads_info)
     }
 }
