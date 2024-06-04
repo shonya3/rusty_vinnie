@@ -1,12 +1,14 @@
 mod commands;
 mod message_handler;
 mod poe_newsletter;
+mod status;
 
 use crate::poe_newsletter::spin_news_loop;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
-use poise::serenity_prelude::{self as serenity};
+use poise::serenity_prelude::{self as serenity, ChannelId};
+use status::{get_kroiya_status, watch_status};
 
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -21,8 +23,10 @@ async fn main() {
     dotenv().ok();
 
     let token = std::env::var("DISCORD_TOKEN").expect("no DIVCORD_TOKEN env");
-    let intents =
-        serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT;
+    let intents = serenity::GatewayIntents::non_privileged()
+        | serenity::GatewayIntents::MESSAGE_CONTENT
+        | serenity::GatewayIntents::GUILD_MEMBERS
+        | serenity::GatewayIntents::GUILD_PRESENCES;
 
     let framework = poise::Framework::builder()
         .setup(move |ctx, _ready, framework| {
@@ -60,7 +64,19 @@ async fn event_handler(
                 data_about_bot.user.name
             );
 
+            let channel_id = ChannelId::new(356012941083934722);
+            let say = |message: &'static str| async move {
+                if let Err(err) = channel_id.say(ctx, message).await {
+                    println!("Could not send message to channel: {err:#?}");
+                };
+            };
+
             tokio::join!(
+                watch_status(
+                    || get_kroiya_status(ctx),
+                    || say(":rabbit: пришел"),
+                    || say(":rabbit: ушел"),
+                ),
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News),
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News),
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::PatchNotes),
