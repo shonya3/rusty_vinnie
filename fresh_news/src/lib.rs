@@ -1,11 +1,8 @@
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{path::PathBuf, sync::Arc};
-
-pub async fn get_fresh_news_url(lang: WebsiteLanguage) -> Result<Option<FreshNewsUrl>, Error> {
-    FreshNewsUrl::get(lang).await
-}
+use std::path::PathBuf;
+const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub async fn get_fresh_threads(
     not_older_than_minutes: i64,
@@ -67,7 +64,7 @@ impl NewsThreadInfo {
         subforum: &Subforum,
     ) -> Result<Vec<Self>, Error> {
         let saved = Self::read_saved(lang, subforum)?;
-        let fetched = Self::fetch(lang, subforum).await?;
+        let fetched = fetch_forum_threads(lang, subforum).await?;
 
         let actual: Vec<Self> = fetched
             .into_iter()
@@ -117,136 +114,38 @@ impl NewsThreadInfo {
         let json = serde_json::to_string(&threads_info)?;
         Ok(std::fs::write(Self::path(lang, subforum)?, json)?)
     }
-
-    pub async fn fetch(lang: &WebsiteLanguage, subforum: &Subforum) -> Result<Vec<Self>, Error> {
-        let script = format!(
-            "(el) => {{{} return getThreadsInfo()}}",
-            include_str!("../getThreadsInfo.js")
-        );
-
-        let playwright = playwright::Playwright::initialize().await.unwrap();
-        playwright.install_chromium().unwrap();
-        let chrome = playwright.chromium();
-        let browser = chrome.launcher().headless(true).launch().await?;
-        let context = browser
-            .context_builder()
-            .clear_user_agent()
-            .build()
-            .await
-            .unwrap();
-
-        let announcements_url = match lang {
-            WebsiteLanguage::Ru => {
-                format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
-            }
-            WebsiteLanguage::En => {
-                format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
-            }
-        };
-
-        let page = context.new_page().await.unwrap();
-        page.goto_builder(&announcements_url).goto().await?;
-
-        let threads_info: Vec<Self> = page.evaluate(&script, ()).await?;
-        context.close().await?;
-        browser.close().await?;
-        Ok(threads_info)
-    }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct FreshNewsUrl(pub String);
-impl FreshNewsUrl {
-    pub const fn new(url: String) -> Self {
-        Self(url)
-    }
-
-    pub async fn get(lang: WebsiteLanguage) -> Result<Option<Self>, Error> {
-        let saved_url = Self::read_saved()?;
-        let fetched_url = Self::fetch(lang).await?;
-
-        match saved_url {
-            Some(saved_url) => match saved_url == fetched_url {
-                true => Ok(None),
-                false => {
-                    fetched_url.save()?;
-                    Ok(Some(fetched_url))
-                }
-            },
-            None => {
-                fetched_url.save()?;
-                Ok(Some(fetched_url))
-            }
+pub async fn fetch_forum_threads(
+    lang: &WebsiteLanguage,
+    subforum: &Subforum,
+) -> Result<Vec<NewsThreadInfo>, Error> {
+    let url = match lang {
+        WebsiteLanguage::Ru => {
+            format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
         }
-    }
-
-    fn path() -> Result<PathBuf, std::io::Error> {
-        let dir = std::env::current_dir()?.join("data");
-        if !dir.exists() {
-            std::fs::create_dir_all(&dir)?;
-        };
-
-        Ok(dir.join("latest-news-url.txt"))
-    }
-
-    pub fn read_saved() -> Result<Option<Self>, std::io::Error> {
-        let path = Self::path()?;
-
-        Ok(std::fs::read_to_string(path).map(Self::new).ok())
-    }
-
-    pub fn save(&self) -> Result<(), Error> {
-        Ok(std::fs::write(Self::path()?, &self.0)?)
-    }
-
-    pub async fn fetch(lang: WebsiteLanguage) -> Result<Self, Error> {
-        let script = format!(
-            "(el) => {{{} return getFreshNewsUrl()}}",
-            include_str!("../getFreshNewsUrl.js")
-        );
-
-        let playwright = playwright::Playwright::initialize().await.unwrap();
-        playwright.install_chromium().unwrap();
-        let chrome = playwright.chromium();
-        let browser = chrome.launcher().headless(true).launch().await?;
-        let context = browser
-            .context_builder()
-            .clear_user_agent()
-            .build()
-            .await
-            .unwrap();
-
-        let announcements_url = match lang {
-            WebsiteLanguage::Ru => "https://ru.pathofexile.com/forum/view-forum/news",
-            WebsiteLanguage::En => "https://www.pathofexile.com/forum/view-forum/news",
-        };
-
-        let page = context.new_page().await.unwrap();
-        page.goto_builder(announcements_url).goto().await?;
-
-        let latest_url: String = page.evaluate(&script, ()).await?;
-
-        Ok(Self::new(latest_url))
-    }
+        WebsiteLanguage::En => {
+            format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
+        }
+    };
+    let client = reqwest::ClientBuilder::new()
+        .user_agent(USER_AGENT)
+        .build()?;
+    let html = client.get(url).send().await?.text().await?;
+    Ok(html::parse(&html, lang))
 }
 
 #[derive(Debug)]
 pub enum Error {
     Serde(serde_json::Error),
     Io(std::io::Error),
-    Playwright(Arc<playwright::Error>),
     DateParse(chrono::ParseError),
+    ReqwestError(reqwest::Error),
 }
 
 impl From<std::io::Error> for Error {
     fn from(value: std::io::Error) -> Self {
         Self::Io(value)
-    }
-}
-
-impl From<Arc<playwright::Error>> for Error {
-    fn from(value: Arc<playwright::Error>) -> Self {
-        Self::Playwright(value)
     }
 }
 
@@ -259,5 +158,109 @@ impl From<serde_json::Error> for Error {
 impl From<chrono::ParseError> for Error {
     fn from(value: chrono::ParseError) -> Self {
         Self::DateParse(value)
+    }
+}
+
+impl From<reqwest::Error> for Error {
+    fn from(value: reqwest::Error) -> Self {
+        Self::ReqwestError(value)
+    }
+}
+
+mod html {
+    use crate::{NewsThreadInfo, WebsiteLanguage};
+    use chrono::{DateTime, NaiveDateTime, ParseError, Utc};
+    use scraper::{ElementRef, Html, Selector};
+
+    pub fn parse(html: &str, lang: &WebsiteLanguage) -> Vec<NewsThreadInfo> {
+        Html::parse_document(html)
+            .select(&Selector::parse("table tbody tr").unwrap())
+            .filter_map(|row| parse_tr(&row, lang))
+            .collect()
+    }
+
+    pub fn parse_tr(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<NewsThreadInfo> {
+        Some(NewsThreadInfo::new(
+            get_thread_url(tr)?,
+            get_posted_date(tr, lang)?,
+            get_thread_title(tr)?,
+        ))
+    }
+
+    fn get_thread_title(tr: &ElementRef) -> Option<String> {
+        let a_selector = &Selector::parse(".title a").ok()?;
+        Some(
+            tr.select(a_selector)
+                .next()?
+                .text()
+                .next()?
+                .trim()
+                .to_string(),
+        )
+    }
+
+    fn get_thread_url(tr: &ElementRef) -> Option<String> {
+        let a_selector = &Selector::parse(".title a").ok()?;
+        Some(tr.select(a_selector).next()?.attr("href")?.to_owned())
+    }
+
+    fn get_posted_date(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<DateTime<Utc>> {
+        let date_str = tr
+            .select(&Selector::parse(".post_date").ok()?)
+            .next()?
+            .text()
+            .next()?;
+
+        match parse_forum_date(lang, date_str) {
+            Ok(date) => Some(date),
+            Err(e) => {
+                eprintln!("Could not parse date {e}");
+                None
+            }
+        }
+
+        // Some(parse_forum_date(lang, date_str).unwrap())
+    }
+
+    fn parse_forum_date(
+        lang: &WebsiteLanguage,
+        date_str: &str,
+    ) -> Result<DateTime<Utc>, ParseError> {
+        let fmt = match lang {
+            WebsiteLanguage::En => "%b %e, %Y, %I:%M:%S %p", // May 8, 2024, 4:37:26 PM
+            WebsiteLanguage::Ru => "%d %m %Y, %H:%M:%S",     // 26 марта 2024 г., 5:10:44
+        };
+        let mut s = match lang {
+            WebsiteLanguage::En => date_str.to_owned(),
+            WebsiteLanguage::Ru => {
+                println!("we are in RU");
+                let mut s = date_str.to_owned();
+                for (index, month) in [
+                    "янв.",
+                    "февр.",
+                    "марта",
+                    "апр.",
+                    "мая",
+                    "июня",
+                    "июля",
+                    "авг.",
+                    "сент.",
+                    "окт.",
+                    "нояб.",
+                    "дек.",
+                ]
+                .iter()
+                .enumerate()
+                {
+                    s = s.replace(month, &format!("{}", index + 1));
+                }
+                s.replace(" г.", "")
+            }
+        };
+        if s.starts_with(", ") {
+            s = s.chars().skip(2).collect();
+        }
+
+        NaiveDateTime::parse_from_str(&s, fmt).map(|naive| naive.and_utc())
     }
 }
