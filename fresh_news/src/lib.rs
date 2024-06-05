@@ -233,7 +233,6 @@ mod html {
         let mut s = match lang {
             WebsiteLanguage::En => date_str.to_owned(),
             WebsiteLanguage::Ru => {
-                println!("we are in RU");
                 let mut s = date_str.to_owned();
                 for (index, month) in [
                     "янв.",

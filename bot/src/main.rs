@@ -18,11 +18,13 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 // Custom user data passed to all command functions
 pub struct Data {}
 
-#[tokio::main]
-async fn main() {
+#[shuttle_runtime::main]
+async fn main(
+    #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
+) -> shuttle_serenity::ShuttleSerenity {
     dotenv().ok();
 
-    let token = std::env::var("DISCORD_TOKEN").expect("no DIVCORD_TOKEN env");
+    let token = secrets.get("DISCORD_TOKEN").expect("no DIVCORD_TOKEN env");
     let intents = serenity::GatewayIntents::non_privileged()
         | serenity::GatewayIntents::MESSAGE_CONTENT
         | serenity::GatewayIntents::GUILD_MEMBERS
@@ -46,8 +48,10 @@ async fn main() {
 
     let client = serenity::ClientBuilder::new(token, intents)
         .framework(framework)
-        .await;
-    client.unwrap().start().await.unwrap();
+        .await
+        .map_err(shuttle_runtime::CustomError::new)?;
+
+    Ok(client.into())
 }
 
 async fn event_handler(
