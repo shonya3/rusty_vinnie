@@ -1,9 +1,10 @@
-// use fresh_news::NewsThreadInfo;
+#![allow(unused)]
 
-use fresh_news::{fetch_forum_threads, Subforum, WebsiteLanguage};
+use std::str::FromStr;
+
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Offset, TimeZone, Utc};
+use fresh_news::{fetch_forum_threads, NewsThreadInfo, Subforum, WebsiteLanguage};
+use serde::{Deserialize, Serialize};
 
 #[tokio::main]
-async fn main() {
-    let vec = fetch_forum_threads(&WebsiteLanguage::En, &Subforum::PatchNotes).await;
-    println!("{vec:#?}");
-}
+async fn main() {}

@@ -9,4 +9,5 @@ repository = "https://github.com/shonya3/rusty_vinnie"
 
 [workspace.dependencies]
 tokio = { version = "1", features = ["full"] }
-chrono = "0.4.37"
+chrono = { version = "0.4.38", features = ["serde"]}
+serde = { version = "1", features = ["derive"] }

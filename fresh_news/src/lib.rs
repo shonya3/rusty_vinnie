@@ -169,7 +169,7 @@ impl From<reqwest::Error> for Error {
 
 mod html {
     use crate::{NewsThreadInfo, WebsiteLanguage};
-    use chrono::{DateTime, NaiveDateTime, ParseError, Utc};
+    use chrono::{DateTime, Local, NaiveDateTime, Offset, ParseError, TimeZone, Utc};
     use scraper::{ElementRef, Html, Selector};
 
     pub fn parse(html: &str, lang: &WebsiteLanguage) -> Vec<NewsThreadInfo> {
@@ -263,6 +263,10 @@ mod html {
             s = s.chars().skip(2).collect();
         }
 
-        NaiveDateTime::parse_from_str(&s, fmt).map(|naive| naive.and_utc())
+        let naive = NaiveDateTime::parse_from_str(&s, fmt)?;
+        let local_offset = Local::now().offset().fix();
+        let local_date_time = local_offset.from_local_datetime(&naive).unwrap();
+        let utc_date_time = local_date_time.with_timezone(&Utc);
+        Ok(utc_date_time)
     }
 }
