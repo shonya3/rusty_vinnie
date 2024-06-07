@@ -266,7 +266,7 @@ mod html {
         let naive = NaiveDateTime::parse_from_str(&s, fmt)?;
         let local_offset = Local::now().offset().fix();
         let local_date_time = local_offset.from_local_datetime(&naive).unwrap();
-        let utc_date_time = local_date_time.with_timezone(&Utc);
+        let utc_date_time = local_date_time.to_utc();
         Ok(utc_date_time)
     }
 }
