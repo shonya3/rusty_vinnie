@@ -181,7 +181,7 @@ mod html {
 
     pub fn parse_tr(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<NewsThreadInfo> {
         Some(NewsThreadInfo::new(
-            get_thread_url(tr)?,
+            get_thread_url(tr, lang)?,
             get_posted_date(tr, lang)?,
             get_thread_title(tr)?,
         ))
@@ -199,9 +199,14 @@ mod html {
         )
     }
 
-    fn get_thread_url(tr: &ElementRef) -> Option<String> {
+    fn get_thread_url(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<String> {
         let a_selector = &Selector::parse(".title a").ok()?;
-        Some(tr.select(a_selector).next()?.attr("href")?.to_owned())
+        let path = tr.select(a_selector).next()?.attr("href")?.to_owned();
+        let subdomain = match lang {
+            WebsiteLanguage::Ru => "ru.",
+            WebsiteLanguage::En => "www.",
+        };
+        Some(format!("{subdomain}pathofexile.com{path}"))
     }
 
     fn get_posted_date(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<DateTime<Utc>> {
@@ -218,8 +223,6 @@ mod html {
                 None
             }
         }
-
-        // Some(parse_forum_date(lang, date_str).unwrap())
     }
 
     fn parse_forum_date(
