@@ -206,7 +206,7 @@ mod html {
             WebsiteLanguage::Ru => "ru.",
             WebsiteLanguage::En => "www.",
         };
-        Some(format!("{subdomain}pathofexile.com{path}"))
+        Some(format!("https://{subdomain}pathofexile.com{path}"))
     }
 
     fn get_posted_date(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<DateTime<Utc>> {
