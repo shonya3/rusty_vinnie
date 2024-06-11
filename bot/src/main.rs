@@ -4,6 +4,7 @@ mod poe_newsletter;
 mod status;
 
 use crate::poe_newsletter::spin_news_loop;
+use chrono::{FixedOffset, Local};
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
@@ -62,6 +63,13 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
+            let working_channel = ChannelId::new(841929108829372460);
+
+            working_channel
+                .say(&ctx, format!("{}", Local::now().fixed_offset()))
+                .await
+                .unwrap();
+
             println!(
                 "{}: Logged in as {}",
                 chrono::Local::now().format("%a %T"),
@@ -75,16 +83,28 @@ async fn event_handler(
                 };
             };
 
+            let offset = FixedOffset::east_opt(3600);
+            let offset = offset.as_ref();
             tokio::join!(
                 watch_status(
                     || get_kroiya_status(ctx),
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
                 ),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::PatchNotes),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::PatchNotes),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News, offset),
+                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News, offset),
+                spin_news_loop(
+                    ctx.clone(),
+                    &WebsiteLanguage::En,
+                    &Subforum::PatchNotes,
+                    offset
+                ),
+                spin_news_loop(
+                    ctx.clone(),
+                    &WebsiteLanguage::Ru,
+                    &Subforum::PatchNotes,
+                    offset
+                ),
             );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(ctx, msg).await,

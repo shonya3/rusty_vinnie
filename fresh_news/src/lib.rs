@@ -1,4 +1,4 @@
-use chrono::{DateTime, TimeDelta, Utc};
+use chrono::{DateTime, FixedOffset, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::path::PathBuf;
@@ -8,8 +8,9 @@ pub async fn get_fresh_threads(
     not_older_than_minutes: i64,
     lang: &WebsiteLanguage,
     subforum: &Subforum,
+    time_offset: Option<&FixedOffset>,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
-    NewsThreadInfo::get(not_older_than_minutes, lang, subforum).await
+    NewsThreadInfo::get(not_older_than_minutes, lang, subforum, time_offset).await
 }
 
 pub enum Subforum {
@@ -62,9 +63,10 @@ impl NewsThreadInfo {
         not_older_than_minutes: i64,
         lang: &WebsiteLanguage,
         subforum: &Subforum,
+        time_offset: Option<&FixedOffset>,
     ) -> Result<Vec<Self>, Error> {
         let saved = Self::read_saved(lang, subforum)?;
-        let fetched = fetch_forum_threads(lang, subforum).await?;
+        let fetched = fetch_forum_threads(lang, subforum, time_offset).await?;
 
         let actual: Vec<Self> = fetched
             .into_iter()
@@ -119,6 +121,7 @@ impl NewsThreadInfo {
 pub async fn fetch_forum_threads(
     lang: &WebsiteLanguage,
     subforum: &Subforum,
+    time_offset: Option<&FixedOffset>,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
     let url = match lang {
         WebsiteLanguage::Ru => {
@@ -132,7 +135,7 @@ pub async fn fetch_forum_threads(
         .user_agent(USER_AGENT)
         .build()?;
     let html = client.get(url).send().await?.text().await?;
-    Ok(html::parse(&html, lang))
+    Ok(html::parse(&html, lang, time_offset))
 }
 
 #[derive(Debug)]
@@ -169,20 +172,28 @@ impl From<reqwest::Error> for Error {
 
 mod html {
     use crate::{NewsThreadInfo, WebsiteLanguage};
-    use chrono::{DateTime, Local, NaiveDateTime, Offset, ParseError, TimeZone, Utc};
+    use chrono::{DateTime, FixedOffset, Local, NaiveDateTime, Offset, ParseError, TimeZone, Utc};
     use scraper::{ElementRef, Html, Selector};
 
-    pub fn parse(html: &str, lang: &WebsiteLanguage) -> Vec<NewsThreadInfo> {
+    pub fn parse(
+        html: &str,
+        lang: &WebsiteLanguage,
+        time_offset: Option<&FixedOffset>,
+    ) -> Vec<NewsThreadInfo> {
         Html::parse_document(html)
             .select(&Selector::parse("table tbody tr").unwrap())
-            .filter_map(|row| parse_tr(&row, lang))
+            .filter_map(|row| parse_tr(&row, lang, time_offset))
             .collect()
     }
 
-    pub fn parse_tr(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<NewsThreadInfo> {
+    pub fn parse_tr(
+        tr: &ElementRef,
+        lang: &WebsiteLanguage,
+        time_offset: Option<&FixedOffset>,
+    ) -> Option<NewsThreadInfo> {
         Some(NewsThreadInfo::new(
             get_thread_url(tr, lang)?,
-            get_posted_date(tr, lang)?,
+            get_posted_date(tr, lang, time_offset)?,
             get_thread_title(tr)?,
         ))
     }
@@ -209,14 +220,18 @@ mod html {
         Some(format!("https://{subdomain}pathofexile.com{path}"))
     }
 
-    fn get_posted_date(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<DateTime<Utc>> {
+    fn get_posted_date(
+        tr: &ElementRef,
+        lang: &WebsiteLanguage,
+        time_offset: Option<&FixedOffset>,
+    ) -> Option<DateTime<Utc>> {
         let date_str = tr
             .select(&Selector::parse(".post_date").ok()?)
             .next()?
             .text()
             .next()?;
 
-        match parse_forum_date(lang, date_str) {
+        match parse_forum_date(lang, date_str, time_offset) {
             Ok(date) => Some(date),
             Err(e) => {
                 eprintln!("Could not parse date {e}");
@@ -228,6 +243,7 @@ mod html {
     fn parse_forum_date(
         lang: &WebsiteLanguage,
         date_str: &str,
+        time_offset: Option<&FixedOffset>,
     ) -> Result<DateTime<Utc>, ParseError> {
         let fmt = match lang {
             WebsiteLanguage::En => "%b %e, %Y, %I:%M:%S %p", // May 8, 2024, 4:37:26 PM
@@ -263,10 +279,30 @@ mod html {
             s = s.chars().skip(2).collect();
         }
 
+        println!("{date_str}");
+
         let naive = NaiveDateTime::parse_from_str(&s, fmt)?;
-        let local_offset = Local::now().offset().fix();
-        let local_date_time = local_offset.from_local_datetime(&naive).unwrap();
-        let utc_date_time = local_date_time.to_utc();
-        Ok(utc_date_time)
+
+        let local_date_time = match time_offset {
+            Some(offset) => offset.from_local_datetime(&naive).unwrap(),
+            None => Local::now()
+                .offset()
+                .fix()
+                .from_local_datetime(&naive)
+                .unwrap(),
+        };
+
+        Ok(local_date_time.to_utc())
+
+        // let offset = time_offset.unwrap_or_else(|| Local::now().offset().fix());
+        // let local_offset = Local::now().offset().fix();
+        // let local_date_time = local_offset.from_local_datetime(&naive).unwrap();
+        // let utc_date_time = local_date_time.to_utc();
+
+        // println!("naive: {naive}  |   {naive:#?}");
+        // println!("local offset: {local_offset} | {local_offset:#?}");
+        // println!("local date time: {local_date_time} | {local_date_time:#?}");
+        // println!("utc date time: {utc_date_time}  | {utc_date_time:#?}");
+        // Ok(utc_date_time)
     }
 }
