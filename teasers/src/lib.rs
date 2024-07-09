@@ -1,5 +1,6 @@
 use error::Error;
 use scraper::{ElementRef, Html, Selector};
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
@@ -57,13 +58,13 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
     Ok(vec)
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Teaser {
     pub heading: String,
     pub content: Content,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Content {
     YoutubeEmbedUrl(String),
 }

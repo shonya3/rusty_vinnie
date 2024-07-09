@@ -7,3 +7,4 @@ repository.workspace = true
 [dependencies]
 scraper.workspace = true
 reqwest.workspace = true
+serde.workspace = true
