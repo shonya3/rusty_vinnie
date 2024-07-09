@@ -1,11 +1,20 @@
 use error::Error;
 use scraper::{ElementRef, Html, Selector};
 use std::fmt::Display;
+const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub mod error;
 
 pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Error> {
-    let thread_markup = reqwest::get(url).await?.error_for_status()?.text().await?;
+    let thread_markup = reqwest::ClientBuilder::new()
+        .user_agent(USER_AGENT)
+        .build()?
+        .get(url)
+        .send()
+        .await?
+        .error_for_status()?
+        .text()
+        .await?;
     std::fs::write("response.html", &thread_markup).unwrap();
     Ok(parse_teasers_thread(&thread_markup)?)
 }
