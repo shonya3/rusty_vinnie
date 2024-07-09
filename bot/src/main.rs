@@ -87,6 +87,7 @@ async fn event_handler(
             );
 
             let channel_id = ChannelId::new(356012941083934722);
+            let archers_main_channel = ChannelId::new(356013349496029184);
             let say = |message: &'static str| async move {
                 if let Err(err) = channel_id.say(ctx, message).await {
                     println!("Could not send message to channel: {err:#?}");
