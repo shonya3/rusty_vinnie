@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["bot", "fresh_news", "playground"]
+members = ["bot", "fresh_news", "playground", "teasers"]
 
 [workspace.package]
 version = "0.1.0"
@@ -11,3 +11,5 @@ repository = "https://github.com/shonya3/rusty_vinnie"
 tokio = { version = "1", features = ["full"] }
 chrono = { version = "0.4.38", features = ["serde"]}
 serde = { version = "1", features = ["derive"] }
+scraper = "0.19.0"
+reqwest = { version = "0.12.4", features = ["json", "rustls-tls"] }

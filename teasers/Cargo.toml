@@ -1,0 +1,9 @@
+[package]
+name = "teasers"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+scraper.workspace = true
+reqwest.workspace = true
