@@ -2,6 +2,7 @@ mod commands;
 mod message_handler;
 mod poe_newsletter;
 mod status;
+pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
 use chrono::{FixedOffset, Local};
@@ -9,6 +10,7 @@ use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
+use shuttle_persist::PersistInstance;
 use status::{get_kroiya_status, watch_status};
 
 // Types used by all command functions
@@ -17,11 +19,14 @@ pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
-pub struct Data {}
+pub struct Data {
+    persist: PersistInstance,
+}
 
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
+    #[shuttle_persist::Persist] persist: PersistInstance,
 ) -> shuttle_serenity::ShuttleSerenity {
     dotenv().ok();
 
@@ -35,14 +40,19 @@ async fn main(
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data { persist })
             })
         })
         .options(poise::FrameworkOptions {
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![commands::patchnotes(), commands::news()],
+            commands: vec![
+                commands::patchnotes(),
+                commands::news(),
+                crate::teasers::populate_teasers(),
+                crate::teasers::get_teasers(),
+            ],
             ..Default::default()
         })
         .build();

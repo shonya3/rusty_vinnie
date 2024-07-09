@@ -9,6 +9,6 @@ repository.workspace = true
 [dependencies]
 chrono.workspace = true
 serde = { workspace = true, features = ["derive"] }
-serde_json = "1.0.114"
+serde_json.workspace = true
 scraper = "0.19.0"
 reqwest.workspace = true
