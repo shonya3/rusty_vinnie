@@ -11,4 +11,11 @@ use fresh_news::{
 use serde::{Deserialize, Serialize};
 
 #[tokio::main]
-async fn main() {}
+async fn main() {
+    let teas = teasers::download_teasers_from_thread(
+        "https://ru.pathofexile.com/forum/view-thread/3530604/page/1",
+    )
+    .await
+    .unwrap();
+    println!("{teas:#?}");
+}

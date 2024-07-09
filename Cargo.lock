@@ -1630,6 +1630,7 @@ dependencies = [
  "scraper",
  "serde",
  "serde_json",
+ "teasers",
  "tokio",
 ]
 

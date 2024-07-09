@@ -13,3 +13,4 @@ serde_json = "1.0.114"
 scraper.workspace = true
 chrono.workspace = true
 serde.workspace = true
+teasers = { path = "../teasers" }

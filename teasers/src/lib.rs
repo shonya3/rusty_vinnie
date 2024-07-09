@@ -1,7 +1,14 @@
+use error::Error;
 use scraper::{ElementRef, Html, Selector};
 use std::fmt::Display;
 
 pub mod error;
+
+pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Error> {
+    let thread_markup = reqwest::get(url).await?.error_for_status()?.text().await?;
+    std::fs::write("response.html", &thread_markup).unwrap();
+    Ok(parse_teasers_thread(&thread_markup)?)
+}
 
 pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThreadError> {
     let html = Html::parse_document(markup);
