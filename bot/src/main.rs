@@ -12,6 +12,7 @@ use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
 use shuttle_persist::PersistInstance;
 use status::{get_kroiya_status, watch_status};
+use teasers::spin_teasers_loop;
 
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -52,6 +53,7 @@ async fn main(
                 commands::news(),
                 crate::teasers::populate_teasers(),
                 crate::teasers::get_teasers(),
+                crate::teasers::clear_teasers(),
             ],
             ..Default::default()
         })
@@ -69,7 +71,7 @@ async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
     _framework: poise::FrameworkContext<'_, Data, Error>,
-    _data: &Data,
+    data: &Data,
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
@@ -101,6 +103,12 @@ async fn event_handler(
                     || get_kroiya_status(ctx),
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
+                ),
+                spin_teasers_loop(
+                    ctx.clone(),
+                    data,
+                    "https://ru.pathofexile.com/forum/view-thread/3530604/page/1",
+                    &archers_main_channel,
                 ),
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News, offset),

@@ -1,10 +1,29 @@
-use crate::{Context, Error};
-use poise::serenity_prelude::ChannelId;
+use crate::{Context, Data, Error};
+use poise::serenity_prelude::{self, ChannelId};
 use shuttle_persist::PersistInstance;
+use std::time::Duration;
 use teasers::{Content, Teaser};
 
-pub async fn run_teasers_task(ctx: Context<'_>, url: &str, channel_id: &ChannelId) {
-    let persist = &ctx.data().persist;
+pub async fn spin_teasers_loop(
+    ctx: serenity_prelude::Context,
+    data: &Data,
+    url: &str,
+    channel_id: &ChannelId,
+) {
+    let mut interval = tokio::time::interval(Duration::from_secs(360));
+    loop {
+        publish_new_teasers(&ctx, data, url, channel_id).await;
+        interval.tick().await;
+    }
+}
+
+pub async fn publish_new_teasers(
+    ctx: &serenity_prelude::Context,
+    data: &Data,
+    url: &str,
+    channel_id: &ChannelId,
+) {
+    let persist = &data.persist;
     let thread_teasers = match teasers::download_teasers_from_thread(url).await {
         Ok(teas) => teas,
         Err(err) => {
@@ -19,7 +38,7 @@ pub async fn run_teasers_task(ctx: Context<'_>, url: &str, channel_id: &ChannelI
             let Content::YoutubeEmbedUrl(content) = &thread_teaser.content;
 
             if let Err(err) = channel_id
-                .say(ctx, format!("{}\n{}", thread_teaser.heading, content))
+                .say(&ctx, format!("{}\n{}", thread_teaser.heading, content))
                 .await
             {
                 println!("Could not send teaser to chat: {err}");
@@ -44,7 +63,11 @@ pub async fn populate_teasers(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn get_teasers(ctx: Context<'_>) -> Result<(), Error> {
     let data = ctx.data();
-    let teas = load_published_teasers(&data.persist);
+    let teas = load_published_teasers(&data.persist)
+        .into_iter()
+        .map(|t| t.heading)
+        .collect::<Vec<String>>()
+        .join("\n");
     ctx.say(serde_json::to_string(&teas).unwrap()).await?;
 
     Ok(())
@@ -73,6 +96,7 @@ fn load_published_teasers(persist: &PersistInstance) -> Vec<Teaser> {
 
 fn _populate_teasers(persist: &PersistInstance) {
     let teas = vec![
+
         Teaser {
             heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
             content: Content::YoutubeEmbedUrl(

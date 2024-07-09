@@ -3,7 +3,6 @@ use fresh_news::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{CacheHttp, ChannelId, CreateMessage};
 use std::time::Duration;
 pub const INTERVAL_MINS: i64 = 10;
-
 fn mins_duration(mins: u64) -> Duration {
     Duration::from_secs(60 * mins)
 }
