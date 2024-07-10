@@ -1,6 +1,6 @@
 use chrono::FixedOffset;
 use fresh_news::{Subforum, WebsiteLanguage};
-use poise::serenity_prelude::{CacheHttp, ChannelId, CreateMessage};
+use poise::serenity_prelude::{ChannelId, Context as SerenityContext, CreateMessage};
 use std::time::Duration;
 pub const INTERVAL_MINS: i64 = 10;
 fn mins_duration(mins: u64) -> Duration {
@@ -8,7 +8,7 @@ fn mins_duration(mins: u64) -> Duration {
 }
 
 pub async fn spin_news_loop(
-    ctx: impl CacheHttp + 'static,
+    ctx: &SerenityContext,
     lang: &WebsiteLanguage,
     subforum: &Subforum,
     time_offset: Option<&FixedOffset>,

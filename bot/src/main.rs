@@ -5,7 +5,7 @@ mod status;
 pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
-use chrono::{FixedOffset, Local};
+use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
@@ -74,22 +74,9 @@ async fn event_handler(
     data: &Data,
 ) -> Result<(), Error> {
     match event {
-        serenity::FullEvent::Ready { data_about_bot, .. } => {
-            let working_channel = ChannelId::new(841929108829372460);
-
-            working_channel
-                .say(&ctx, format!("{}", Local::now().fixed_offset()))
-                .await
-                .unwrap();
-
-            println!(
-                "{}: Logged in as {}",
-                chrono::Local::now().format("%a %T"),
-                data_about_bot.user.name
-            );
-
+        serenity::FullEvent::Ready { .. } => {
             let channel_id = ChannelId::new(356012941083934722);
-            let archers_main_channel = ChannelId::new(356013349496029184);
+            let archer_mains_channel = ChannelId::new(356013349496029184);
             let say = |message: &'static str| async move {
                 if let Err(err) = channel_id.say(ctx, message).await {
                     println!("Could not send message to channel: {err:#?}");
@@ -105,25 +92,15 @@ async fn event_handler(
                     || say(":rabbit: ушел"),
                 ),
                 spin_teasers_loop(
-                    ctx.clone(),
+                    ctx,
                     data,
                     "https://ru.pathofexile.com/forum/view-thread/3530604/page/1",
-                    &archers_main_channel,
+                    &archer_mains_channel,
                 ),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::En, &Subforum::News, offset),
-                spin_news_loop(ctx.clone(), &WebsiteLanguage::Ru, &Subforum::News, offset),
-                spin_news_loop(
-                    ctx.clone(),
-                    &WebsiteLanguage::En,
-                    &Subforum::PatchNotes,
-                    offset
-                ),
-                spin_news_loop(
-                    ctx.clone(),
-                    &WebsiteLanguage::Ru,
-                    &Subforum::PatchNotes,
-                    offset
-                ),
+                spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
+                spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
+                spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::PatchNotes, offset),
+                spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::PatchNotes, offset),
             );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(ctx, msg).await,

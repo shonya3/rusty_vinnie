@@ -1,24 +1,24 @@
 use crate::{Context, Data, Error};
-use poise::serenity_prelude::{self, ChannelId};
+use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
 use shuttle_persist::PersistInstance;
 use std::time::Duration;
 use teasers::{Content, Teaser};
 
 pub async fn spin_teasers_loop(
-    ctx: serenity_prelude::Context,
+    ctx: &SerenityContext,
     data: &Data,
     url: &str,
     channel_id: &ChannelId,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
     loop {
-        publish_new_teasers(&ctx, data, url, channel_id).await;
+        publish_new_teasers(ctx, data, url, channel_id).await;
         interval.tick().await;
     }
 }
 
 pub async fn publish_new_teasers(
-    ctx: &serenity_prelude::Context,
+    ctx: &SerenityContext,
     data: &Data,
     url: &str,
     channel_id: &ChannelId,
