@@ -1,5 +1,5 @@
 use error::Error;
-use scraper::{ElementRef, Html, Selector};
+use scraper::{selectable::Selectable, ElementRef, Html, Selector};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
@@ -16,7 +16,6 @@ pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Erro
         .error_for_status()?
         .text()
         .await?;
-    std::fs::write("response.html", &thread_markup).unwrap();
     Ok(parse_teasers_thread(&thread_markup)?)
 }
 
@@ -27,35 +26,28 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
         .next()
         .ok_or(ParseTeasersThreadError::NoNewsPost)?;
 
-    let mut vec: Vec<Teaser> = vec![];
+    Ok(teasers_post
+        .select(&Selector::parse("h2").unwrap())
+        .filter_map(|h2| {
+            let youtube_attr_src = next_sibling_element(&h2).and_then(|content_container| {
+                content_container
+                    .select(&Selector::parse(".spoilerContent iframe").unwrap())
+                    .next()
+                    .and_then(|iframe| iframe.attr("src"))
+            });
+            let url = match youtube_attr_src {
+                Some(attr) if attr.starts_with("//www.youtube.com/") => format!("https:{attr}"),
+                Some(attr) if attr.starts_with("https") => attr.to_string(),
+                _ => return None,
+            };
+            let heading = h2.text().collect::<String>().replace(['\n', '\t'], "");
 
-    let content_iframe_selector = Selector::parse(".spoilerContent iframe").unwrap();
-    for heading_element in teasers_post.select(&Selector::parse("h2").unwrap()) {
-        let Some(content_container) = next_sibling_element(&heading_element) else {
-            continue;
-        };
-        let Some(iframe) = content_container.select(&content_iframe_selector).next() else {
-            continue;
-        };
-        let Some(youtube_attr_src) = iframe.attr("src") else {
-            continue;
-        };
-
-        if youtube_attr_src.starts_with("//www.youtube.com/") {
-            let url = format!("https:{youtube_attr_src}");
-            let heading = heading_element
-                .text()
-                .collect::<String>()
-                .replace(['\n', '\t'], "");
-
-            vec.push(Teaser {
+            Some(Teaser {
                 heading,
                 content: Content::YoutubeEmbedUrl(url),
-            });
-        }
-    }
-
-    Ok(vec)
+            })
+        })
+        .collect())
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -104,7 +96,7 @@ mod tests {
 
     #[test]
     fn parse_teasers_thread() {
-        let markup = std::fs::read_to_string("teasers.html").expect("Cannot find teasers.html");
+        let markup = std::fs::read_to_string("teasers.txt").expect("Cannot find teasers.txt");
         let teasers = super::parse_teasers_thread(&markup).unwrap();
         assert_eq!(teasers, vec![
     Teaser {
@@ -138,12 +130,11 @@ mod tests {
         ),
     },
 ]);
-        println!("{teasers:#?}");
     }
 
     #[test]
     fn next_sibling() {
-        let html = Html::parse_document(&std::fs::read_to_string("next_sibling.html").unwrap());
+        let html = Html::parse_document(&std::fs::read_to_string("next_sibling.txt").unwrap());
         let h2 = html.select(&Selector::parse("h2").unwrap()).next().unwrap();
         println!("{}", h2.html());
 
