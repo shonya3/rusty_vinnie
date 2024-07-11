@@ -35,7 +35,7 @@ pub async fn publish_new_teasers(
 
     for thread_teaser in &thread_teasers {
         if !published_teasers.contains(thread_teaser) {
-            let Content::YoutubeEmbedUrl(content) = &thread_teaser.content;
+            let Content::YoutubeUrl(content) = &thread_teaser.content;
 
             if let Err(err) = channel_id
                 .say(&ctx, format!("{}\n{}", thread_teaser.heading, content))
@@ -99,26 +99,26 @@ fn _populate_teasers(persist: &PersistInstance) {
 
         Teaser {
             heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
-            content: Content::YoutubeEmbedUrl(
-                "https://www.youtube.com/embed/FlgP5NEQWbs".to_owned(),
+            content: Content::YoutubeUrl(
+                "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
             ),
         },
         Teaser {
             heading: "В Path of Exile: Поселенцы Калгуура вам больше ненужно нажимать на порталы в областях для ихактивации.".to_owned(),
-            content: Content::YoutubeEmbedUrl(
-                "https://www.youtube.com/embed/0Wd0mLXtteg".to_owned(),
+            content: Content::YoutubeUrl(
+                "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
             ),
         },
         Teaser {
             heading: "В дополнении Поселенцы Калгуура вы сможете начатьсхватки в Жатве всего одним действием.".to_owned(),
-            content: Content::YoutubeEmbedUrl(
-                "https://www.youtube.com/embed/7CwpLN5ryw4".to_owned(),
+            content: Content::YoutubeUrl(
+                "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
             ),
         },
         Teaser {
             heading: "В Path of Exile: Поселенцы Калгуура мы добавляемнекоторые полезные улучшения. К примеру, эффектыудержания вроде Вестников и аур, теперь несбрасываются при смерти.".to_owned(),
-            content: Content::YoutubeEmbedUrl(
-                "https://www.youtube.com/embed/F4QpJGg9Bn0".to_owned(),
+            content: Content::YoutubeUrl(
+                "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
             ),
         },
     ];

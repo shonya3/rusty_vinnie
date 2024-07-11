@@ -40,11 +40,12 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                 Some(attr) if attr.starts_with("https") => attr.to_string(),
                 _ => return None,
             };
+            let url = url.replace("embed", "watch");
             let heading = h2.text().collect::<String>().replace(['\n', '\t'], "");
 
             Some(Teaser {
                 heading,
-                content: Content::YoutubeEmbedUrl(url),
+                content: Content::YoutubeUrl(url),
             })
         })
         .collect())
@@ -58,7 +59,7 @@ pub struct Teaser {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Content {
-    YoutubeEmbedUrl(String),
+    YoutubeUrl(String),
 }
 
 #[derive(Debug)]
@@ -101,32 +102,32 @@ mod tests {
         assert_eq!(teasers, vec![
     Teaser {
         heading: "Прибавки от качества на броне и оружии теперьмультипликативные!".to_owned(),
-        content: Content::YoutubeEmbedUrl(
-            "https://www.youtube.com/embed/T2bX9xXQOL8".to_owned(),
+        content: Content::YoutubeUrl(
+            "https://www.youtube.com/watch/T2bX9xXQOL8".to_owned(),
         ),
     },
     Teaser {
         heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
-        content: Content::YoutubeEmbedUrl(
-            "https://www.youtube.com/embed/FlgP5NEQWbs".to_owned(),
+        content: Content::YoutubeUrl(
+            "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
         ),
     },
     Teaser {
         heading: "В Path of Exile: Поселенцы Калгуура вам больше ненужно нажимать на порталы в областях для ихактивации.".to_owned(),
-        content: Content::YoutubeEmbedUrl(
-            "https://www.youtube.com/embed/0Wd0mLXtteg".to_owned(),
+        content: Content::YoutubeUrl(
+            "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
         ),
     },
     Teaser {
         heading: "В дополнении Поселенцы Калгуура вы сможете начатьсхватки в Жатве всего одним действием.".to_owned(),
-        content: Content::YoutubeEmbedUrl(
-            "https://www.youtube.com/embed/7CwpLN5ryw4".to_owned(),
+        content: Content::YoutubeUrl(
+            "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
         ),
     },
     Teaser {
         heading: "В Path of Exile: Поселенцы Калгуура мы добавляемнекоторые полезные улучшения. К примеру, эффектыудержания вроде Вестников и аур, теперь несбрасываются при смерти.".to_owned(),
-        content: Content::YoutubeEmbedUrl(
-            "https://www.youtube.com/embed/F4QpJGg9Bn0".to_owned(),
+        content: Content::YoutubeUrl(
+            "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
         ),
     },
 ]);
