@@ -19,7 +19,8 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
-    if m.contains("rust") || m.contains("раст") {
+    if m.contains("rust") || m.contains("раст") || m.contains("краб") || m.contains("crab")
+    {
         emojis.push(VinnieEmoji::Zdruste);
     };
 
