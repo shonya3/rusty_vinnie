@@ -20,7 +20,11 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
-    if m.contains("rust") || m.contains("раст") || m.contains("краб") || m.contains("crab")
+    if m.contains("rust")
+        || m.contains("раст")
+        || m.contains("краб")
+        || m.contains("crab")
+        || m.contains("🦀")
     {
         let crab_emojis = [
             VinnieEmoji::Zdruste,
