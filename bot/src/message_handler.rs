@@ -22,7 +22,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
 
     if m.contains("rust") || m.contains("раст") || m.contains("краб") || m.contains("crab")
     {
-        let crab_emojis = vec![
+        let crab_emojis = [
             VinnieEmoji::Zdruste,
             VinnieEmoji::Crab,
             VinnieEmoji::RustHappy,
@@ -33,7 +33,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
             .choose(&mut rng)
             .unwrap_or(&VinnieEmoji::Zdruste);
 
-        emojis.push(emoji);
+        emojis.push(*emoji);
     };
 
     for emoji in emojis {
@@ -43,6 +43,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
     }
 }
 
+#[derive(Copy, Clone)]
 enum VinnieEmoji {
     Jaba,
     Nivazmojna,
