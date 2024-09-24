@@ -1,5 +1,6 @@
 use poise::serenity_prelude as serenity;
 use poise::serenity_prelude::{EmojiId, Message, ReactionType};
+use rand::seq::SliceRandom;
 
 pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
     let mut emojis: Vec<VinnieEmoji> = vec![];
@@ -21,7 +22,18 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
 
     if m.contains("rust") || m.contains("раст") || m.contains("краб") || m.contains("crab")
     {
-        emojis.push(VinnieEmoji::Zdruste);
+        let crab_emojis = vec![
+            VinnieEmoji::Zdruste,
+            VinnieEmoji::Crab,
+            VinnieEmoji::RustHappy,
+        ];
+
+        let mut rng = rand::thread_rng();
+        let emoji = crab_emojis
+            .choose(&mut rng)
+            .unwrap_or(&VinnieEmoji::Zdruste);
+
+        emojis.push(emoji);
     };
 
     for emoji in emojis {
@@ -36,6 +48,8 @@ enum VinnieEmoji {
     Nivazmojna,
     Utrechka,
     Zdruste,
+    Crab,
+    RustHappy,
 }
 
 impl VinnieEmoji {
@@ -56,6 +70,12 @@ impl VinnieEmoji {
                 animated: false,
                 id: EmojiId::new(1082770484036374639),
                 name: Some(String::from("zdruste")),
+            },
+            VinnieEmoji::Crab => ReactionType::Unicode(String::from("🦀")),
+            VinnieEmoji::RustHappy => ReactionType::Custom {
+                animated: false,
+                id: EmojiId::new(1082770391845585016),
+                name: Some(String::from("rusthappy")),
             },
         }
     }
