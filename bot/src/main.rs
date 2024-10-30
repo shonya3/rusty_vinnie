@@ -83,7 +83,9 @@ async fn event_handler(
                 };
             };
 
-            let offset = FixedOffset::east_opt(3600);
+            // let offset = FixedOffset::east_opt(3600);
+            // winter london time
+            let offset = FixedOffset::east_opt(0);
             let offset = offset.as_ref();
             tokio::join!(
                 watch_status(
