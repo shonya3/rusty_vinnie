@@ -279,8 +279,6 @@ mod html {
             s = s.chars().skip(2).collect();
         }
 
-        println!("{date_str}");
-
         let naive = NaiveDateTime::parse_from_str(&s, fmt)?;
 
         let local_date_time = match time_offset {
