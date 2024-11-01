@@ -8,3 +8,6 @@ repository.workspace = true
 scraper.workspace = true
 reqwest.workspace = true
 serde.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true

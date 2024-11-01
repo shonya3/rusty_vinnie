@@ -1,7 +1,7 @@
 use teasers::{Content, Teaser};
 
 #[test]
-fn parse_old_325_teasers_thread() {
+fn parse_old_3_25_teasers_thread() {
     let markup = std::fs::read_to_string("./tests/3.25_teasers.html").unwrap();
     let vec = teasers::parse_teasers_thread(&markup).unwrap();
     assert_eq!(vec, vec![
