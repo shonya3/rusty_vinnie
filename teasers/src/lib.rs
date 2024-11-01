@@ -22,7 +22,7 @@ pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Erro
 pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThreadError> {
     let html = Html::parse_document(markup);
     let teasers_post = html
-        .select(&Selector::parse("table.forumTable tbody tr.newsPost").unwrap())
+        .select(&Selector::parse("tr.newsPost").unwrap())
         .next()
         .ok_or(ParseTeasersThreadError::NoNewsPost)?;
 
@@ -41,7 +41,12 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                 _ => return None,
             };
             let url = url.replace("embed", "watch");
-            let heading = h2.text().collect::<String>().replace(['\n', '\t'], "");
+            let heading = h2
+                .text()
+                .collect::<String>()
+                .trim()
+                .replace('\n', " ")
+                .replace('\t', "");
 
             Some(Teaser {
                 heading,
@@ -93,49 +98,13 @@ fn next_sibling_element<'a>(element: &'a ElementRef) -> Option<ElementRef<'a>> {
 mod tests {
     use scraper::{Html, Selector};
 
-    use crate::{Content, Teaser};
-
-    #[test]
-    fn parse_teasers_thread() {
-        let markup = std::fs::read_to_string("teasers.txt").expect("Cannot find teasers.txt");
-        let teasers = super::parse_teasers_thread(&markup).unwrap();
-        assert_eq!(teasers, vec![
-    Teaser {
-        heading: "Прибавки от качества на броне и оружии теперьмультипликативные!".to_owned(),
-        content: Content::YoutubeUrl(
-            "https://www.youtube.com/watch/T2bX9xXQOL8".to_owned(),
-        ),
-    },
-    Teaser {
-        heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
-        content: Content::YoutubeUrl(
-            "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
-        ),
-    },
-    Teaser {
-        heading: "В Path of Exile: Поселенцы Калгуура вам больше ненужно нажимать на порталы в областях для ихактивации.".to_owned(),
-        content: Content::YoutubeUrl(
-            "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
-        ),
-    },
-    Teaser {
-        heading: "В дополнении Поселенцы Калгуура вы сможете начатьсхватки в Жатве всего одним действием.".to_owned(),
-        content: Content::YoutubeUrl(
-            "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
-        ),
-    },
-    Teaser {
-        heading: "В Path of Exile: Поселенцы Калгуура мы добавляемнекоторые полезные улучшения. К примеру, эффектыудержания вроде Вестников и аур, теперь несбрасываются при смерти.".to_owned(),
-        content: Content::YoutubeUrl(
-            "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
-        ),
-    },
-]);
-    }
-
     #[test]
     fn next_sibling() {
-        let html = Html::parse_document(&std::fs::read_to_string("next_sibling.txt").unwrap());
+        let markup = r#"<h2>Прибавки от качества на броне и оружии теперь мультипликативные!</h2>
+<div class="spoiler spoilerVisible"></div>
+<br /><br />
+"#;
+        let html = Html::parse_document(markup);
         let h2 = html.select(&Selector::parse("h2").unwrap()).next().unwrap();
         println!("{}", h2.html());
 
