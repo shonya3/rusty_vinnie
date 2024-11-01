@@ -50,7 +50,12 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                         .map(|s| s.to_string())?
                 }
             };
-            let url = url.replace("embed", "watch");
+            let mut url = url.replace("embed", "watch");
+            if url.starts_with("https://player.vimeo.com/video/") {
+                // Remove "player." and "/video" to get the desired format for discord embedding
+                url = url.replace("player.vimeo.com/video/", "vimeo.com/");
+            }
+
             let heading = h2
                 .text()
                 .collect::<String>()
