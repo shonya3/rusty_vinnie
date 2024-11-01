@@ -2,7 +2,7 @@ use teasers::{Content, Teaser};
 
 #[test]
 fn parse_old_3_25_teasers_thread() {
-    let markup = std::fs::read_to_string("./tests/3.25_teasers.html").unwrap();
+    let markup = std::fs::read_to_string("./tests/3.25_some_teasers.html").unwrap();
     let vec = teasers::parse_teasers_thread(&markup).unwrap();
     assert_eq!(vec, vec![
     Teaser {
@@ -31,4 +31,12 @@ fn parse_old_3_25_teasers_thread() {
     },
 
 ]);
+}
+
+#[test]
+fn parse_poe2_teasers() {
+    let markup = std::fs::read_to_string("./tests/poe2_some_teasers.html").unwrap();
+    let vec = teasers::parse_teasers_thread(&markup).unwrap();
+    println!("{vec:#?}");
+    assert_eq!(vec.len(), 2);
 }

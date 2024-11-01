@@ -38,7 +38,17 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
             let url = match youtube_attr_src {
                 Some(attr) if attr.starts_with("//www.youtube.com/") => format!("https:{attr}"),
                 Some(attr) if attr.starts_with("https") => attr.to_string(),
-                _ => return None,
+                _ => {
+                    // if no video src, find image;
+                    next_sibling_element(&h2)
+                        .and_then(|content_container| {
+                            content_container
+                                .select(&Selector::parse(".spoiler img").unwrap())
+                                .next()
+                                .and_then(|img| img.attr("src"))
+                        })
+                        .map(|s| s.to_string())?
+                }
             };
             let url = url.replace("embed", "watch");
             let heading = h2
