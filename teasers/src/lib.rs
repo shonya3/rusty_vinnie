@@ -26,46 +26,46 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
         .next()
         .ok_or(ParseTeasersThreadError::NoNewsPost)?;
 
+    let spoiler_content_iframe_selector = Selector::parse(".spoilerContent iframe").unwrap();
+    let spoiler_content_img_selector = Selector::parse(".spoilerContent img").unwrap();
+
     Ok(teasers_post
         .select(&Selector::parse("h2").unwrap())
         .filter_map(|h2| {
-            let youtube_attr_src = next_sibling_element(&h2).and_then(|content_container| {
-                content_container
-                    .select(&Selector::parse(".spoilerContent iframe").unwrap())
+            let content = next_sibling_element(&h2).and_then(|spoiler_element| {
+                match spoiler_element
+                    .select(&spoiler_content_iframe_selector)
                     .next()
-                    .and_then(|iframe| iframe.attr("src"))
-            });
-            let url = match youtube_attr_src {
-                Some(attr) if attr.starts_with("//www.youtube.com/") => format!("https:{attr}"),
-                Some(attr) if attr.starts_with("https") => attr.to_string(),
-                _ => {
-                    // if no video src, find image;
-                    next_sibling_element(&h2)
-                        .and_then(|content_container| {
-                            content_container
-                                .select(&Selector::parse(".spoiler img").unwrap())
-                                .next()
-                                .and_then(|img| img.attr("src"))
-                        })
-                        .map(|s| s.to_string())?
-                }
-            };
-            let mut url = url.replace("embed", "watch");
-            if url.starts_with("https://player.vimeo.com/video/") {
-                // Remove "player." and "/video" to get the desired format for discord embedding
-                url = url.replace("player.vimeo.com/video/", "vimeo.com/");
-            }
+                {
+                    Some(iframe) => iframe.attr("src").and_then(|src| match src {
+                        src if src.starts_with("//www.youtube.com/") => {
+                            Some(format!("https:{src}").replace("embed", "watch"))
+                        }
 
-            let heading = h2
-                .text()
-                .collect::<String>()
-                .trim()
-                .replace('\n', " ")
-                .replace('\t', "");
+                        src if src.starts_with("https://player.vimeo.com/video/") => {
+                            Some(src.replace("player.vimeo.com/video/", "vimeo.com/"))
+                        }
+
+                        src if src.starts_with("https://") => Some(src.replace("embed", "watch")),
+
+                        _ => None,
+                    }),
+                    None => spoiler_element
+                        .select(&spoiler_content_img_selector)
+                        .next()
+                        .and_then(|img_el| img_el.attr("src"))
+                        .map(|url| url.to_string()),
+                }
+            })?;
 
             Some(Teaser {
-                heading,
-                content: Content::YoutubeUrl(url),
+                heading: h2
+                    .text()
+                    .collect::<String>()
+                    .trim()
+                    .replace('\n', " ")
+                    .replace('\t', ""),
+                content,
             })
         })
         .collect())
@@ -74,12 +74,24 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Teaser {
     pub heading: String,
-    pub content: Content,
+    pub content: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Content {
-    YoutubeUrl(String),
+pub enum SpoilerContent {
+    YoutubeVideoUrl(String),
+    VimeoVideoUrl(String),
+    ImageSrcUrl(String),
+}
+
+impl SpoilerContent {
+    pub fn content(&self) -> String {
+        match self {
+            SpoilerContent::YoutubeVideoUrl(url) => url.to_owned(),
+            SpoilerContent::VimeoVideoUrl(url) => url.to_owned(),
+            SpoilerContent::ImageSrcUrl(src) => src.to_owned(),
+        }
+    }
 }
 
 #[derive(Debug)]

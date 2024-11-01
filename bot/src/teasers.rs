@@ -2,7 +2,7 @@ use crate::{Context, Data, Error};
 use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
 use shuttle_persist::PersistInstance;
 use std::time::Duration;
-use teasers::{Content, Teaser};
+use teasers::Teaser;
 
 pub async fn spin_teasers_loop(
     ctx: &SerenityContext,
@@ -33,12 +33,10 @@ pub async fn publish_new_teasers(
     };
     let published_teasers = load_published_teasers(persist);
 
-    for thread_teaser in &thread_teasers {
-        if !published_teasers.contains(thread_teaser) {
-            let Content::YoutubeUrl(content) = &thread_teaser.content;
-
+    for teaser in &thread_teasers {
+        if !published_teasers.contains(teaser) {
             if let Err(err) = channel_id
-                .say(&ctx, format!("{}\n{}", thread_teaser.heading, content))
+                .say(&ctx, format!("{}\n{}", teaser.heading, &teaser.content))
                 .await
             {
                 println!("Could not send teaser to chat: {err}");
@@ -99,27 +97,19 @@ fn _populate_teasers(persist: &PersistInstance) {
 
         Teaser {
             heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
-            content: Content::YoutubeUrl(
-                "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
-            ),
+            content: "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
         },
         Teaser {
             heading: "В Path of Exile: Поселенцы Калгуура вам больше ненужно нажимать на порталы в областях для ихактивации.".to_owned(),
-            content: Content::YoutubeUrl(
-                "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
-            ),
+            content: "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
         },
         Teaser {
             heading: "В дополнении Поселенцы Калгуура вы сможете начатьсхватки в Жатве всего одним действием.".to_owned(),
-            content: Content::YoutubeUrl(
-                "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
-            ),
+            content: "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
         },
         Teaser {
             heading: "В Path of Exile: Поселенцы Калгуура мы добавляемнекоторые полезные улучшения. К примеру, эффектыудержания вроде Вестников и аур, теперь несбрасываются при смерти.".to_owned(),
-            content: Content::YoutubeUrl(
-                "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
-            ),
+            content: "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
         },
     ];
 
