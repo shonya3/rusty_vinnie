@@ -96,7 +96,7 @@ async fn event_handler(
                 spin_teasers_loop(
                     ctx,
                     data,
-                    "https://ru.pathofexile.com/forum/view-thread/3530604/page/1",
+                    "https://ru.pathofexile.com/forum/view-thread/3584454",
                     &archer_mains_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
