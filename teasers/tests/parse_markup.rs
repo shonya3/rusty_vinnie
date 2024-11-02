@@ -29,6 +29,17 @@ fn parse_old_3_25_teasers_thread() {
 fn parse_poe2_teasers() {
     let markup = std::fs::read_to_string("./tests/poe2_some_teasers.html").unwrap();
     let vec = teasers::parse_teasers_thread(&markup).unwrap();
-    println!("{vec:#?}");
-    assert_eq!(vec.len(), 2);
+    assert_eq!(
+        vec,
+        vec![
+            Teaser {
+                heading: "С момента демонстрации класса Наёмник в Path of Exile 2, мы добавили гораздо больше огневой мощи в его арсенал. Оцените действие Гальванической гранаты на группу монстров и разрушительную силу Плазменного взрыва.".to_owned(),
+                content: "https://vimeo.com/1025317638".to_owned()
+            },
+            Teaser {
+                heading: "У каждого уникального предмета в Path of Exile 2 есть собственные 2D-иконки и 3D-модели. Взгляните на некоторые знаковые уникальные предметы из Path of Exile, получившие новый внешний вид в Path of Exile 2.".to_owned(),
+                content: "https://web.poecdn.com/public/news/2024-11-01/POE1Uniques.png".to_owned()
+            }
+        ]
+    );
 }

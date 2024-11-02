@@ -94,24 +94,15 @@ fn load_published_teasers(persist: &PersistInstance) -> Vec<Teaser> {
 
 fn _populate_teasers(persist: &PersistInstance) {
     let teas = vec![
-
-        Teaser {
-            heading: "Мы переработали качество предметов! Редкостьпредмета больше не имеет значения при использованиивалюты для качества на неуникальные предметы. Вместоэтого повышение качества теперь зависит от уровняпредмета.".to_owned(),
-            content: "https://www.youtube.com/watch/FlgP5NEQWbs".to_owned(),
-        },
-        Teaser {
-            heading: "В Path of Exile: Поселенцы Калгуура вам больше ненужно нажимать на порталы в областях для ихактивации.".to_owned(),
-            content: "https://www.youtube.com/watch/0Wd0mLXtteg".to_owned(),
-        },
-        Teaser {
-            heading: "В дополнении Поселенцы Калгуура вы сможете начатьсхватки в Жатве всего одним действием.".to_owned(),
-            content: "https://www.youtube.com/watch/7CwpLN5ryw4".to_owned(),
-        },
-        Teaser {
-            heading: "В Path of Exile: Поселенцы Калгуура мы добавляемнекоторые полезные улучшения. К примеру, эффектыудержания вроде Вестников и аур, теперь несбрасываются при смерти.".to_owned(),
-            content: "https://www.youtube.com/watch/F4QpJGg9Bn0".to_owned(),
-        },
-    ];
+            Teaser {
+                heading: "С момента демонстрации класса Наёмник в Path of Exile 2, мы добавили гораздо больше огневой мощи в его арсенал. Оцените действие Гальванической гранаты на группу монстров и разрушительную силу Плазменного взрыва.".to_owned(),
+                content: "https://vimeo.com/1025317638".to_owned()
+            },
+            Teaser {
+                heading: "У каждого уникального предмета в Path of Exile 2 есть собственные 2D-иконки и 3D-модели. Взгляните на некоторые знаковые уникальные предметы из Path of Exile, получившие новый внешний вид в Path of Exile 2.".to_owned(),
+                content: "https://web.poecdn.com/public/news/2024-11-01/POE1Uniques.png".to_owned()
+            }
+        ];
 
     persist.save("teasers", teas).unwrap();
 }
