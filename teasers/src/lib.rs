@@ -77,23 +77,6 @@ pub struct Teaser {
     pub content: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum SpoilerContent {
-    YoutubeVideoUrl(String),
-    VimeoVideoUrl(String),
-    ImageSrcUrl(String),
-}
-
-impl SpoilerContent {
-    pub fn content(&self) -> String {
-        match self {
-            SpoilerContent::YoutubeVideoUrl(url) => url.to_owned(),
-            SpoilerContent::VimeoVideoUrl(url) => url.to_owned(),
-            SpoilerContent::ImageSrcUrl(src) => src.to_owned(),
-        }
-    }
-}
-
 #[derive(Debug)]
 pub enum ParseTeasersThreadError {
     NoNewsPost,
