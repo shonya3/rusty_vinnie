@@ -69,6 +69,9 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
             })
         })
         .collect();
+
+    // Reverse teasers, because the newest one is on top of the teasers post.
+    // So the order becomes [oldest, old, ..., newest]
     thread_teasers.reverse();
 
     Ok(thread_teasers)
