@@ -29,7 +29,7 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
     let spoiler_content_iframe_selector = Selector::parse(".spoilerContent iframe").unwrap();
     let spoiler_content_img_selector = Selector::parse(".spoilerContent img").unwrap();
 
-    Ok(teasers_post
+    let mut thread_teasers: Vec<Teaser> = teasers_post
         .select(&Selector::parse("h2").unwrap())
         .filter_map(|h2| {
             let content = next_sibling_element(&h2).and_then(|spoiler_element| {
@@ -68,7 +68,10 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                 content,
             })
         })
-        .collect())
+        .collect();
+    thread_teasers.reverse();
+
+    Ok(thread_teasers)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
