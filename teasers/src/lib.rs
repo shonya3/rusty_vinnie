@@ -71,7 +71,7 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
         .collect())
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
 pub struct Teaser {
     pub heading: String,
     pub content: String,

@@ -1,7 +1,7 @@
 use crate::{Context, Data, Error};
 use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
 use shuttle_persist::PersistInstance;
-use std::time::Duration;
+use std::{collections::HashSet, time::Duration};
 use teasers::Teaser;
 
 pub async fn spin_teasers_loop(
@@ -44,7 +44,12 @@ pub async fn publish_new_teasers(
         };
     }
 
-    if let Err(err) = persist.save("teasers", thread_teasers) {
+    let mut set = HashSet::<Teaser>::from_iter(published_teasers);
+    set.extend(thread_teasers);
+
+    let unique_teasers: Vec<Teaser> = set.into_iter().collect();
+
+    if let Err(err) = persist.save("teasers", unique_teasers) {
         println!("Could not persist thread teasers: {err}");
     };
 }
