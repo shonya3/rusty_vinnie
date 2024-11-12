@@ -73,35 +73,82 @@ fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
 }
 
 #[poise::command(slash_command)]
+#[allow(clippy::field_reassign_with_default)]
 pub async fn get_latest_teaser(ctx: Context<'_>) -> Result<(), Error> {
-    let data = ctx.data();
-    let teas = load_published_teasers(&data.persist);
+    let url = "https://www.pathofexile.com/forum/view-thread/3584453";
+    let embed = CreateEmbed::new()
+        .title("Poe Teaser")
+        .url(url)
+        .author(create_vinnie_bot_author_embed())
+        .description("If you had to pick one monster from Oswald's journal to encounter in the Utzaal jungle, which would it be? Check out Oswald's notes on some more monsters from Path of Exile 2!");
 
-    let latest = teas.last();
+    let links: Vec<&str> = vec![
+        "https://web.poecdn.com/public/news/2024-11-08/BlueSensibleRadars.png",
+        "https://web.poecdn.com/public/news/2024-11-08/OrangePersonalFireplace.png",
+        "https://web.poecdn.com/public/news/2024-11-08/PurplePlayfulPlatypus.png",
+        "https://web.poecdn.com/public/news/2024-11-08/RedJoyfulHound.png",
+    ];
+    let images_embeds: Vec<_> = links
+        .into_iter()
+        .map(|image_url| CreateEmbed::new().image(image_url).url(url))
+        .collect();
 
-    match latest {
-        Some(teaser) => {
-            let embed = CreateEmbed::new()
-                .title("Poe Teaser")
-                .author(create_vinnie_bot_author_embed())
-                .description(format!("{}\n{}", teaser.heading, &teaser.content));
-            let reply = CreateReply::default().embed(embed);
+    let mut reply = CreateReply::default();
+    reply.embeds = vec![embed];
+    reply.embeds.extend(images_embeds);
 
-            ctx.send(reply).await?;
-        }
-        None => {
-            let embed = CreateEmbed::new()
-                .title("PoE Teaser")
-                .description("description here");
-
-            let reply = CreateReply::default().embed(embed);
-
-            ctx.send(reply).await?;
-        }
-    };
+    ctx.send(reply).await?;
 
     Ok(())
 }
+
+// #[poise::command(slash_command)]
+// #[allow(clippy::field_reassign_with_default)]
+// pub async fn get_latest_teaser(ctx: Context<'_>) -> Result<(), Error> {
+//     let data = ctx.data();
+//     let mut teas = load_published_teasers(&data.persist);
+
+//     teas.sort_by(|a, b| b.content.cmp(&a.content));
+//     let teaser = teas.first().to_owned();
+
+//     match teaser {
+//         Some(teaser) => {
+//             let url = "https://www.youtube.com/watch?v=CagIhaIoqtg";
+//             let embed = CreateEmbed::new()
+//                 .title("Poe Teaser")
+//                 .url(url)
+//                 .author(create_vinnie_bot_author_embed())
+//                 .description(&teaser.heading);
+
+//             let links = teaser.content.split(" ").collect::<Vec<_>>();
+//             let images_embeds: Vec<_> = links
+//                 .into_iter()
+//                 .map(|image_url| CreateEmbed::new().image(image_url).url(url))
+//                 .collect();
+
+//             // let img_embeds = EmbedImage::
+
+//             let mut reply = CreateReply::default();
+//             reply.embeds = vec![embed];
+//             reply.embeds.extend(images_embeds);
+
+//             // EmbedImage
+
+//             ctx.send(reply).await?;
+//         }
+//         None => {
+//             let embed = CreateEmbed::new()
+//                 .title("PoE Teaser")
+//                 .description("description here");
+
+//             let reply = CreateReply::default().embed(embed);
+
+//             ctx.send(reply).await?;
+//         }
+//     };
+
+//     Ok(())
+// }
 
 #[poise::command(slash_command)]
 pub async fn clear_teasers(ctx: Context<'_>) -> Result<(), Error> {
