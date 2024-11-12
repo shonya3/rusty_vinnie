@@ -24,7 +24,7 @@ pub async fn spin_teasers_loop(
     }
 }
 
-pub async fn publish_new_teasers(
+async fn publish_new_teasers(
     ctx: &SerenityContext,
     data: &Data,
     forum_thread: TeasersForumThread,
@@ -111,7 +111,7 @@ async fn send_teaser(
 // }
 
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
-    CreateEmbedAuthor::new("Vinnie The Bot")
+    CreateEmbedAuthor::new("Rusty Vinnie")
         .icon_url("https://discord.com/assets/ca24969f2fd7a9fb03d5.png")
         .url("https://github.com/shonya3/rusty_vinnie")
 }
