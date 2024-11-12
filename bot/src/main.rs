@@ -13,7 +13,7 @@ use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
 use shuttle_persist::PersistInstance;
 use status::{get_kroiya_status, watch_status};
-use teasers::{send_teaser, spin_teasers_loop};
+use teasers::spin_teasers_loop;
 
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -76,9 +76,10 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { .. } => {
+            data.persist.clear().unwrap();
             let _working_channel = ChannelId::new(841929108829372460);
             let main_channel = ChannelId::new(356012941083934722);
-            let archer_mains_channel = ChannelId::new(356013349496029184);
+            let _archer_mains_channel = ChannelId::new(356013349496029184);
             let say = |message: &'static str| async move {
                 if let Err(err) = main_channel.say(ctx, message).await {
                     println!("Could not send message to channel: {err:#?}");
@@ -102,13 +103,13 @@ async fn event_handler(
                 spin_teasers_loop(
                     ctx,
                     data,
-                    TeasersForumThread::Poe2(Lang::Ru).url(),
+                    TeasersForumThread::Poe2(Lang::Ru),
                     &_working_channel,
                 ),
                 spin_teasers_loop(
                     ctx,
                     data,
-                    TeasersForumThread::Poe2(Lang::En).url(),
+                    TeasersForumThread::Poe2(Lang::En),
                     &_working_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
