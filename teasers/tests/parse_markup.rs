@@ -26,7 +26,7 @@ fn captures_multiple_content_links_from_one_teaser() {
 #[test]
 fn parse_old_3_25_teasers_thread() {
     let markup = std::fs::read_to_string("./tests/3.25_some_teasers.html").unwrap();
-    let forum_thread = TeasersForumThread::Poe1_3_25_Russian;
+    let forum_thread = TeasersForumThread::Poe1_3_25Russian;
     let vec = teasers::parse_teasers_thread(&markup, forum_thread).unwrap();
     assert_eq!(vec, vec![
     Teaser {
