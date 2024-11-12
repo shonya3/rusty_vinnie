@@ -88,14 +88,16 @@ async fn send_teaser(
         return Err(format!("Could not send teaser to {channel_id}. {err}"));
     }
 
-    if let Err(err) = channel_id
-        .send_message(
-            &ctx,
-            CreateMessage::new().content(teaser.videos_urls.join(" ")),
-        )
-        .await
-    {
-        return Err(format!("Could not send teaser to {channel_id}. {err}"));
+    if !teaser.videos_urls.is_empty() {
+        if let Err(err) = channel_id
+            .send_message(
+                &ctx,
+                CreateMessage::new().content(teaser.videos_urls.join(" ")),
+            )
+            .await
+        {
+            return Err(format!("Could not send teaser to {channel_id}. {err}"));
+        }
     }
 
     Ok(())
