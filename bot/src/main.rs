@@ -5,6 +5,7 @@ mod status;
 pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
+use ::teasers::{Lang, Url};
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
@@ -97,13 +98,13 @@ async fn event_handler(
                 spin_teasers_loop(
                     ctx,
                     data,
-                    "https://ru.pathofexile.com/forum/view-thread/3584454",
+                    Url::Poe2(Lang::Ru).as_str(),
                     &archer_mains_channel,
                 ),
                 spin_teasers_loop(
                     ctx,
                     data,
-                    "https://www.pathofexile.com/forum/view-thread/3584453",
+                    Url::Poe2(Lang::En).as_str(),
                     &archer_mains_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
