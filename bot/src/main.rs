@@ -79,7 +79,7 @@ async fn event_handler(
             data.persist.clear().unwrap();
             let _working_channel = ChannelId::new(841929108829372460);
             let main_channel = ChannelId::new(356012941083934722);
-            let _archer_mains_channel = ChannelId::new(356013349496029184);
+            let archer_mains_channel = ChannelId::new(356013349496029184);
             let say = |message: &'static str| async move {
                 if let Err(err) = main_channel.say(ctx, message).await {
                     println!("Could not send message to channel: {err:#?}");
@@ -90,9 +90,6 @@ async fn event_handler(
             // winter london time
             let offset = FixedOffset::east_opt(0);
             let offset = offset.as_ref();
-            // send_teaser(ctx, &_working_channel)
-            //     .await
-            //     .unwrap_or_else(|err| println!("{err}"));
 
             tokio::join!(
                 watch_status(
@@ -103,14 +100,11 @@ async fn event_handler(
                 spin_teasers_loop(
                     ctx,
                     data,
-                    TeasersForumThread::Poe2(Lang::Ru),
-                    &_working_channel,
-                ),
-                spin_teasers_loop(
-                    ctx,
-                    data,
-                    TeasersForumThread::Poe2(Lang::En),
-                    &_working_channel,
+                    &[
+                        TeasersForumThread::Poe2(Lang::Ru),
+                        TeasersForumThread::Poe2(Lang::En),
+                    ],
+                    &archer_mains_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),

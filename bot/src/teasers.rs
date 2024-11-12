@@ -12,12 +12,14 @@ use teasers::{Teaser, TeasersForumThread};
 pub async fn spin_teasers_loop(
     ctx: &SerenityContext,
     data: &Data,
-    forum_thread: TeasersForumThread,
+    forum_threads: &[TeasersForumThread],
     channel_id: &ChannelId,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
     loop {
-        publish_new_teasers(ctx, data, forum_thread, channel_id).await;
+        for forum_thread in forum_threads {
+            publish_new_teasers(ctx, data, *forum_thread, channel_id).await;
+        }
         interval.tick().await;
     }
 }
