@@ -1,5 +1,8 @@
 use crate::{Context, Data, Error};
-use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
+use poise::{
+    serenity_prelude::{ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor},
+    CreateReply,
+};
 use shuttle_persist::PersistInstance;
 use std::{collections::HashSet, time::Duration};
 use teasers::Teaser;
@@ -63,15 +66,39 @@ pub async fn populate_teasers(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
+    CreateEmbedAuthor::new("Vinnie The Bot")
+        .icon_url("https://discord.com/assets/ca24969f2fd7a9fb03d5.png")
+        .url("https://github.com/shonya3/rusty_vinnie")
+}
+
 #[poise::command(slash_command)]
-pub async fn get_teasers(ctx: Context<'_>) -> Result<(), Error> {
+pub async fn get_latest_teaser(ctx: Context<'_>) -> Result<(), Error> {
     let data = ctx.data();
-    let teas = load_published_teasers(&data.persist)
-        .into_iter()
-        .map(|t| t.heading)
-        .collect::<Vec<String>>()
-        .join("\n");
-    ctx.say(serde_json::to_string(&teas).unwrap()).await?;
+    let teas = load_published_teasers(&data.persist);
+
+    let latest = teas.last();
+
+    match latest {
+        Some(teaser) => {
+            let embed = CreateEmbed::new()
+                .title("Poe Teaser")
+                .author(create_vinnie_bot_author_embed())
+                .description(format!("{}\n{}", teaser.heading, &teaser.content));
+            let reply = CreateReply::default().embed(embed);
+
+            ctx.send(reply).await?;
+        }
+        None => {
+            let embed = CreateEmbed::new()
+                .title("PoE Teaser")
+                .description("description here");
+
+            let reply = CreateReply::default().embed(embed);
+
+            ctx.send(reply).await?;
+        }
+    };
 
     Ok(())
 }

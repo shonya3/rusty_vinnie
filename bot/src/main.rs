@@ -53,7 +53,7 @@ async fn main(
                 commands::patchnotes(),
                 commands::news(),
                 crate::teasers::populate_teasers(),
-                crate::teasers::get_teasers(),
+                crate::teasers::get_latest_teaser(),
                 crate::teasers::clear_teasers(),
             ],
             ..Default::default()
