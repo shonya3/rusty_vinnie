@@ -5,7 +5,7 @@ mod status;
 pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
-use ::teasers::{Lang, Url};
+use ::teasers::{Lang, TeasersForumThread};
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
@@ -13,7 +13,7 @@ use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
 use shuttle_persist::PersistInstance;
 use status::{get_kroiya_status, watch_status};
-use teasers::spin_teasers_loop;
+use teasers::{send_teaser, spin_teasers_loop};
 
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -52,7 +52,7 @@ async fn main(
             commands: vec![
                 commands::patchnotes(),
                 commands::news(),
-                crate::teasers::populate_teasers(),
+                // crate::teasers::populate_teasers(),
                 crate::teasers::get_latest_teaser(),
                 crate::teasers::clear_teasers(),
             ],
@@ -89,6 +89,10 @@ async fn event_handler(
             // winter london time
             let offset = FixedOffset::east_opt(0);
             let offset = offset.as_ref();
+            // send_teaser(ctx, &_working_channel)
+            //     .await
+            //     .unwrap_or_else(|err| println!("{err}"));
+
             tokio::join!(
                 watch_status(
                     || get_kroiya_status(ctx),
@@ -98,14 +102,14 @@ async fn event_handler(
                 spin_teasers_loop(
                     ctx,
                     data,
-                    Url::Poe2(Lang::Ru).as_str(),
-                    &archer_mains_channel,
+                    TeasersForumThread::Poe2(Lang::Ru).url(),
+                    &_working_channel,
                 ),
                 spin_teasers_loop(
                     ctx,
                     data,
-                    Url::Poe2(Lang::En).as_str(),
-                    &archer_mains_channel,
+                    TeasersForumThread::Poe2(Lang::En).url(),
+                    &_working_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),

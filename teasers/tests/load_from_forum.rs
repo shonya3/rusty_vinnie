@@ -1,7 +1,10 @@
+use teasers::TeasersForumThread;
+
 #[tokio::test]
 async fn load_3_25_teasers_thread() {
     // 3.25 teasers forum thread
-    let url = "https://ru.pathofexile.com/forum/view-thread/3530604/page/1";
-    let vec = teasers::download_teasers_from_thread(url).await.unwrap();
+    let vec = teasers::download_teasers_from_thread(TeasersForumThread::Poe1_3_25_Russian)
+        .await
+        .unwrap();
     assert!(vec.len() == 14);
 }

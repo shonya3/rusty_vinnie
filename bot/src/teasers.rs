@@ -1,11 +1,13 @@
 use crate::{Context, Data, Error};
 use poise::{
-    serenity_prelude::{ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor},
+    serenity_prelude::{
+        ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
+    },
     CreateReply,
 };
 use shuttle_persist::PersistInstance;
 use std::{collections::HashSet, time::Duration};
-use teasers::Teaser;
+use teasers::{Teaser, TeasersForumThread};
 
 pub async fn spin_teasers_loop(
     ctx: &SerenityContext,
@@ -20,51 +22,125 @@ pub async fn spin_teasers_loop(
     }
 }
 
+pub async fn send_teaser(
+    ctx: &SerenityContext,
+    channel_id: &ChannelId,
+    teaser: &Teaser,
+) -> Result<(), String> {
+    // let url = "https://www.pathofexile.com/forum/view-thread/3584453";
+    let embed = CreateEmbed::new()
+        .title(teaser.forum_thread.title())
+        .url(teaser.forum_thread.url())
+        .author(create_vinnie_bot_author_embed())
+        .description(&teaser.heading);
+
+    let images_embeds: Vec<CreateEmbed> = teaser
+        .images_urls
+        .iter()
+        .map(|image_url| {
+            CreateEmbed::new()
+                .image(image_url)
+                .url(teaser.forum_thread.url())
+        })
+        .collect();
+
+    let mut embeds = vec![embed];
+    embeds.extend(images_embeds);
+
+    let message = CreateMessage::new().embeds(embeds);
+
+    if let Err(err) = channel_id.send_message(&ctx, message).await {
+        return Err(format!("Could not send teaser to {channel_id}. {err}"));
+    }
+
+    if let Err(err) = channel_id
+        .send_message(
+            &ctx,
+            CreateMessage::new().content(teaser.videos_urls.join(" ")),
+        )
+        .await
+    {
+        return Err(format!("Could not send teaser to {channel_id}. {err}"));
+    }
+
+    Ok(())
+}
+
+// pub async fn send_teaser(
+//     ctx: &SerenityContext,
+//     channel_id: &ChannelId,
+//     teaser: Teaser,
+// ) -> Result<(), String> {
+//     let url = "https://www.pathofexile.com/forum/view-thread/3584453";
+//     let embed = CreateEmbed::new()
+//         .title("Poe Teaser")
+//         .url(url)
+//         .author(create_vinnie_bot_author_embed())
+//         .description(&teaser.heading);
+
+//     let images_embeds: Vec<_> = teaser
+//         .images_urls
+//         .into_iter()
+//         .map(|image_url| CreateEmbed::new().image(image_url).url(url))
+//         .collect();
+
+//     let mut embeds = vec![embed];
+//     embeds.extend(images_embeds);
+
+//     let message = CreateMessage::new().embeds(embeds);
+
+//     if let Err(err) = channel_id.send_message(&ctx, message).await {
+//         return Err(format!("Could not send teaser to {channel_id}. {err}"));
+//     }
+
+//     Ok(())
+// }
+
 pub async fn publish_new_teasers(
     ctx: &SerenityContext,
     data: &Data,
     url: &str,
     channel_id: &ChannelId,
 ) {
-    let persist = &data.persist;
-    let thread_teasers = match teasers::download_teasers_from_thread(url).await {
-        Ok(teas) => teas,
-        Err(err) => {
-            println!("Could not download thread teasers. {err}");
-            return;
-        }
-    };
-    let published_teasers = load_published_teasers(persist);
+    // let persist = &data.persist;
+    // let thread_teasers = match teasers::download_teasers_from_thread(url).await {
+    //     Ok(teas) => teas,
+    //     Err(err) => {
+    //         println!("Could not download thread teasers. {err}");
+    //         return;
+    //     }
+    // };
+    // let published_teasers = load_published_teasers(persist);
 
-    for teaser in &thread_teasers {
-        if !published_teasers.contains(teaser) {
-            if let Err(err) = channel_id
-                .say(&ctx, format!("{}\n{}", teaser.heading, &teaser.content))
-                .await
-            {
-                println!("Could not send teaser to chat: {err}");
-            };
-        };
-    }
+    // // for teaser in &thread_teasers {
+    // //     if !published_teasers.contains(teaser) {
+    // //         if let Err(err) = channel_id
+    // //             .say(&ctx, format!("{}\n{}", teaser.heading, &teaser.content))
+    // //             .await
+    // //         {
+    // //             println!("Could not send teaser to chat: {err}");
+    // //         };
+    // //     };
+    // // }
 
-    let mut set = HashSet::<Teaser>::from_iter(published_teasers);
-    set.extend(thread_teasers);
+    // let mut set = HashSet::<Teaser>::from_iter(published_teasers);
+    // set.extend(thread_teasers);
 
-    let unique_teasers: Vec<Teaser> = set.into_iter().collect();
+    // let unique_teasers: Vec<Teaser> = set.into_iter().collect();
 
-    if let Err(err) = persist.save("teasers", unique_teasers) {
-        println!("Could not persist thread teasers: {err}");
-    };
+    // if let Err(err) = persist.save("teasers", unique_teasers) {
+    //     println!("Could not persist thread teasers: {err}");
+    // };
 }
 
-/// Patchnotes links
-#[poise::command(slash_command)]
-pub async fn populate_teasers(ctx: Context<'_>) -> Result<(), Error> {
-    _populate_teasers(&ctx.data().persist);
-    ctx.say("Teasers populated").await?;
+// /// Patchnotes links
+// #[poise::command(slash_command)]
+// pub async fn populate_teasers(ctx: Context<'_>) -> Result<(), Error> {
+//     _populate_teasers(&ctx.data().persist);
+//     ctx.say("Teasers populated").await?;
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
     CreateEmbedAuthor::new("Vinnie The Bot")
@@ -171,17 +247,17 @@ fn load_published_teasers(persist: &PersistInstance) -> Vec<Teaser> {
     }
 }
 
-fn _populate_teasers(persist: &PersistInstance) {
-    let teas = vec![
-            Teaser {
-                heading: "С момента демонстрации класса Наёмник в Path of Exile 2, мы добавили гораздо больше огневой мощи в его арсенал. Оцените действие Гальванической гранаты на группу монстров и разрушительную силу Плазменного взрыва.".to_owned(),
-                content: "https://vimeo.com/1025317638".to_owned()
-            },
-            Teaser {
-                heading: "У каждого уникального предмета в Path of Exile 2 есть собственные 2D-иконки и 3D-модели. Взгляните на некоторые знаковые уникальные предметы из Path of Exile, получившие новый внешний вид в Path of Exile 2.".to_owned(),
-                content: "https://web.poecdn.com/public/news/2024-11-01/POE1Uniques.png".to_owned()
-            }
-        ];
+// fn _populate_teasers(persist: &PersistInstance) {
+//     let teas = vec![
+//             Teaser {
+//                 heading: "С момента демонстрации класса Наёмник в Path of Exile 2, мы добавили гораздо больше огневой мощи в его арсенал. Оцените действие Гальванической гранаты на группу монстров и разрушительную силу Плазменного взрыва.".to_owned(),
+//                 content: "https://vimeo.com/1025317638".to_owned()
+//             },
+//             Teaser {
+//                 heading: "У каждого уникального предмета в Path of Exile 2 есть собственные 2D-иконки и 3D-модели. Взгляните на некоторые знаковые уникальные предметы из Path of Exile, получившие новый внешний вид в Path of Exile 2.".to_owned(),
+//                 content: "https://web.poecdn.com/public/news/2024-11-01/POE1Uniques.png".to_owned()
+//             }
+//         ];
 
-    persist.save("teasers", teas).unwrap();
-}
+//     persist.save("teasers", teas).unwrap();
+// }

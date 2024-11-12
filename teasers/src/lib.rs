@@ -6,20 +6,25 @@ const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub mod error;
 
-pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Error> {
+pub async fn download_teasers_from_thread(
+    forum_thread: TeasersForumThread,
+) -> Result<Vec<Teaser>, Error> {
     let thread_markup = reqwest::ClientBuilder::new()
         .user_agent(USER_AGENT)
         .build()?
-        .get(url)
+        .get(forum_thread.url())
         .send()
         .await?
         .error_for_status()?
         .text()
         .await?;
-    Ok(parse_teasers_thread(&thread_markup)?)
+    Ok(parse_teasers_thread(&thread_markup, forum_thread)?)
 }
 
-pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThreadError> {
+pub fn parse_teasers_thread(
+    markup: &str,
+    forum_thread: TeasersForumThread,
+) -> Result<Vec<Teaser>, ParseTeasersThreadError> {
     let html = Html::parse_document(markup);
     let teasers_post = html
         .select(&Selector::parse("tr.newsPost").unwrap())
@@ -34,7 +39,7 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
         .filter_map(|h2| {
             let spoiler_element = next_sibling_element(&h2)?;
 
-            let iframes_links: Vec<String> = spoiler_element
+            let videos_urls: Vec<String> = spoiler_element
                 .select(&spoiler_content_iframe_selector)
                 .filter_map(|iframe| {
                     iframe.attr("src").and_then(|src| match src {
@@ -53,14 +58,10 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                 })
                 .collect();
 
-            let imgs_links: Vec<String> = spoiler_element
+            let images_urls: Vec<String> = spoiler_element
                 .select(&spoiler_content_img_selector)
                 .filter_map(|img_el| img_el.attr("src").map(|attr| attr.to_string()))
                 .collect();
-
-            let mut contents: Vec<String> = Vec::new();
-            contents.extend(iframes_links);
-            contents.extend(imgs_links);
 
             Some(Teaser {
                 heading: h2
@@ -69,7 +70,9 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                     .trim()
                     .replace('\n', " ")
                     .replace('\t', ""),
-                content: contents.join(" "),
+                images_urls,
+                videos_urls,
+                forum_thread,
             })
         })
         .collect();
@@ -84,7 +87,9 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
 pub struct Teaser {
     pub heading: String,
-    pub content: String,
+    pub images_urls: Vec<String>,
+    pub videos_urls: Vec<String>,
+    pub forum_thread: TeasersForumThread,
 }
 
 #[derive(Debug)]
@@ -114,29 +119,37 @@ fn next_sibling_element<'a>(element: &'a ElementRef) -> Option<ElementRef<'a>> {
     None
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum Url {
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Hash, Eq)]
+pub enum TeasersForumThread {
     Poe2(Lang),
+    Poe1_3_25_Russian,
 }
 
-impl Url {
-    pub fn as_str(&self) -> &'static str {
+impl TeasersForumThread {
+    pub fn url(&self) -> &'static str {
         match self {
-            Url::Poe2(lang) => match lang {
+            &TeasersForumThread::Poe2(lang) => match lang {
                 Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3584454",
                 Lang::En => "https://www.pathofexile.com/forum/view-thread/3584453",
             },
+            TeasersForumThread::Poe1_3_25_Russian => {
+                "https://ru.pathofexile.com/forum/view-thread/3530604/page/1"
+            }
+        }
+    }
+
+    pub fn title(&self) -> &'static str {
+        match self {
+            TeasersForumThread::Poe2(lang) => match lang {
+                Lang::Ru => "Тизеры Path of Exile 2",
+                Lang::En => "Path of Exile 2 Teasers",
+            },
+            TeasersForumThread::Poe1_3_25_Russian => "Тизеры Path of Exile: Поселенцы Калгуура",
         }
     }
 }
 
-impl Display for Url {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum Lang {
     Ru,
     En,
