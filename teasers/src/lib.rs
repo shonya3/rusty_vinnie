@@ -38,12 +38,12 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
     let mut thread_teasers: Vec<Teaser> = teasers_post
         .select(&Selector::parse("h2").unwrap())
         .filter_map(|h2| {
-            let content = next_sibling_element(&h2).and_then(|spoiler_element| {
-                match spoiler_element
-                    .select(&spoiler_content_iframe_selector)
-                    .next()
-                {
-                    Some(iframe) => iframe.attr("src").and_then(|src| match src {
+            let spoiler_element = next_sibling_element(&h2)?;
+
+            let iframes_links: Vec<String> = spoiler_element
+                .select(&spoiler_content_iframe_selector)
+                .filter_map(|iframe| {
+                    iframe.attr("src").and_then(|src| match src {
                         src if src.starts_with("//www.youtube.com/") => {
                             Some(format!("https:{src}").replace("embed", "watch"))
                         }
@@ -55,14 +55,18 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                         src if src.starts_with("https://") => Some(src.replace("embed", "watch")),
 
                         _ => None,
-                    }),
-                    None => spoiler_element
-                        .select(&spoiler_content_img_selector)
-                        .next()
-                        .and_then(|img_el| img_el.attr("src"))
-                        .map(|url| url.to_string()),
-                }
-            })?;
+                    })
+                })
+                .collect();
+
+            let imgs_links: Vec<String> = spoiler_element
+                .select(&spoiler_content_img_selector)
+                .filter_map(|img_el| img_el.attr("src").map(|attr| attr.to_string()))
+                .collect();
+
+            let mut contents: Vec<String> = Vec::new();
+            contents.extend(iframes_links);
+            contents.extend(imgs_links);
 
             Some(Teaser {
                 heading: h2
@@ -71,7 +75,7 @@ pub fn parse_teasers_thread(markup: &str) -> Result<Vec<Teaser>, ParseTeasersThr
                     .trim()
                     .replace('\n', " ")
                     .replace('\t', ""),
-                content,
+                content: contents.join(" "),
             })
         })
         .collect();
