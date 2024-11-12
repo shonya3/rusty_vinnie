@@ -6,12 +6,6 @@ const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub mod error;
 
-#[derive(Debug, Clone, Copy)]
-pub enum Lang {
-    Ru,
-    En,
-}
-
 pub async fn download_teasers_from_thread(url: &str) -> Result<Vec<Teaser>, Error> {
     let thread_markup = reqwest::ClientBuilder::new()
         .user_agent(USER_AGENT)
@@ -140,6 +134,12 @@ impl Display for Url {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Lang {
+    Ru,
+    En,
 }
 
 #[cfg(test)]
