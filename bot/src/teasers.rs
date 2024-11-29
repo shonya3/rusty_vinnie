@@ -1,9 +1,6 @@
 use crate::{Context, Data, Error};
-use poise::{
-    serenity_prelude::{
-        ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
-    },
-    CreateReply,
+use poise::serenity_prelude::{
+    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
 use shuttle_persist::PersistInstance;
 use std::{collections::HashSet, time::Duration};
@@ -103,15 +100,6 @@ async fn send_teaser(
     Ok(())
 }
 
-// /// Patchnotes links
-// #[poise::command(slash_command)]
-// pub async fn populate_teasers(ctx: Context<'_>) -> Result<(), Error> {
-//     _populate_teasers(&ctx.data().persist);
-//     ctx.say("Teasers populated").await?;
-
-//     Ok(())
-// }
-
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
     CreateEmbedAuthor::new("Rusty Vinnie")
         .icon_url("https://discord.com/assets/ca24969f2fd7a9fb03d5.png")
@@ -121,29 +109,11 @@ fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
 #[poise::command(slash_command)]
 #[allow(clippy::field_reassign_with_default)]
 pub async fn get_latest_teaser(ctx: Context<'_>) -> Result<(), Error> {
-    let url = "https://www.pathofexile.com/forum/view-thread/3584453";
-    let embed = CreateEmbed::new()
-        .title("Poe Teaser")
-        .url(url)
-        .author(create_vinnie_bot_author_embed())
-        .description("If you had to pick one monster from Oswald's journal to encounter in the Utzaal jungle, which would it be? Check out Oswald's notes on some more monsters from Path of Exile 2!");
+    let teasers = load_published_teasers(&ctx.data().persist);
 
-    let links: Vec<&str> = vec![
-        "https://web.poecdn.com/public/news/2024-11-08/BlueSensibleRadars.png",
-        "https://web.poecdn.com/public/news/2024-11-08/OrangePersonalFireplace.png",
-        "https://web.poecdn.com/public/news/2024-11-08/PurplePlayfulPlatypus.png",
-        "https://web.poecdn.com/public/news/2024-11-08/RedJoyfulHound.png",
-    ];
-    let images_embeds: Vec<_> = links
-        .into_iter()
-        .map(|image_url| CreateEmbed::new().image(image_url).url(url))
-        .collect();
-
-    let mut reply = CreateReply::default();
-    reply.embeds = vec![embed];
-    reply.embeds.extend(images_embeds);
-
-    ctx.send(reply).await?;
+    if let Some(teaser) = teasers.last() {
+        ctx.reply(&serde_json::to_string(teaser).unwrap()).await?;
+    }
 
     Ok(())
 }
@@ -168,18 +138,3 @@ fn load_published_teasers(persist: &PersistInstance) -> Vec<Teaser> {
         }
     }
 }
-
-// fn _populate_teasers(persist: &PersistInstance) {
-//     let teas = vec![
-//             Teaser {
-//                 heading: "С момента демонстрации класса Наёмник в Path of Exile 2, мы добавили гораздо больше огневой мощи в его арсенал. Оцените действие Гальванической гранаты на группу монстров и разрушительную силу Плазменного взрыва.".to_owned(),
-//                 content: "https://vimeo.com/1025317638".to_owned()
-//             },
-//             Teaser {
-//                 heading: "У каждого уникального предмета в Path of Exile 2 есть собственные 2D-иконки и 3D-модели. Взгляните на некоторые знаковые уникальные предметы из Path of Exile, получившие новый внешний вид в Path of Exile 2.".to_owned(),
-//                 content: "https://web.poecdn.com/public/news/2024-11-01/POE1Uniques.png".to_owned()
-//             }
-//         ];
-
-//     persist.save("teasers", teas).unwrap();
-// }

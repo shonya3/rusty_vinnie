@@ -76,7 +76,6 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { .. } => {
-            data.persist.clear().unwrap();
             let _working_channel = ChannelId::new(841929108829372460);
             let main_channel = ChannelId::new(356012941083934722);
             let archer_mains_channel = ChannelId::new(356013349496029184);
