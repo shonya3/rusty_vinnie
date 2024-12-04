@@ -55,6 +55,8 @@ async fn main(
                 // crate::teasers::populate_teasers(),
                 crate::teasers::get_latest_teaser(),
                 crate::teasers::clear_teasers(),
+                crate::commands::ascendancies1(),
+                crate::commands::ascendancies2(),
             ],
             ..Default::default()
         })
