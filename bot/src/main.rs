@@ -111,6 +111,18 @@ async fn event_handler(
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::PatchNotes, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::PatchNotes, offset),
+                spin_news_loop(
+                    ctx,
+                    &WebsiteLanguage::En,
+                    &Subforum::EarlyAccessPatchNotesEn,
+                    offset
+                ),
+                spin_news_loop(
+                    ctx,
+                    &WebsiteLanguage::Ru,
+                    &Subforum::EarlyAccessPatchNotesRu,
+                    offset
+                )
             );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(ctx, msg).await,
