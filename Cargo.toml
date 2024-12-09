@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["bot", "fresh_news", "playground", "teasers"]
+members = ["bot", "ea_live_updates", "fresh_news", "playground", "teasers"]
 
 [workspace.package]
 version = "0.1.0"

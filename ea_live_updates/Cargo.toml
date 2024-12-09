@@ -1,0 +1,13 @@
+[package]
+name = "ea_live_updates"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+scraper.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
