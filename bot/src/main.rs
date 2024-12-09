@@ -1,13 +1,16 @@
 mod commands;
+pub mod ea_live_updates;
 mod message_handler;
 mod poe_newsletter;
 mod status;
 pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
+use ::ea_live_updates::LiveUpdatesThread;
 use ::teasers::{Lang, TeasersForumThread};
 use chrono::FixedOffset;
 use dotenv::dotenv;
+use ea_live_updates::spin_ea_live_updates_loop;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
@@ -106,6 +109,12 @@ async fn event_handler(
                         TeasersForumThread::Poe2(Lang::En),
                     ],
                     &archer_mains_channel,
+                ),
+                spin_ea_live_updates_loop(
+                    ctx,
+                    data,
+                    &[LiveUpdatesThread::Ru, LiveUpdatesThread::En],
+                    &archer_mains_channel
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
