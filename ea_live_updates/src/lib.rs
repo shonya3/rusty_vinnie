@@ -4,10 +4,6 @@ use std::collections::HashMap;
 
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// #[serde(transparent)]
-// pub struct LiveUpdateHeading(pub String);
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 #[serde(transparent)]
 pub struct EarlyAccessDay(pub u32);
@@ -50,7 +46,6 @@ impl LiveUpdatesThread {
     }
 }
 
-// "https://www.pathofexile.com/forum/view-thread/3594080"
 pub async fn get_live_updates(
     live_updates_thread: LiveUpdatesThread,
 ) -> Result<Vec<LiveUpdate>, reqwest::Error> {
