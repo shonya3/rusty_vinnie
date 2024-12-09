@@ -16,6 +16,8 @@ pub async fn get_fresh_threads(
 pub enum Subforum {
     News,
     PatchNotes,
+    EarlyAccessPatchNotesEn,
+    EarlyAccessPatchNotesRu,
 }
 
 impl std::fmt::Display for Subforum {
@@ -23,6 +25,8 @@ impl std::fmt::Display for Subforum {
         match self {
             Subforum::News => f.write_str("news"),
             Subforum::PatchNotes => f.write_str("patch-notes"),
+            Subforum::EarlyAccessPatchNotesEn => f.write_str("2212"),
+            Subforum::EarlyAccessPatchNotesRu => f.write_str("2272"),
         }
     }
 }
