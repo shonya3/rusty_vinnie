@@ -18,6 +18,8 @@ pub enum Subforum {
     PatchNotes,
     EarlyAccessPatchNotesEn,
     EarlyAccessPatchNotesRu,
+    EarlyAccessAnnouncementsEn,
+    EarlyAccessAnnouncementsRu,
 }
 
 impl std::fmt::Display for Subforum {
@@ -27,6 +29,8 @@ impl std::fmt::Display for Subforum {
             Subforum::PatchNotes => f.write_str("patch-notes"),
             Subforum::EarlyAccessPatchNotesEn => f.write_str("2212"),
             Subforum::EarlyAccessPatchNotesRu => f.write_str("2272"),
+            Subforum::EarlyAccessAnnouncementsEn => f.write_str("2211"),
+            Subforum::EarlyAccessAnnouncementsRu => f.write_str("2271"),
         }
     }
 }

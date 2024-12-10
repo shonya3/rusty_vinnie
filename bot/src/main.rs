@@ -131,7 +131,19 @@ async fn event_handler(
                     &WebsiteLanguage::Ru,
                     &Subforum::EarlyAccessPatchNotesRu,
                     offset
-                )
+                ),
+                spin_news_loop(
+                    ctx,
+                    &WebsiteLanguage::En,
+                    &Subforum::EarlyAccessAnnouncementsEn,
+                    offset
+                ),
+                spin_news_loop(
+                    ctx,
+                    &WebsiteLanguage::Ru,
+                    &Subforum::EarlyAccessAnnouncementsRu,
+                    offset
+                ),
             );
         }
         serenity::FullEvent::Message { new_message: msg } => handle_message(ctx, msg).await,
