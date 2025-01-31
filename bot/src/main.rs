@@ -35,7 +35,7 @@ async fn main(
 ) -> shuttle_serenity::ShuttleSerenity {
     dotenv().ok();
 
-    let token = secrets.get("DISCORD_TOKEN").expect("no DIVCORD_TOKEN env");
+    let token = secrets.get("DISCORD_TOKEN").expect("no DISCORD_TOKEN env");
     let intents = serenity::GatewayIntents::non_privileged()
         | serenity::GatewayIntents::MESSAGE_CONTENT
         | serenity::GatewayIntents::GUILD_MEMBERS
