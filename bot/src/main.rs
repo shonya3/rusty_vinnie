@@ -110,6 +110,15 @@ async fn event_handler(
                     ],
                     &archer_mains_channel,
                 ),
+                spin_teasers_loop(
+                    ctx,
+                    data,
+                    &[
+                        TeasersForumThread::Poe2_02(Lang::Ru),
+                        TeasersForumThread::Poe2_02(Lang::En),
+                    ],
+                    &archer_mains_channel,
+                ),
                 spin_ea_live_updates_loop(
                     ctx,
                     data,

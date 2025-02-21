@@ -123,6 +123,7 @@ fn next_sibling_element<'a>(element: &'a ElementRef) -> Option<ElementRef<'a>> {
 pub enum TeasersForumThread {
     Poe2(Lang),
     Poe1_3_25Russian,
+    Poe2_02(Lang),
 }
 
 impl TeasersForumThread {
@@ -135,6 +136,10 @@ impl TeasersForumThread {
             TeasersForumThread::Poe1_3_25Russian => {
                 "https://ru.pathofexile.com/forum/view-thread/3530604/page/1"
             }
+            TeasersForumThread::Poe2_02(lang) => match lang {
+                Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3726161",
+                Lang::En => "https://www.pathofexile.com/forum/view-thread/3726160",
+            },
         }
     }
 
@@ -145,6 +150,10 @@ impl TeasersForumThread {
                 Lang::En => "Path of Exile 2 Teasers",
             },
             TeasersForumThread::Poe1_3_25Russian => "Тизеры Path of Exile: Поселенцы Калгуура",
+            TeasersForumThread::Poe2_02(lang) => match lang {
+                Lang::Ru => "Тизеры Path of Exile 2 0.2.0",
+                Lang::En => "Path of Exile 2 - 0.2.0 Teasers",
+            },
         }
     }
 }
