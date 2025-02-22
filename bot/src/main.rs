@@ -6,11 +6,9 @@ mod status;
 pub mod teasers;
 
 use crate::poe_newsletter::spin_news_loop;
-use ::ea_live_updates::LiveUpdatesThread;
 use ::teasers::{Lang, TeasersForumThread};
 use chrono::FixedOffset;
 use dotenv::dotenv;
-use ea_live_updates::spin_ea_live_updates_loop;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
@@ -33,9 +31,11 @@ async fn main(
     #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
     #[shuttle_persist::Persist] persist: PersistInstance,
 ) -> shuttle_serenity::ShuttleSerenity {
+    println!("App Start");
     dotenv().ok();
 
     let token = secrets.get("DISCORD_TOKEN").expect("no DISCORD_TOKEN env");
+    println!("{token}");
     let intents = serenity::GatewayIntents::non_privileged()
         | serenity::GatewayIntents::MESSAGE_CONTENT
         | serenity::GatewayIntents::GUILD_MEMBERS
@@ -81,9 +81,10 @@ async fn event_handler(
 ) -> Result<(), Error> {
     match event {
         serenity::FullEvent::Ready { .. } => {
+            println!("Bot is ready");
             let _working_channel = ChannelId::new(841929108829372460);
             let main_channel = ChannelId::new(356012941083934722);
-            let archer_mains_channel = ChannelId::new(356013349496029184);
+            let _archer_mains_channel = ChannelId::new(356013349496029184);
             let say = |message: &'static str| async move {
                 if let Err(err) = main_channel.say(ctx, message).await {
                     println!("Could not send message to channel: {err:#?}");
@@ -107,16 +108,10 @@ async fn event_handler(
                     &[
                         TeasersForumThread::Poe2_02(Lang::En),
                         TeasersForumThread::Poe2_02(Lang::Ru),
-                        TeasersForumThread::Poe2(Lang::Ru),
-                        TeasersForumThread::Poe2(Lang::En),
+                        // TeasersForumThread::Poe2(Lang::Ru),
+                        // TeasersForumThread::Poe2(Lang::En),
                     ],
-                    &archer_mains_channel,
-                ),
-                spin_ea_live_updates_loop(
-                    ctx,
-                    data,
-                    &[LiveUpdatesThread::Ru, LiveUpdatesThread::En],
-                    &archer_mains_channel
+                    &_working_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),

@@ -13,11 +13,13 @@ pub async fn spin_teasers_loop(
     channel_id: &ChannelId,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
+    let mut skip = true;
     loop {
-        for forum_thread in forum_threads {
-            publish_new_teasers(ctx, data, *forum_thread, channel_id).await;
-        }
         interval.tick().await;
+        for forum_thread in forum_threads {
+            publish_new_teasers(ctx, data, *forum_thread, channel_id, skip).await;
+        }
+        skip = false;
     }
 }
 
@@ -26,6 +28,7 @@ async fn publish_new_teasers(
     data: &Data,
     forum_thread: TeasersForumThread,
     channel_id: &ChannelId,
+    skip: bool,
 ) {
     let persist = &data.persist;
     let thread_teasers = match teasers::download_teasers_from_thread(forum_thread).await {
@@ -36,6 +39,10 @@ async fn publish_new_teasers(
         }
     };
     let published_teasers = load_published_teasers(persist);
+    if skip {
+        return;
+    }
+    println!("Thread: {forum_thread:?} Teasers: {published_teasers:?}",);
 
     for teaser in &thread_teasers {
         if !published_teasers.contains(teaser) {
