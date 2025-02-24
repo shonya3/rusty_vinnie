@@ -111,7 +111,7 @@ async fn event_handler(
                         // TeasersForumThread::Poe2(Lang::Ru),
                         // TeasersForumThread::Poe2(Lang::En),
                     ],
-                    &_working_channel,
+                    &_archer_mains_channel,
                 ),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
