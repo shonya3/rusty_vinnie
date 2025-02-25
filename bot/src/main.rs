@@ -1,9 +1,9 @@
 mod commands;
-pub mod ea_live_updates;
 mod message_handler;
 mod poe_newsletter;
 mod status;
 pub mod teasers;
+mod unused;
 
 use crate::poe_newsletter::spin_news_loop;
 use ::teasers::{Lang, TeasersForumThread};
