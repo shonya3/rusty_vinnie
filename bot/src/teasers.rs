@@ -1,8 +1,7 @@
-use crate::{Context, Data, Error};
+use crate::Data;
 use poise::serenity_prelude::{
     ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
-use shuttle_persist::PersistInstance;
 use std::{collections::HashSet, time::Duration};
 use teasers::{Teaser, TeasersForumThread};
 
@@ -13,24 +12,20 @@ pub async fn spin_teasers_loop(
     channel_id: &ChannelId,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
-    let mut skip = true;
     loop {
         interval.tick().await;
         for forum_thread in forum_threads {
-            publish_new_teasers(ctx, data, *forum_thread, channel_id, skip).await;
+            publish_new_teasers(ctx, data, *forum_thread, channel_id).await;
         }
-        skip = false;
     }
 }
 
 async fn publish_new_teasers(
     ctx: &SerenityContext,
-    data: &Data,
+    _data: &Data,
     forum_thread: TeasersForumThread,
     channel_id: &ChannelId,
-    skip: bool,
 ) {
-    let persist = &data.persist;
     let thread_teasers = match teasers::download_teasers_from_thread(forum_thread).await {
         Ok(teas) => teas,
         Err(err) => {
@@ -38,11 +33,7 @@ async fn publish_new_teasers(
             return;
         }
     };
-    let published_teasers = load_published_teasers(persist);
-    if skip {
-        return;
-    }
-    println!("Thread: {forum_thread:?} Teasers: {published_teasers:?}",);
+    let published_teasers = load_published_teasers();
 
     for teaser in &thread_teasers {
         if !published_teasers.contains(teaser) {
@@ -55,11 +46,21 @@ async fn publish_new_teasers(
     let mut set = HashSet::<Teaser>::from_iter(published_teasers);
     set.extend(thread_teasers);
 
-    let unique_teasers: Vec<Teaser> = set.into_iter().collect();
+    let _unique_teasers: Vec<Teaser> = set.into_iter().collect();
 
-    if let Err(err) = persist.save("teasers", unique_teasers) {
+    if let Err(err) = save_published_teasers() {
         println!("Could not persist thread teasers: {err}");
     };
+}
+
+// TODO Use the actual storage
+fn load_published_teasers() -> Vec<Teaser> {
+    Vec::new()
+}
+
+// TODO Use the actual storage
+fn save_published_teasers() -> Result<(), String> {
+    Ok(())
 }
 
 async fn send_teaser(
@@ -111,37 +112,4 @@ fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
     CreateEmbedAuthor::new("Rusty Vinnie")
         .icon_url("https://discord.com/assets/ca24969f2fd7a9fb03d5.png")
         .url("https://github.com/shonya3/rusty_vinnie")
-}
-
-#[poise::command(slash_command)]
-#[allow(clippy::field_reassign_with_default)]
-pub async fn get_latest_teaser(ctx: Context<'_>) -> Result<(), Error> {
-    let teasers = load_published_teasers(&ctx.data().persist);
-
-    if let Some(teaser) = teasers.last() {
-        ctx.reply(&serde_json::to_string(teaser).unwrap()).await?;
-    }
-
-    Ok(())
-}
-
-#[poise::command(slash_command)]
-pub async fn clear_teasers(ctx: Context<'_>) -> Result<(), Error> {
-    let data = ctx.data();
-    data.persist.remove("teasers")?;
-    ctx.say("Teasers cleared").await?;
-
-    Ok(())
-}
-
-fn load_published_teasers(persist: &PersistInstance) -> Vec<Teaser> {
-    match persist.load::<Vec<Teaser>>("teasers") {
-        Ok(teasers) => teasers,
-        Err(err) => {
-            {
-                println!("Could not load persisted teasers: {err}");
-            }
-            vec![]
-        }
-    }
 }

@@ -34,7 +34,6 @@ pub async fn publish_new_ea_live_updates(
     live_updates_thread: LiveUpdatesThread,
     channel_id: &ChannelId,
 ) {
-    let persist = &data.persist;
     let ea_updates = match ea_live_updates::get_live_updates(live_updates_thread).await {
         Ok(updates) => updates,
         Err(err) => {
@@ -42,7 +41,7 @@ pub async fn publish_new_ea_live_updates(
             return;
         }
     };
-    let already_seen_updates = load_published_updates(persist);
+    let already_seen_updates = load_published_updates();
 
     let not_seen_updates = ea_updates
         .iter()
@@ -58,7 +57,7 @@ pub async fn publish_new_ea_live_updates(
 
     let unique_updates: Vec<LiveUpdate> = set.into_iter().collect();
 
-    if let Err(err) = persist.save(PERSIST_KEY, unique_updates) {
+    if let Err(err) = save_published_updates() {
         println!("Could not persist ea live teasers: {err}");
     }
 }
@@ -102,16 +101,14 @@ async fn send_live_updates(
     Ok(())
 }
 
-fn load_published_updates(persist: &PersistInstance) -> Vec<LiveUpdate> {
-    match persist.load::<Vec<LiveUpdate>>(PERSIST_KEY) {
-        Ok(teasers) => teasers,
-        Err(err) => {
-            {
-                println!("Could not load persisted teasers: {err}");
-            }
-            vec![]
-        }
-    }
+// TODO Use the actual storage
+fn load_published_updates() -> Vec<LiveUpdate> {
+    Vec::new()
+}
+
+// TODO Use the actual storage
+fn save_published_updates() -> Result<(), String> {
+    Ok(())
 }
 
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {

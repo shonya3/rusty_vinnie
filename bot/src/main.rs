@@ -6,13 +6,11 @@ pub mod teasers;
 mod unused;
 
 use crate::poe_newsletter::spin_news_loop;
-use ::teasers::{Lang, TeasersForumThread};
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, ChannelId};
-use shuttle_persist::PersistInstance;
 use status::{get_kroiya_status, watch_status};
 use teasers::spin_teasers_loop;
 
@@ -22,14 +20,11 @@ pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
-pub struct Data {
-    persist: PersistInstance,
-}
+pub struct Data {}
 
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
-    #[shuttle_persist::Persist] persist: PersistInstance,
 ) -> shuttle_serenity::ShuttleSerenity {
     println!("App Start");
     dotenv().ok();
@@ -45,7 +40,7 @@ async fn main(
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data { persist })
+                Ok(Data {})
             })
         })
         .options(poise::FrameworkOptions {
@@ -56,8 +51,6 @@ async fn main(
                 commands::patchnotes(),
                 commands::news(),
                 // crate::teasers::populate_teasers(),
-                crate::teasers::get_latest_teaser(),
-                crate::teasers::clear_teasers(),
                 crate::commands::ascendancies1(),
                 crate::commands::ascendancies2(),
             ],
@@ -102,17 +95,7 @@ async fn event_handler(
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
                 ),
-                spin_teasers_loop(
-                    ctx,
-                    data,
-                    &[
-                        TeasersForumThread::Poe2_02(Lang::En),
-                        TeasersForumThread::Poe2_02(Lang::Ru),
-                        // TeasersForumThread::Poe2(Lang::Ru),
-                        // TeasersForumThread::Poe2(Lang::En),
-                    ],
-                    &_archer_mains_channel,
-                ),
+                spin_teasers_loop(ctx, data, &[], &_archer_mains_channel),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::PatchNotes, offset),
