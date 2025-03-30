@@ -16,7 +16,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
         emojis.push(VinnieEmoji::Nivazmojna);
     };
 
-    if m.contains("утр") {
+    if m.contains("утр") || m.contains("бдо") {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
