@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    time::Duration,
-};
+use std::{collections::HashMap, time::Duration};
 
 use ea_live_updates::{LiveUpdate, LiveUpdatesThread};
 use poise::serenity_prelude::{
@@ -25,9 +22,43 @@ pub async fn spin_ea_live_updates_loop(
     }
 }
 
+// pub async fn publish_new_ea_live_updates(
+//     ctx: &SerenityContext,
+//     _data: &Data,
+//     live_updates_thread: LiveUpdatesThread,
+//     channel_id: &ChannelId,
+// ) {
+//     let ea_updates = match ea_live_updates::get_live_updates(live_updates_thread).await {
+//         Ok(updates) => updates,
+//         Err(err) => {
+//             println!("Could not get ea live updates. {live_updates_thread:#?} {err}");
+//             return;
+//         }
+//     };
+//     let already_seen_updates = load_published_updates();
+
+//     let not_seen_updates = ea_updates
+//         .iter()
+//         .filter(|update| !already_seen_updates.contains(update))
+//         .collect::<Vec<_>>();
+
+//     send_live_updates(ctx, channel_id, &not_seen_updates)
+//         .await
+//         .unwrap_or_else(|err| eprintln!("publish_new_updates Error: {err}"));
+
+//     let mut set = HashSet::<LiveUpdate>::from_iter(already_seen_updates);
+//     set.extend(ea_updates);
+
+//     let _unique_updates: Vec<LiveUpdate> = set.into_iter().collect();
+
+//     if let Err(err) = save_published_updates() {
+//         println!("Could not persist ea live teasers: {err}");
+//     }
+// }
+
 pub async fn publish_new_ea_live_updates(
     ctx: &SerenityContext,
-    _data: &Data,
+    data: &Data,
     live_updates_thread: LiveUpdatesThread,
     channel_id: &ChannelId,
 ) {
@@ -38,24 +69,20 @@ pub async fn publish_new_ea_live_updates(
             return;
         }
     };
-    let already_seen_updates = load_published_updates();
+
+    let mut published = data.published_live_updates.lock().await;
 
     let not_seen_updates = ea_updates
         .iter()
-        .filter(|update| !already_seen_updates.contains(update))
+        .filter(|update| !published.contains(update))
         .collect::<Vec<_>>();
 
     send_live_updates(ctx, channel_id, &not_seen_updates)
         .await
         .unwrap_or_else(|err| eprintln!("publish_new_updates Error: {err}"));
 
-    let mut set = HashSet::<LiveUpdate>::from_iter(already_seen_updates);
-    set.extend(ea_updates);
-
-    let _unique_updates: Vec<LiveUpdate> = set.into_iter().collect();
-
-    if let Err(err) = save_published_updates() {
-        println!("Could not persist ea live teasers: {err}");
+    for u in not_seen_updates {
+        published.insert(u.clone());
     }
 }
 
@@ -98,15 +125,15 @@ async fn send_live_updates(
     Ok(())
 }
 
-// TODO Use the actual storage
-fn load_published_updates() -> Vec<LiveUpdate> {
-    Vec::new()
-}
+// // TODO Use the actual storage
+// fn load_published_updates() -> Vec<LiveUpdate> {
+//     Vec::new()
+// }
 
-// TODO Use the actual storage
-fn save_published_updates() -> Result<(), String> {
-    Ok(())
-}
+// // TODO Use the actual storage
+// fn save_published_updates() -> Result<(), String> {
+//     Ok(())
+// }
 
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
     CreateEmbedAuthor::new("Rusty Vinnie")

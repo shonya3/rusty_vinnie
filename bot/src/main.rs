@@ -6,13 +6,15 @@ mod status;
 pub mod teasers;
 mod unused;
 
+use std::collections::HashSet;
+
 use crate::poe_newsletter::spin_news_loop;
-use ::ea_live_updates::LiveUpdatesThread;
+use ::ea_live_updates::{LiveUpdate, LiveUpdatesThread};
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
 use message_handler::handle_message;
-use poise::serenity_prelude::{self as serenity, ChannelId};
+use poise::serenity_prelude::{self as serenity, futures::lock::Mutex, ChannelId};
 use status::{get_kroiya_status, watch_status};
 use teasers::spin_teasers_loop;
 
@@ -22,7 +24,9 @@ pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
-pub struct Data {}
+pub struct Data {
+    published_live_updates: Mutex<HashSet<LiveUpdate>>,
+}
 
 #[shuttle_runtime::main]
 async fn main(
@@ -42,7 +46,9 @@ async fn main(
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data {
+                    published_live_updates: Mutex::new(HashSet::new()),
+                })
             })
         })
         .options(poise::FrameworkOptions {
