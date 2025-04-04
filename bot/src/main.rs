@@ -1,4 +1,5 @@
 mod commands;
+mod ea_live_updates;
 mod message_handler;
 mod poe_newsletter;
 mod status;
@@ -6,6 +7,7 @@ pub mod teasers;
 mod unused;
 
 use crate::poe_newsletter::spin_news_loop;
+use ::ea_live_updates::LiveUpdatesThread;
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
@@ -94,6 +96,12 @@ async fn event_handler(
                     || get_kroiya_status(ctx),
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
+                ),
+                ea_live_updates::spin_ea_live_updates_loop(
+                    ctx,
+                    data,
+                    &[LiveUpdatesThread::En, LiveUpdatesThread::Ru],
+                    &_archer_mains_channel,
                 ),
                 spin_teasers_loop(ctx, data, &[], &_archer_mains_channel),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),

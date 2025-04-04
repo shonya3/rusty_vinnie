@@ -7,11 +7,8 @@ use ea_live_updates::{LiveUpdate, LiveUpdatesThread};
 use poise::serenity_prelude::{
     ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
-use shuttle_persist::PersistInstance;
 
 use crate::Data;
-
-const PERSIST_KEY: &str = "live_updates";
 
 pub async fn spin_ea_live_updates_loop(
     ctx: &SerenityContext,
@@ -30,7 +27,7 @@ pub async fn spin_ea_live_updates_loop(
 
 pub async fn publish_new_ea_live_updates(
     ctx: &SerenityContext,
-    data: &Data,
+    _data: &Data,
     live_updates_thread: LiveUpdatesThread,
     channel_id: &ChannelId,
 ) {
@@ -55,7 +52,7 @@ pub async fn publish_new_ea_live_updates(
     let mut set = HashSet::<LiveUpdate>::from_iter(already_seen_updates);
     set.extend(ea_updates);
 
-    let unique_updates: Vec<LiveUpdate> = set.into_iter().collect();
+    let _unique_updates: Vec<LiveUpdate> = set.into_iter().collect();
 
     if let Err(err) = save_published_updates() {
         println!("Could not persist ea live teasers: {err}");
