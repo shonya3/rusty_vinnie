@@ -2,7 +2,7 @@ use std::{collections::HashMap, time::Duration};
 
 use ea_live_updates::{LiveUpdate, LiveUpdatesThread};
 use poise::serenity_prelude::{
-    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
+    ChannelId, Colour, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
 
 use crate::Data;
@@ -105,6 +105,8 @@ async fn send_live_updates(
                     .title(thread.title())
                     .url(thread.url())
                     .author(create_vinnie_bot_author_embed())
+                    // tailwind amber-500
+                    .color(Colour::from_rgb(245, 158, 11))
                     .fields(
                         updates
                             .iter()
