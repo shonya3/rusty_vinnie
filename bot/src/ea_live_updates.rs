@@ -137,6 +137,6 @@ async fn send_live_updates(
 
 fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
     CreateEmbedAuthor::new("Rusty Vinnie")
-        .icon_url("https://discord.com/assets/ca24969f2fd7a9fb03d5.png")
+        .icon_url("https://cdn.discordapp.com/app-icons/1139087605003202610/00040381fd8cae4be71e1b9b57723806.png")
         .url("https://github.com/shonya3/rusty_vinnie")
 }
