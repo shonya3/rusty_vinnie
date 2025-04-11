@@ -1,5 +1,5 @@
 mod commands;
-mod ea_live_updates;
+pub mod ea_live_updates;
 mod message_handler;
 mod poe_newsletter;
 mod status;
@@ -9,7 +9,7 @@ mod unused;
 use std::collections::HashSet;
 
 use crate::poe_newsletter::spin_news_loop;
-use ::ea_live_updates::{LiveUpdate, LiveUpdatesThread};
+use ::ea_live_updates::LiveUpdate;
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
@@ -25,6 +25,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {
+    #[allow(unused)]
     published_live_updates: Mutex<HashSet<LiveUpdate>>,
 }
 
@@ -102,12 +103,6 @@ async fn event_handler(
                     || get_kroiya_status(ctx),
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
-                ),
-                ea_live_updates::spin_ea_live_updates_loop(
-                    ctx,
-                    data,
-                    &[LiveUpdatesThread::En, LiveUpdatesThread::Ru],
-                    &_archer_mains_channel,
                 ),
                 spin_teasers_loop(ctx, data, &[], &_archer_mains_channel),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
