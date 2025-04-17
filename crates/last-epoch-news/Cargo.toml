@@ -1,0 +1,16 @@
+[package]
+name = "last-epoch-news"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+tokio.workspace = true
+scraper.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+chrono.workspace = true
+futures = "0.3.31"
+
+[dev-dependencies]
+tokio.workspace = true
