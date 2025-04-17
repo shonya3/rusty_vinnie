@@ -10,11 +10,11 @@ dotenv = "0.15.0"
 poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}
 rand = "0.8.5"
 tokio = { workspace = true }
-fresh_news = {path = "../fresh_news"}
 chrono = { workspace = true }
 shuttle-runtime = "0.53.0"
 shuttle-serenity = "0.53.0"
 shuttle-persist = "0.51.0"
-teasers = { path = "../teasers" }
-ea_live_updates = { path = "../ea_live_updates" }
+fresh_news = {path = "../crates/fresh_news"}
+teasers = { path = "../crates/teasers" }
+ea_live_updates = { path = "../crates/ea_live_updates" }
 serde_json.workspace = true
