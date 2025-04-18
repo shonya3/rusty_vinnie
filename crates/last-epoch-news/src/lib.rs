@@ -25,7 +25,7 @@ pub async fn fetch_subforum_threads_list(
 pub struct NewsThreadInfo {
     pub url: String,
     pub title: String,
-    pub unix_timestamp: DateTime<Utc>,
+    pub datetime: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -52,7 +52,6 @@ impl std::fmt::Display for Subforum {
 pub mod html {
     use crate::NewsThreadInfo;
     use chrono::{DateTime, Utc};
-    use futures::stream::{self, StreamExt};
     use scraper::{ElementRef, Html, Selector};
 
     async fn fetch_post_markup(url: &str) -> Result<String, reqwest::Error> {
@@ -70,33 +69,79 @@ pub mod html {
     }
 
     pub async fn prepare_threads_info(html: &str) -> Vec<NewsThreadInfo> {
-        let document = Html::parse_document(html);
-        let tr_selector = create_selector("table tbody tr");
-        let rows = document.select(&tr_selector).take(3);
+        let html = html.to_owned();
 
-        let tasks: Vec<_> = rows
-            .filter_map(|row| {
-                let url = get_thread_url(&row)?;
-                let title = get_thread_title(&row)?;
-                Some((url, title))
-            })
-            .collect();
+        let parse_result = tokio::task::spawn_blocking(move || {
+            let document = Html::parse_document(&html);
+            let tr_selector = create_selector("table tbody tr");
 
-        stream::iter(tasks)
-            .map(|(url, title)| async move {
-                let post_markup = fetch_post_markup(&url).await.ok()?;
-                let unix_timestamp = get_unix_timestamp(&post_markup)?;
-                Some(NewsThreadInfo {
-                    url,
-                    title,
-                    unix_timestamp,
+            document
+                .select(&tr_selector)
+                .take(3)
+                .filter_map(|row| {
+                    Some((
+                        get_thread_url(&row)?.to_owned(),
+                        get_thread_title(&row)?.to_owned(),
+                    ))
                 })
-            })
-            .buffer_unordered(3)
-            .filter_map(|x| async move { x })
-            .collect()
-            .await
+                .collect::<Vec<(String, String)>>()
+        })
+        .await
+        .unwrap_or_default();
+
+        let mut results = Vec::new();
+        for (url, title) in parse_result {
+            if let Ok(post_markup) = fetch_post_markup(&url).await {
+                if let Some(datetime) = get_datetime(&post_markup) {
+                    results.push(NewsThreadInfo {
+                        url,
+                        title,
+                        datetime,
+                    });
+                }
+            }
+        }
+
+        results
     }
+
+    // pub async fn prepare_threads_info(html: &str) -> Vec<NewsThreadInfo> {
+    //     let document = Html::parse_document(html);
+    //     let tr_selector = create_selector("table tbody tr");
+    //     let rows = document.select(&tr_selector).take(3);
+
+    //     let tasks: Vec<_> = rows
+    //         .filter_map(|row| {
+    //             let url = get_thread_url(&row)?;
+    //             let title = get_thread_title(&row)?;
+    //             Some((url, title))
+    //         })
+    //         .collect();
+
+    //     tasks
+    //         .into_iter()
+    //         .map(|(url, title)| NewsThreadInfo {
+    //             url,
+    //             title,
+    //             datetime: Utc::now(),
+    //         })
+    //         .collect()
+
+    //     // stream::iter(tasks)
+    //     //     .map(|(url, title)| async move {
+    //     //         let post_markup = fetch_post_markup(&url).await.ok()?;
+    //     //         let datetime = get_datetime(&post_markup)?;
+    //     //         Some(NewsThreadInfo {
+    //     //             url,
+    //     //             title,
+    //     //             datetime,
+    //     //         })
+    //     //     })
+    //     //     .buffer_unordered(3)
+    //     //     .filter_map(|x| async move { x })
+    //     //     .collect()
+    //     //     .await
+    // }
 
     fn title_selector() -> Selector {
         create_selector("a.title")
@@ -126,7 +171,7 @@ pub mod html {
         )
     }
 
-    fn get_unix_timestamp(post_markup: &str) -> Option<DateTime<Utc>> {
+    fn get_datetime(post_markup: &str) -> Option<DateTime<Utc>> {
         let document = Html::parse_document(post_markup);
         let selector = create_selector(".topic-body time");
         let datetime_str = document.select(&selector).next()?.attr("datetime")?;

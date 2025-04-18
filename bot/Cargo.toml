@@ -17,4 +17,5 @@ shuttle-persist = "0.51.0"
 fresh_news = {path = "../crates/fresh_news"}
 teasers = { path = "../crates/teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
+last-epoch-news = { path = "../crates/last-epoch-news" }
 serde_json.workspace = true

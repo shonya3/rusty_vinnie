@@ -242,7 +242,7 @@ mod html {
         match parse_forum_date(lang, date_str, time_offset) {
             Ok(date) => Some(date),
             Err(e) => {
-                eprintln!("Could not parse date {e}");
+                dbg!("Could not parse date. ", e);
                 None
             }
         }

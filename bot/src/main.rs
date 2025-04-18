@@ -1,5 +1,6 @@
 mod commands;
 pub mod ea_live_updates;
+mod last_epoch;
 mod message_handler;
 mod poe_newsletter;
 mod status;
@@ -13,6 +14,7 @@ use ::ea_live_updates::LiveUpdate;
 use chrono::FixedOffset;
 use dotenv::dotenv;
 use fresh_news::{Subforum, WebsiteLanguage};
+use last_epoch::{watch_lastepoch, Subforum as LastEpochSubforum};
 use message_handler::handle_message;
 use poise::serenity_prelude::{self as serenity, futures::lock::Mutex, ChannelId};
 use status::{get_kroiya_status, watch_status};
@@ -104,6 +106,10 @@ async fn event_handler(
                     || say(":rabbit: пришел"),
                     || say(":rabbit: ушел"),
                 ),
+                watch_lastepoch(ctx, LastEpochSubforum::Announcements),
+                watch_lastepoch(ctx, LastEpochSubforum::DeveloperBlogs),
+                watch_lastepoch(ctx, LastEpochSubforum::News),
+                watch_lastepoch(ctx, LastEpochSubforum::PatchNotes),
                 spin_teasers_loop(ctx, data, &[], &_archer_mains_channel),
                 spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
                 spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),

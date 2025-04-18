@@ -10,19 +10,19 @@ async fn prepares_threads_info_based_on_markup() {
     let a = NewsThreadInfo {
         url: "https://forum.lastepoch.com/t/last-epoch-season-2-tombs-of-the-erased-is-officially-live/75431".to_owned(),
         title: "Last Epoch - Season 2 - Tombs of the Erased is officially LIVE!".to_owned(),
-        unix_timestamp: "2025-04-17T16:01:00Z".parse().unwrap(),
+        datetime: "2025-04-17T16:01:00Z".parse().unwrap(),
     };
 
     let b = NewsThreadInfo {
         url: "https://forum.lastepoch.com/t/supporter-packs-now-available/75419".to_owned(),
         title: "Supporter Packs now Available!".to_owned(),
-        unix_timestamp: "2025-04-16T18:40:00Z".parse().unwrap(),
+        datetime: "2025-04-16T18:40:00Z".parse().unwrap(),
     };
 
     let c = NewsThreadInfo {
         url: "https://forum.lastepoch.com/t/48-hours-till-go-live/75386".to_owned(),
         title: "48 Hours till go live".to_owned(),
-        unix_timestamp: "2025-04-15T16:02:00Z".parse().unwrap(),
+        datetime: "2025-04-15T16:02:00Z".parse().unwrap(),
     };
 
     assert!([a, b, c].iter().any(|t| threads.contains(t)));
