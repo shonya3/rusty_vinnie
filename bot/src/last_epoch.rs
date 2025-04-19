@@ -8,9 +8,7 @@ fn mins_duration(mins: u64) -> Duration {
 }
 
 fn is_within_last_minutes(minutes: i64, timestamp: DateTime<Utc>) -> bool {
-    let now = Utc::now();
-    let ten_minutes_ago = now - ChronoDuration::minutes(minutes);
-    timestamp >= ten_minutes_ago
+    timestamp >= Utc::now() - ChronoDuration::minutes(minutes)
 }
 
 pub async fn watch_lastepoch(ctx: &SerenityContext, subforum: Subforum) {
