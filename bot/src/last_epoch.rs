@@ -19,14 +19,10 @@ pub async fn watch_lastepoch(ctx: &SerenityContext, subforum: Subforum) {
         interval.tick().await;
         match last_epoch_news::fetch_subforum_threads_list(subforum).await {
             Ok(threads) => {
-                println!("{:?}", threads);
                 let content = threads
                     .into_iter()
                     .filter(|thread| is_within_last_minutes(INTERVAL_MINS, thread.datetime))
-                    .map(|thread| {
-                        println!("{} {thread:#?}", chrono::Local::now().format("%a %T"),);
-                        thread.url
-                    })
+                    .map(|thread| thread.url)
                     .collect::<Vec<_>>()
                     .join(" ");
 

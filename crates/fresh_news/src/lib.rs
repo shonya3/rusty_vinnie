@@ -242,7 +242,7 @@ mod html {
         match parse_forum_date(lang, date_str, time_offset) {
             Ok(date) => Some(date),
             Err(e) => {
-                dbg!("Could not parse date. ", e);
+                dbg!("Could not parse date. ", e, format!("{lang}"), date_str);
                 None
             }
         }
@@ -264,11 +264,11 @@ mod html {
                 for (index, month) in [
                     "янв.",
                     "февр.",
-                    "марта",
+                    "мар.",
                     "апр.",
                     "мая",
-                    "июня",
-                    "июля",
+                    "июн.",
+                    "июл.",
                     "авг.",
                     "сент.",
                     "окт.",
