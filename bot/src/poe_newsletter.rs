@@ -1,7 +1,9 @@
 use chrono::FixedOffset;
 use fresh_news::{Subforum, WebsiteLanguage};
-use poise::serenity_prelude::{ChannelId, Context as SerenityContext, CreateMessage};
+use poise::serenity_prelude::{Context as SerenityContext, CreateMessage};
 use std::time::Duration;
+
+use crate::channel::AppChannel;
 pub const INTERVAL_MINS: i64 = 10;
 fn mins_duration(mins: u64) -> Duration {
     Duration::from_secs(60 * mins)
@@ -11,14 +13,16 @@ pub async fn spin_news_loop(
     ctx: &SerenityContext,
     lang: &WebsiteLanguage,
     subforum: &Subforum,
-    time_offset: Option<&FixedOffset>,
+    time_offset: Option<FixedOffset>,
 ) {
     let mut interval = tokio::time::interval(mins_duration(INTERVAL_MINS as u64));
-    let channel_id = ChannelId::new(356013349496029184);
+    let channel_id = AppChannel::Poe.id();
 
     loop {
         interval.tick().await;
-        match fresh_news::get_fresh_threads(INTERVAL_MINS, lang, subforum, time_offset).await {
+        match fresh_news::get_fresh_threads(INTERVAL_MINS, lang, subforum, time_offset.as_ref())
+            .await
+        {
             Ok(threads) => {
                 let tasks = threads
                     .into_iter()

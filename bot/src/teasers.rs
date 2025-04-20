@@ -1,4 +1,4 @@
-use crate::Data;
+use crate::{channel::AppChannel, Data};
 use poise::serenity_prelude::{
     ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
@@ -9,9 +9,9 @@ pub async fn spin_teasers_loop(
     ctx: &SerenityContext,
     data: &Data,
     forum_threads: &[TeasersForumThread],
-    channel_id: &ChannelId,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
+    let channel_id = AppChannel::Poe.id();
     loop {
         interval.tick().await;
         for forum_thread in forum_threads {
@@ -24,7 +24,7 @@ async fn publish_new_teasers(
     ctx: &SerenityContext,
     _data: &Data,
     forum_thread: TeasersForumThread,
-    channel_id: &ChannelId,
+    channel_id: ChannelId,
 ) {
     let thread_teasers = match teasers::download_teasers_from_thread(forum_thread).await {
         Ok(teas) => teas,
@@ -65,7 +65,7 @@ fn save_published_teasers() -> Result<(), String> {
 
 async fn send_teaser(
     ctx: &SerenityContext,
-    channel_id: &ChannelId,
+    channel_id: ChannelId,
     teaser: &Teaser,
 ) -> Result<(), String> {
     let embed = CreateEmbed::new()
