@@ -6,13 +6,14 @@ const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub async fn get_fresh_threads(
     not_older_than_minutes: i64,
-    lang: &WebsiteLanguage,
-    subforum: &Subforum,
+    lang: WebsiteLanguage,
+    subforum: Subforum,
     time_offset: Option<&FixedOffset>,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
     NewsThreadInfo::get(not_older_than_minutes, lang, subforum, time_offset).await
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Subforum {
     News,
     PatchNotes,
@@ -35,6 +36,7 @@ impl std::fmt::Display for Subforum {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum WebsiteLanguage {
     Ru,
     En,
@@ -69,8 +71,8 @@ impl NewsThreadInfo {
 
     pub async fn get(
         not_older_than_minutes: i64,
-        lang: &WebsiteLanguage,
-        subforum: &Subforum,
+        lang: WebsiteLanguage,
+        subforum: Subforum,
         time_offset: Option<&FixedOffset>,
     ) -> Result<Vec<Self>, Error> {
         let saved = Self::read_saved(lang, subforum)?;
@@ -92,7 +94,7 @@ impl NewsThreadInfo {
         Utc::now() - self.posted_date
     }
 
-    pub fn path(lang: &WebsiteLanguage, subforum: &Subforum) -> Result<PathBuf, std::io::Error> {
+    pub fn path(lang: WebsiteLanguage, subforum: Subforum) -> Result<PathBuf, std::io::Error> {
         let dir = std::env::current_dir()?.join("data");
         if !dir.exists() {
             std::fs::create_dir_all(&dir)?;
@@ -105,8 +107,8 @@ impl NewsThreadInfo {
     }
 
     pub fn read_saved(
-        lang: &WebsiteLanguage,
-        subforum: &Subforum,
+        lang: WebsiteLanguage,
+        subforum: Subforum,
     ) -> Result<Vec<Self>, std::io::Error> {
         let path = Self::path(lang, subforum)?;
         let json = std::fs::read_to_string(path)?;
@@ -118,8 +120,8 @@ impl NewsThreadInfo {
 
     pub fn save(
         threads_info: &[Self],
-        lang: &WebsiteLanguage,
-        subforum: &Subforum,
+        lang: WebsiteLanguage,
+        subforum: Subforum,
     ) -> Result<(), Error> {
         let json = serde_json::to_string(&threads_info)?;
         Ok(std::fs::write(Self::path(lang, subforum)?, json)?)
@@ -127,8 +129,8 @@ impl NewsThreadInfo {
 }
 
 pub async fn fetch_forum_threads(
-    lang: &WebsiteLanguage,
-    subforum: &Subforum,
+    lang: WebsiteLanguage,
+    subforum: Subforum,
     time_offset: Option<&FixedOffset>,
 ) -> Result<Vec<NewsThreadInfo>, Error> {
     let url = match lang {
@@ -185,7 +187,7 @@ mod html {
 
     pub fn parse(
         html: &str,
-        lang: &WebsiteLanguage,
+        lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Vec<NewsThreadInfo> {
         Html::parse_document(html)
@@ -196,7 +198,7 @@ mod html {
 
     pub fn parse_tr(
         tr: &ElementRef,
-        lang: &WebsiteLanguage,
+        lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Option<NewsThreadInfo> {
         Some(NewsThreadInfo::new(
@@ -218,7 +220,7 @@ mod html {
         )
     }
 
-    fn get_thread_url(tr: &ElementRef, lang: &WebsiteLanguage) -> Option<String> {
+    fn get_thread_url(tr: &ElementRef, lang: WebsiteLanguage) -> Option<String> {
         let a_selector = &Selector::parse(".title a").ok()?;
         let path = tr.select(a_selector).next()?.attr("href")?.to_owned();
         let subdomain = match lang {
@@ -230,7 +232,7 @@ mod html {
 
     fn get_posted_date(
         tr: &ElementRef,
-        lang: &WebsiteLanguage,
+        lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Option<DateTime<Utc>> {
         let date_str = tr
@@ -249,7 +251,7 @@ mod html {
     }
 
     fn parse_forum_date(
-        lang: &WebsiteLanguage,
+        lang: WebsiteLanguage,
         date_str: &str,
         time_offset: Option<&FixedOffset>,
     ) -> Result<DateTime<Utc>, ParseError> {

@@ -11,7 +11,16 @@ fn is_within_last_minutes(minutes: i64, timestamp: DateTime<Utc>) -> bool {
     timestamp >= Utc::now() - ChronoDuration::minutes(minutes)
 }
 
-pub async fn watch_lastepoch(ctx: &SerenityContext, subforum: Subforum) {
+pub async fn watch_subforums(ctx: &SerenityContext, subforums: Vec<Subforum>) {
+    let tasks = subforums
+        .into_iter()
+        .map(|subforum| watch_subforum(ctx, subforum))
+        .collect::<Vec<_>>();
+
+    futures::future::join_all(tasks).await;
+}
+
+async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
     let mut interval = tokio::time::interval(mins_duration(INTERVAL_MINS as u64));
     let channel_id = ChannelId::new(1362313267879350363);
 

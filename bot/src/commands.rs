@@ -19,8 +19,8 @@ pub async fn patchnotes(ctx: Context<'_>) -> Result<(), Error> {
 pub async fn news(ctx: Context<'_>) -> Result<(), Error> {
     let news = match fresh_news::get_fresh_threads(
         1500,
-        &WebsiteLanguage::En,
-        &Subforum::News,
+        WebsiteLanguage::En,
+        Subforum::News,
         FixedOffset::east_opt(3600).as_ref(),
     )
     .await

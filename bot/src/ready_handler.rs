@@ -1,7 +1,7 @@
 use crate::{
     channel::AppChannel,
-    last_epoch::{watch_lastepoch, Subforum as LastEpochSubforum},
-    poe_newsletter::spin_news_loop,
+    last_epoch::{self, Subforum as LastEpochSubforum},
+    poe_newsletter,
     status::{get_kroiya_status, watch_status},
     teasers::spin_teasers_loop,
     Data,
@@ -26,39 +26,30 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
             || say(":rabbit: пришел"),
             || say(":rabbit: ушел"),
         ),
-        watch_lastepoch(ctx, LastEpochSubforum::Announcements),
-        watch_lastepoch(ctx, LastEpochSubforum::DeveloperBlogs),
-        watch_lastepoch(ctx, LastEpochSubforum::News),
-        watch_lastepoch(ctx, LastEpochSubforum::PatchNotes),
+        last_epoch::watch_subforums(
+            ctx,
+            vec![
+                LastEpochSubforum::Announcements,
+                LastEpochSubforum::DeveloperBlogs,
+                LastEpochSubforum::News,
+                LastEpochSubforum::PatchNotes,
+            ],
+        ),
+        poe_newsletter::watch_subforums(
+            ctx,
+            vec![
+                (WebsiteLanguage::En, Subforum::News),
+                (WebsiteLanguage::Ru, Subforum::News),
+                (WebsiteLanguage::En, Subforum::PatchNotes),
+                (WebsiteLanguage::Ru, Subforum::PatchNotes),
+                (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
+                (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
+                (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
+                (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
+            ],
+            offset,
+        ),
         spin_teasers_loop(ctx, data, &[]),
-        spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::News, offset),
-        spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::News, offset),
-        spin_news_loop(ctx, &WebsiteLanguage::En, &Subforum::PatchNotes, offset),
-        spin_news_loop(ctx, &WebsiteLanguage::Ru, &Subforum::PatchNotes, offset),
-        spin_news_loop(
-            ctx,
-            &WebsiteLanguage::En,
-            &Subforum::EarlyAccessPatchNotesEn,
-            offset
-        ),
-        spin_news_loop(
-            ctx,
-            &WebsiteLanguage::Ru,
-            &Subforum::EarlyAccessPatchNotesRu,
-            offset
-        ),
-        spin_news_loop(
-            ctx,
-            &WebsiteLanguage::En,
-            &Subforum::EarlyAccessAnnouncementsEn,
-            offset
-        ),
-        spin_news_loop(
-            ctx,
-            &WebsiteLanguage::Ru,
-            &Subforum::EarlyAccessAnnouncementsRu,
-            offset
-        ),
     );
 }
 

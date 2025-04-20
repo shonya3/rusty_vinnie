@@ -9,10 +9,23 @@ fn mins_duration(mins: u64) -> Duration {
     Duration::from_secs(60 * mins)
 }
 
-pub async fn spin_news_loop(
+pub async fn watch_subforums(
     ctx: &SerenityContext,
-    lang: &WebsiteLanguage,
-    subforum: &Subforum,
+    configs: Vec<(WebsiteLanguage, Subforum)>,
+    offset: Option<FixedOffset>,
+) {
+    let tasks = configs
+        .into_iter()
+        .map(|(lang, subforum)| watch_subforum(ctx, lang, subforum, offset))
+        .collect::<Vec<_>>();
+
+    futures::future::join_all(tasks).await;
+}
+
+async fn watch_subforum(
+    ctx: &SerenityContext,
+    lang: WebsiteLanguage,
+    subforum: Subforum,
     time_offset: Option<FixedOffset>,
 ) {
     let mut interval = tokio::time::interval(mins_duration(INTERVAL_MINS as u64));

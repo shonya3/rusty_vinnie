@@ -19,3 +19,4 @@ teasers = { path = "../crates/teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
 last-epoch-news = { path = "../crates/last-epoch-news" }
 serde_json.workspace = true
+futures = "0.3.31"

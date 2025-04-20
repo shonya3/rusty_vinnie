@@ -2176,6 +2176,7 @@ dependencies = [
  "dotenv",
  "ea_live_updates",
  "fresh_news",
+ "futures",
  "last-epoch-news",
  "poise",
  "rand 0.8.5",
