@@ -11,19 +11,12 @@ use poise::serenity_prelude::{self as serenity};
 
 pub async fn handle_ready(ctx: &serenity::Context, _data: &Data) {
     println!("Bot is ready");
-    let say = |message: &'static str| async move {
-        if let Err(err) = AppChannel::General.id().say(ctx, message).await {
-            println!("Could not send message to channel: {err:#?}");
-        };
-    };
-
-    let offset = Timezone::BritishSummer.offset();
 
     tokio::join!(
         watch_status(
             || get_kroiya_status(ctx),
-            || say(":rabbit: пришел"),
-            || say(":rabbit: ушел"),
+            || AppChannel::General.say(ctx, ":rabbit: пришел"),
+            || AppChannel::General.say(ctx, ":rabbit: ушел"),
         ),
         last_epoch::watch_subforums(
             ctx,
@@ -46,7 +39,7 @@ pub async fn handle_ready(ctx: &serenity::Context, _data: &Data) {
                 (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
                 (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
             ],
-            offset,
+            Timezone::BritishSummer.offset(),
         ),
     );
 }

@@ -1,4 +1,4 @@
-use poise::serenity_prelude::ChannelId;
+use poise::serenity_prelude::{CacheHttp, ChannelId};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]
@@ -7,6 +7,14 @@ pub enum AppChannel {
     Poe,
     LastEpoch,
     Dev,
+}
+
+impl AppChannel {
+    pub async fn say(&self, ctx: impl CacheHttp, message: &str) {
+        if let Err(err) = self.id().say(ctx, message).await {
+            println!("Could not send message to channel: {err:#?}");
+        };
+    }
 }
 
 impl AppChannel {
