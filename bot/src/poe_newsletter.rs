@@ -1,6 +1,8 @@
 use chrono::FixedOffset;
 use fresh_news::{Subforum, WebsiteLanguage};
-use poise::serenity_prelude::{Context as SerenityContext, CreateMessage};
+use poise::serenity_prelude::{
+    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
+};
 use std::time::Duration;
 
 use crate::channel::AppChannel;
@@ -40,8 +42,12 @@ async fn watch_subforum(
                 let tasks = threads
                     .into_iter()
                     .map(|thread| {
-                        println!("{} {thread:#?}", chrono::Local::now().format("%a %T"),);
-                        channel_id.send_message(&ctx, CreateMessage::new().content(thread.url))
+                        let embed = CreateEmbed::new()
+                            .author(CreateEmbedAuthor::new(subforum_title(lang, subforum)))
+                            .title(&thread.title)
+                            .url(&thread.url);
+
+                        channel_id.send_message(ctx, CreateMessage::new().embed(embed))
                     })
                     .collect::<Vec<_>>();
 
@@ -54,4 +60,24 @@ async fn watch_subforum(
             Err(err) => eprintln!("{err:?}"),
         }
     }
+}
+
+fn subforum_title(lang: WebsiteLanguage, subforum: Subforum) -> String {
+    let (subforum_name, emoji) = match subforum {
+        Subforum::News => ("PoE News", "📢"),
+        Subforum::PatchNotes => ("PoE Patch Notes", "✏️"),
+        Subforum::EarlyAccessPatchNotesEn | Subforum::EarlyAccessPatchNotesRu => {
+            ("PoE2 Patch Notes", "🆕")
+        }
+        Subforum::EarlyAccessAnnouncementsEn | Subforum::EarlyAccessAnnouncementsRu => {
+            ("PoE2 Announcements", "📣")
+        }
+    };
+
+    let lang_str = match lang {
+        WebsiteLanguage::En => "EN",
+        WebsiteLanguage::Ru => "RU",
+    };
+
+    format!("{} [{}] {}", subforum_name, lang_str, emoji)
 }
