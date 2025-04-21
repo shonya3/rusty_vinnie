@@ -9,9 +9,9 @@ pub mod ea_live_updates;
 mod last_epoch;
 mod message_handler;
 mod poe_newsletter;
+pub mod poe_teasers;
 mod ready_handler;
 mod status;
-pub mod teasers;
 mod unused;
 
 async fn event_handler(

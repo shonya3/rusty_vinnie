@@ -5,7 +5,7 @@ use poise::serenity_prelude::{
 use std::{collections::HashSet, time::Duration};
 use teasers::{Teaser, TeasersForumThread};
 
-pub async fn spin_teasers_loop(
+pub async fn watch_teasers_threads(
     ctx: &SerenityContext,
     data: &Data,
     forum_threads: &[TeasersForumThread],
@@ -15,12 +15,12 @@ pub async fn spin_teasers_loop(
     loop {
         interval.tick().await;
         for forum_thread in forum_threads {
-            publish_new_teasers(ctx, data, *forum_thread, channel_id).await;
+            send_new_teasers(ctx, data, *forum_thread, channel_id).await;
         }
     }
 }
 
-async fn publish_new_teasers(
+async fn send_new_teasers(
     ctx: &SerenityContext,
     _data: &Data,
     forum_thread: TeasersForumThread,
