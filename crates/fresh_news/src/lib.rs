@@ -1,16 +1,25 @@
-use chrono::{DateTime, FixedOffset, TimeDelta, Utc};
+use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
-use std::path::PathBuf;
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
-pub async fn get_fresh_threads(
-    not_older_than_minutes: i64,
+pub async fn fetch_subforum_threads_list(
     lang: WebsiteLanguage,
     subforum: Subforum,
     time_offset: Option<&FixedOffset>,
-) -> Result<Vec<NewsThreadInfo>, Error> {
-    NewsThreadInfo::get(not_older_than_minutes, lang, subforum, time_offset).await
+) -> Result<Vec<NewsThreadInfo>, reqwest::Error> {
+    let url = match lang {
+        WebsiteLanguage::Ru => {
+            format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
+        }
+        WebsiteLanguage::En => {
+            format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
+        }
+    };
+    let client = reqwest::ClientBuilder::new()
+        .user_agent(USER_AGENT)
+        .build()?;
+    let html = client.get(url).send().await?.text().await?;
+    Ok(html::parse(&html, lang, time_offset))
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -67,116 +76,6 @@ impl NewsThreadInfo {
             posted_date,
             title,
         }
-    }
-
-    pub async fn get(
-        not_older_than_minutes: i64,
-        lang: WebsiteLanguage,
-        subforum: Subforum,
-        time_offset: Option<&FixedOffset>,
-    ) -> Result<Vec<Self>, Error> {
-        let saved = Self::read_saved(lang, subforum)?;
-        let fetched = fetch_forum_threads(lang, subforum, time_offset).await?;
-
-        let actual: Vec<Self> = fetched
-            .into_iter()
-            .filter(|info| {
-                info.age().num_minutes() <= not_older_than_minutes && !saved.contains(info)
-            })
-            .collect();
-
-        Self::save(&actual, lang, subforum)?;
-
-        Ok(actual)
-    }
-
-    pub fn age(&self) -> TimeDelta {
-        Utc::now() - self.posted_date
-    }
-
-    pub fn path(lang: WebsiteLanguage, subforum: Subforum) -> Result<PathBuf, std::io::Error> {
-        let dir = std::env::current_dir()?.join("data");
-        if !dir.exists() {
-            std::fs::create_dir_all(&dir)?;
-        };
-        let file_path = dir.join(format!("threadsInfo-{subforum}-{lang}.json"));
-        if !file_path.exists() {
-            std::fs::write(&file_path, json!([]).to_string())?;
-        }
-        Ok(file_path)
-    }
-
-    pub fn read_saved(
-        lang: WebsiteLanguage,
-        subforum: Subforum,
-    ) -> Result<Vec<Self>, std::io::Error> {
-        let path = Self::path(lang, subforum)?;
-        let json = std::fs::read_to_string(path)?;
-        if json.is_empty() {
-            return Ok(vec![]);
-        }
-        Ok(serde_json::from_str(&json)?)
-    }
-
-    pub fn save(
-        threads_info: &[Self],
-        lang: WebsiteLanguage,
-        subforum: Subforum,
-    ) -> Result<(), Error> {
-        let json = serde_json::to_string(&threads_info)?;
-        Ok(std::fs::write(Self::path(lang, subforum)?, json)?)
-    }
-}
-
-pub async fn fetch_forum_threads(
-    lang: WebsiteLanguage,
-    subforum: Subforum,
-    time_offset: Option<&FixedOffset>,
-) -> Result<Vec<NewsThreadInfo>, Error> {
-    let url = match lang {
-        WebsiteLanguage::Ru => {
-            format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
-        }
-        WebsiteLanguage::En => {
-            format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
-        }
-    };
-    let client = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?;
-    let html = client.get(url).send().await?.text().await?;
-    Ok(html::parse(&html, lang, time_offset))
-}
-
-#[derive(Debug)]
-pub enum Error {
-    Serde(serde_json::Error),
-    Io(std::io::Error),
-    DateParse(chrono::ParseError),
-    ReqwestError(reqwest::Error),
-}
-
-impl From<std::io::Error> for Error {
-    fn from(value: std::io::Error) -> Self {
-        Self::Io(value)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(value: serde_json::Error) -> Self {
-        Self::Serde(value)
-    }
-}
-
-impl From<chrono::ParseError> for Error {
-    fn from(value: chrono::ParseError) -> Self {
-        Self::DateParse(value)
-    }
-}
-
-impl From<reqwest::Error> for Error {
-    fn from(value: reqwest::Error) -> Self {
-        Self::ReqwestError(value)
     }
 }
 
@@ -301,16 +200,5 @@ mod html {
         };
 
         Ok(local_date_time.to_utc())
-
-        // let offset = time_offset.unwrap_or_else(|| Local::now().offset().fix());
-        // let local_offset = Local::now().offset().fix();
-        // let local_date_time = local_offset.from_local_datetime(&naive).unwrap();
-        // let utc_date_time = local_date_time.to_utc();
-
-        // println!("naive: {naive}  |   {naive:#?}");
-        // println!("local offset: {local_offset} | {local_offset:#?}");
-        // println!("local date time: {local_date_time} | {local_date_time:#?}");
-        // println!("utc date time: {utc_date_time}  | {utc_date_time:#?}");
-        // Ok(utc_date_time)
     }
 }

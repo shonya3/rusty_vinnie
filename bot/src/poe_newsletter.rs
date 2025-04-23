@@ -1,15 +1,9 @@
+use crate::{channel::AppChannel, interval};
 use chrono::FixedOffset;
 use fresh_news::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
-use std::time::Duration;
-
-use crate::channel::AppChannel;
-pub const INTERVAL_MINS: i64 = 10;
-fn mins_duration(mins: u64) -> Duration {
-    Duration::from_secs(60 * mins)
-}
 
 pub async fn watch_subforums(
     ctx: &SerenityContext,
@@ -30,17 +24,22 @@ async fn watch_subforum(
     subforum: Subforum,
     time_offset: Option<FixedOffset>,
 ) {
-    let mut interval = tokio::time::interval(mins_duration(INTERVAL_MINS as u64));
+    let mut interval =
+        tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
     let channel_id = AppChannel::Poe.id();
 
     loop {
         interval.tick().await;
-        match fresh_news::get_fresh_threads(INTERVAL_MINS, lang, subforum, time_offset.as_ref())
-            .await
-        {
+        match fresh_news::fetch_subforum_threads_list(lang, subforum, time_offset.as_ref()).await {
             Ok(threads) => {
                 let tasks = threads
                     .into_iter()
+                    .filter(|thread| {
+                        interval::is_within_last_minutes(
+                            interval::INTERVAL_MINS,
+                            thread.posted_date,
+                        )
+                    })
                     .map(|thread| {
                         let embed = CreateEmbed::new()
                             .author(CreateEmbedAuthor::new(subforum_title(lang, subforum)))

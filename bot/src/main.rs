@@ -6,6 +6,7 @@ use std::collections::HashSet;
 mod channel;
 mod commands;
 pub mod ea_live_updates;
+mod interval;
 mod last_epoch;
 mod message_handler;
 mod poe_newsletter;
@@ -70,7 +71,6 @@ async fn main(
             },
             commands: vec![
                 commands::patchnotes(),
-                commands::news(),
                 // crate::teasers::populate_teasers(),
                 crate::commands::ascendancies1(),
                 crate::commands::ascendancies2(),
