@@ -1237,7 +1237,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "last-epoch-news"
+name = "last_epoch_forum"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -1636,19 +1636,6 @@ name = "pkg-config"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "953ec861398dccce10c670dfeaf3ec4911ca479e9c02154b3a215178c5f566f2"
-
-[[package]]
-name = "playground"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "poe_forum",
- "scraper 0.20.0",
- "serde",
- "serde_json",
- "teasers",
- "tokio",
-]
 
 [[package]]
 name = "poe_forum"
@@ -2176,7 +2163,7 @@ dependencies = [
  "dotenv",
  "ea_live_updates",
  "futures",
- "last-epoch-news",
+ "last_epoch_forum",
  "poe_forum",
  "poise",
  "rand 0.8.5",

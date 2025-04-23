@@ -1,9 +1,9 @@
-use last_epoch_news::{NewsThreadInfo, Subforum};
+use last_epoch_forum::{NewsThreadInfo, Subforum};
 
 #[tokio::test]
 async fn prepares_threads_info_based_on_markup() {
     let html = std::fs::read_to_string("./tests/fixtures/announcements.html").unwrap();
-    let threads = last_epoch_news::html::prepare_threads_info(&html).await;
+    let threads = last_epoch_forum::html::prepare_threads_info(&html).await;
 
     assert_eq!(3, threads.len());
 
@@ -30,7 +30,7 @@ async fn prepares_threads_info_based_on_markup() {
 
 #[tokio::test]
 async fn fetches() {
-    let result = last_epoch_news::fetch_subforum_threads_list(Subforum::Announcements).await;
+    let result = last_epoch_forum::fetch_subforum_threads_list(Subforum::Announcements).await;
 
     assert!(result.is_ok());
 }

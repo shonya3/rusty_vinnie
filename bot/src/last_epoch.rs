@@ -1,6 +1,6 @@
 use crate::interval;
 
-pub use last_epoch_news::Subforum;
+pub use last_epoch_forum::Subforum;
 use poise::serenity_prelude::{ChannelId, Context as SerenityContext, CreateMessage};
 
 pub async fn watch_subforums(ctx: &SerenityContext, subforums: Vec<Subforum>) {
@@ -19,7 +19,7 @@ async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
 
     loop {
         interval.tick().await;
-        match last_epoch_news::fetch_subforum_threads_list(subforum).await {
+        match last_epoch_forum::fetch_subforum_threads_list(subforum).await {
             Ok(threads) => {
                 let content = threads
                     .into_iter()

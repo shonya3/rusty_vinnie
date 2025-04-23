@@ -1,5 +1,5 @@
 [package]
-name = "last-epoch-news"
+name = "last_epoch_forum"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
