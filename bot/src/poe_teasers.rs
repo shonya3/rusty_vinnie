@@ -1,9 +1,9 @@
 use crate::{channel::AppChannel, Data};
+use poe_teasers::{Teaser, TeasersForumThread};
 use poise::serenity_prelude::{
     ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
 use std::{collections::HashSet, time::Duration};
-use teasers::{Teaser, TeasersForumThread};
 
 pub async fn watch_teasers_threads(
     ctx: &SerenityContext,
@@ -26,7 +26,7 @@ async fn send_new_teasers(
     forum_thread: TeasersForumThread,
     channel_id: ChannelId,
 ) {
-    let thread_teasers = match teasers::download_teasers_from_thread(forum_thread).await {
+    let thread_teasers = match poe_teasers::download_teasers_from_thread(forum_thread).await {
         Ok(teas) => teas,
         Err(err) => {
             println!("Could not download thread teasers. {err}");

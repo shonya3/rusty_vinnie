@@ -1,5 +1,5 @@
 [package]
-name = "teasers"
+name = "poe_teasers"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true

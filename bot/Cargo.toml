@@ -19,5 +19,5 @@ futures = "0.3.31"
 
 poe_forum = {path = "../crates/poe_forum"}
 last_epoch_forum = { path = "../crates/last_epoch_forum" }
-teasers = { path = "../crates/teasers" }
+poe_teasers = { path = "../crates/poe_teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
