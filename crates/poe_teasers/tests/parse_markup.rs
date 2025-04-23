@@ -1,10 +1,10 @@
-use teasers::{Lang, Teaser, TeasersForumThread};
+use poe_teasers::{Lang, Teaser, TeasersForumThread};
 
 #[test]
 fn captures_multiple_content_links_from_one_teaser() {
     let forum_thread = TeasersForumThread::Poe2(Lang::En);
 
-    let t = teasers::parse_teasers_thread(
+    let t = poe_teasers::parse_teasers_thread(
         &std::fs::read_to_string("./tests/newest_teaser_has_multiple_content_links.html").unwrap(),
         forum_thread,
     )
@@ -27,7 +27,7 @@ fn captures_multiple_content_links_from_one_teaser() {
 fn parse_old_3_25_teasers_thread() {
     let markup = std::fs::read_to_string("./tests/3.25_some_teasers.html").unwrap();
     let forum_thread = TeasersForumThread::Poe1_3_25Russian;
-    let vec = teasers::parse_teasers_thread(&markup, forum_thread).unwrap();
+    let vec = poe_teasers::parse_teasers_thread(&markup, forum_thread).unwrap();
     assert_eq!(vec, vec![
     Teaser {
         heading: "В дополнении Поселенцы Калгуура вы сможете начать схватки в Жатве всего одним действием.".to_owned(),
@@ -60,7 +60,7 @@ fn parse_old_3_25_teasers_thread() {
 fn parse_poe2_teasers() {
     let markup = std::fs::read_to_string("./tests/poe2_some_teasers.html").unwrap();
     let forum_thread = TeasersForumThread::Poe2(Lang::Ru);
-    let vec = teasers::parse_teasers_thread(&markup, forum_thread).unwrap();
+    let vec = poe_teasers::parse_teasers_thread(&markup, forum_thread).unwrap();
     assert_eq!(
         vec,
         vec![
