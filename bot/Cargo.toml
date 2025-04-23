@@ -14,7 +14,7 @@ chrono = { workspace = true }
 shuttle-runtime = "0.53.0"
 shuttle-serenity = "0.53.0"
 shuttle-persist = "0.51.0"
-fresh_news = {path = "../crates/fresh_news"}
+poe_forum = {path = "../crates/poe_forum"}
 teasers = { path = "../crates/teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
 last-epoch-news = { path = "../crates/last-epoch-news" }

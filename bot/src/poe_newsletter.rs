@@ -1,6 +1,6 @@
 use crate::{channel::AppChannel, interval};
 use chrono::FixedOffset;
-use fresh_news::{Subforum, WebsiteLanguage};
+use poe_forum::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
@@ -30,7 +30,8 @@ async fn watch_subforum(
 
     loop {
         interval.tick().await;
-        match fresh_news::fetch_subforum_threads_list(lang, subforum, time_offset.as_ref()).await {
+
+        match poe_forum::fetch_subforum_threads_list(lang, subforum, time_offset.as_ref()).await {
             Ok(threads) => {
                 let tasks = threads
                     .into_iter()

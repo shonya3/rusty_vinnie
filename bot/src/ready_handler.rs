@@ -6,7 +6,7 @@ use crate::{
     Data,
 };
 use chrono::FixedOffset;
-use fresh_news::{Subforum, WebsiteLanguage};
+use poe_forum::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{self as serenity};
 
 pub async fn handle_ready(ctx: &serenity::Context, _data: &Data) {
