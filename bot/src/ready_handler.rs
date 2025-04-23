@@ -12,6 +12,10 @@ use poise::serenity_prelude::{self as serenity};
 pub async fn handle_ready(ctx: &serenity::Context, _data: &Data) {
     println!("Bot is ready");
 
+    set_watchers(ctx).await;
+}
+
+async fn set_watchers(ctx: &serenity::Context) {
     tokio::join!(
         watch_status(
             || get_kroiya_status(ctx),
