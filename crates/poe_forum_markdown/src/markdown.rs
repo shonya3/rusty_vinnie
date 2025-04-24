@@ -1,4 +1,5 @@
-use scraper::ElementRef;
+use crate::selectors::create_selector;
+use scraper::{ElementRef, Html};
 use std::fmt::Write;
 
 pub fn clean_text(text: &str) -> String {
@@ -8,6 +9,22 @@ pub fn clean_text(text: &str) -> String {
         .filter(|line| !line.is_empty())
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+pub fn get_markdown(html: &str) -> String {
+    let document = Html::parse_document(html);
+
+    let patch_notes_post = document
+        .select(&create_selector("tr.staff"))
+        .next()
+        .unwrap();
+
+    let el_content = patch_notes_post
+        .select(&create_selector(".content"))
+        .next()
+        .unwrap();
+
+    html_to_markdown(&el_content)
 }
 
 pub fn html_to_markdown(element: &ElementRef) -> String {

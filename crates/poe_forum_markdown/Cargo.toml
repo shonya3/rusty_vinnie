@@ -1,5 +1,5 @@
 [package]
-name = "poe_forum_embed"
+name = "poe_forum_markdown"
 version.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -10,3 +10,4 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 scraper.workspace = true
 reqwest.workspace = true
+poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}

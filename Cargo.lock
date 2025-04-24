@@ -1626,10 +1626,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "poe_forum_embed"
+name = "poe_forum_markdown"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "poise",
  "reqwest 0.12.15",
  "scraper",
  "serde",
@@ -2163,9 +2164,11 @@ dependencies = [
  "futures",
  "last_epoch_forum",
  "poe_forum",
+ "poe_forum_markdown",
  "poe_teasers",
  "poise",
  "rand 0.8.5",
+ "reqwest 0.12.15",
  "serde_json",
  "shuttle-persist",
  "shuttle-runtime",

@@ -10,6 +10,7 @@ dotenv = "0.15.0"
 poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}
 rand = "0.8.5"
 tokio = { workspace = true }
+reqwest.workspace = true
 chrono = { workspace = true }
 shuttle-runtime = "0.53.0"
 shuttle-serenity = "0.53.0"
@@ -21,3 +22,4 @@ poe_forum = {path = "../crates/poe_forum"}
 last_epoch_forum = { path = "../crates/last_epoch_forum" }
 poe_teasers = { path = "../crates/poe_teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
+poe_forum_markdown = { path = "../crates/poe_forum_markdown" }

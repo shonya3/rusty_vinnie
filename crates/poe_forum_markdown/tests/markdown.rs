@@ -1,4 +1,4 @@
-use poe_forum_embed::markdown;
+use poe_forum_markdown::markdown;
 use scraper::{Html, Selector};
 
 fn create_selector(selectors: &str) -> Selector {
