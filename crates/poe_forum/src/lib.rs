@@ -67,16 +67,7 @@ pub struct NewsThreadInfo {
     #[serde(rename = "postedDateISO")]
     pub posted_date: DateTime<Utc>,
     pub title: String,
-}
-
-impl NewsThreadInfo {
-    pub const fn new(url: String, posted_date: DateTime<Utc>, title: String) -> Self {
-        Self {
-            url,
-            posted_date,
-            title,
-        }
-    }
+    pub author: Option<String>,
 }
 
 mod html {
@@ -100,11 +91,18 @@ mod html {
         lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Option<NewsThreadInfo> {
-        Some(NewsThreadInfo::new(
-            get_thread_url(tr, lang)?,
-            get_posted_date(tr, lang, time_offset)?,
-            get_thread_title(tr)?,
-        ))
+        // Some(NewsThreadInfo::new(
+        //     get_thread_url(tr, lang)?,
+        //     get_posted_date(tr, lang, time_offset)?,
+        //     get_thread_title(tr)?,
+        // ))
+
+        Some(NewsThreadInfo {
+            url: get_thread_url(tr, lang)?,
+            posted_date: get_posted_date(tr, lang, time_offset)?,
+            title: get_thread_title(tr)?,
+            author: get_author(tr),
+        })
     }
 
     fn get_thread_title(tr: &ElementRef) -> Option<String> {
@@ -147,6 +145,15 @@ mod html {
                 None
             }
         }
+    }
+
+    fn get_author(tr: &ElementRef) -> Option<String> {
+        let author = tr
+            .select(&Selector::parse(".post_by_account a").unwrap())
+            .next()?
+            .text()
+            .collect::<String>();
+        Some(author)
     }
 
     fn parse_forum_date(
