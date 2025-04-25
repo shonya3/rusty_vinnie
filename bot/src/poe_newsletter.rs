@@ -19,50 +19,6 @@ pub async fn watch_subforums(
     futures::future::join_all(tasks).await;
 }
 
-// async fn watch_subforum(
-//     ctx: &SerenityContext,
-//     lang: WebsiteLanguage,
-//     subforum: Subforum,
-//     time_offset: Option<FixedOffset>,
-// ) {
-//     let mut interval =
-//         tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
-//     let channel_id = AppChannel::Poe.id();
-
-//     loop {
-//         interval.tick().await;
-
-//         match poe_forum::fetch_subforum_threads_list(lang, subforum, time_offset.as_ref()).await {
-//             Ok(threads) => {
-//                 let tasks = threads
-//                     .into_iter()
-//                     .filter(|thread| {
-//                         interval::is_within_last_minutes(
-//                             interval::INTERVAL_MINS,
-//                             thread.posted_date,
-//                         )
-//                     })
-//                     .map(|thread| {
-//                         let embed = CreateEmbed::new()
-//                             .author(CreateEmbedAuthor::new(subforum_title(lang, subforum)))
-//                             .title(&thread.title)
-//                             .url(&thread.url);
-
-//                         channel_id.send_message(ctx, CreateMessage::new().embed(embed))
-//                     })
-//                     .collect::<Vec<_>>();
-
-//                 for task in tasks {
-//                     if let Err(err) = task.await {
-//                         eprintln!("{err:?}");
-//                     }
-//                 }
-//             }
-//             Err(err) => eprintln!("{err:?}"),
-//         }
-//     }
-// }
-
 async fn watch_subforum(
     ctx: &SerenityContext,
     lang: WebsiteLanguage,
@@ -121,9 +77,13 @@ pub async fn prepare_embed(
 
     match fetch_post_html(&thread.url).await {
         Ok(html) => {
-            if let Some(markdown) = poe_forum_markdown::get_content(&html) {
-                let markdown = truncate_to_max_chars(&markdown, 4095);
+            if let Some(details) = poe_forum_markdown::get_details(&html) {
+                let markdown = truncate_to_max_chars(&details.content, 4095);
                 embed = embed.description(markdown);
+
+                if let Some(image_src) = &details.image_src {
+                    embed = embed.image(image_src);
+                }
             }
         }
         Err(err) => eprintln!("Could not fetch post html {err}"),
@@ -183,60 +143,40 @@ fn truncate_to_max_chars(s: &str, max_chars: usize) -> String {
 }
 
 #[allow(unused)]
-pub async fn debug_send_embed(ctx: &SerenityContext) {
-    let offset = FixedOffset::east_opt(3 * 3600);
-    println!("Start loading list");
+pub mod debug {
+    use chrono::FixedOffset;
+    use poe_forum::{NewsThreadInfo, Subforum, WebsiteLanguage};
 
-    let list = poe_forum::fetch_subforum_threads_list(
-        WebsiteLanguage::En,
-        Subforum::EarlyAccessPatchNotesEn,
-        offset.as_ref(),
-    )
-    .await
-    .unwrap();
-
-    println!("Loaded list");
-
-    // let info = list
-    //     .iter()
-    //     .find(|t| t.title == "0.2.0e Patch Notes")
-    //     .unwrap();
-
-    let info = list[0].clone();
-
-    let patch_notes_html = fetch_post_html(&info.url).await.unwrap();
-
-    let millis = info.posted_date.timestamp_millis();
-
-    let mut embed = CreateEmbed::new()
-        .title(&info.title)
-        .url(&info.url)
-        .field(
-            "Posted date",
-            format!("<t:{}>", info.posted_date.timestamp()),
-            false,
-        )
-        .footer(CreateEmbedFooter::new(subforum_title(
-            WebsiteLanguage::En,
-            Subforum::EarlyAccessPatchNotesEn,
-        )))
-        .timestamp(Timestamp::from_millis(info.posted_date.timestamp_millis()).unwrap());
-
-    if let Some(markdown) = poe_forum_markdown::get_content(&patch_notes_html) {
-        let markdown = truncate_to_max_chars(&markdown, 4095);
-        embed = embed.description(markdown);
+    pub fn offset() -> Option<FixedOffset> {
+        FixedOffset::east_opt(3 * 3600)
     }
 
-    if let Some(author) = &info.author {
-        println!("Author is set {}", author);
-        embed = embed.author(CreateEmbedAuthor::new(author));
+    pub enum Threads {
+        News020e,
     }
 
-    let message = CreateMessage::new().embed(embed);
-    println!("Message created. Sending...");
-    AppChannel::Dev
-        .id()
-        .send_message(ctx, message)
-        .await
-        .unwrap();
+    impl Threads {
+        pub fn thread(&self) -> NewsThreadInfo {
+            match self {
+                Threads::News020e => NewsThreadInfo {
+                    url: "https://www.pathofexile.com/forum/view-thread/3765101".to_owned(),
+                    posted_date: "2025-04-17T08:28:24Z".parse().unwrap(),
+                    title: "Upcoming Plans for 0.2.0g".to_owned(),
+                    author: Some("Community_Team".to_owned()),
+                },
+            }
+        }
+
+        pub fn lang(&self) -> WebsiteLanguage {
+            match self {
+                Threads::News020e => WebsiteLanguage::En,
+            }
+        }
+
+        pub fn subforum(&self) -> Subforum {
+            match self {
+                Threads::News020e => Subforum::EarlyAccessAnnouncementsEn,
+            }
+        }
+    }
 }
