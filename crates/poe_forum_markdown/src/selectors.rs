@@ -5,13 +5,26 @@ pub fn create_selector(selectors: &str) -> Selector {
 }
 
 fn content_post(document: &Html) -> Option<ElementRef> {
-    document.select(&create_selector("tr.staff")).next()
+    document
+        .select(&create_selector("tr.staff"))
+        .next()
+        .or_else(|| document.select(&create_selector(".newsPost")).next())
+}
+
+pub fn post_image_src(document: &Html) -> Option<String> {
+    let el_content = content(document)?;
+    el_content
+        .select(&create_selector("img"))
+        .next()?
+        .attr("src")
+        .map(|src| src.to_string())
 }
 
 pub fn content(document: &Html) -> Option<ElementRef> {
     content_post(document).and_then(|post| post.select(&create_selector(".content")).next())
 }
 
+#[allow(unused)]
 pub fn author(document: &Html) -> Option<String> {
     content_post(document).and_then(|post| {
         post.select(&create_selector(".post_by_account a"))
