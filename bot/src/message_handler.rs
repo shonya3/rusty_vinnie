@@ -20,6 +20,10 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
+    if m.contains("икра") {
+        emojis.push(VinnieEmoji::Eggplant);
+    }
+
     if m.contains("rust")
         || m.contains("раст")
         || m.contains("краб")
@@ -55,6 +59,7 @@ enum VinnieEmoji {
     Zdruste,
     Crab,
     RustHappy,
+    Eggplant,
 }
 
 impl VinnieEmoji {
@@ -82,6 +87,7 @@ impl VinnieEmoji {
                 id: EmojiId::new(1082770391845585016),
                 name: Some(String::from("rusthappy")),
             },
+            VinnieEmoji::Eggplant => ReactionType::Unicode(String::from("🍆")),
         }
     }
 }
