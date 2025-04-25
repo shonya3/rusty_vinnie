@@ -1,6 +1,6 @@
 use crate::{channel::AppChannel, interval};
 use chrono::FixedOffset;
-use poe_forum::{Subforum, WebsiteLanguage};
+use poe_forum::{NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
     Timestamp,
@@ -81,35 +81,7 @@ async fn watch_subforum(
                 for thread in threads.into_iter().filter(|thread| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.posted_date)
                 }) {
-                    let mut embed = CreateEmbed::new()
-                        .title(&thread.title)
-                        .url(&thread.url)
-                        .field(
-                            "Posted date",
-                            format!("<t:{}>", thread.posted_date.timestamp()),
-                            false,
-                        )
-                        .footer(CreateEmbedFooter::new(subforum_title(lang, subforum)));
-
-                    if let Some(author) = &thread.author {
-                        embed = embed.author(CreateEmbedAuthor::new(author));
-                    }
-
-                    if let Ok(timestamp) =
-                        Timestamp::from_millis(thread.posted_date.timestamp_millis())
-                    {
-                        embed = embed.timestamp(timestamp);
-                    }
-
-                    match fetch_post_html(&thread.url).await {
-                        Ok(html) => {
-                            if let Some(markdown) = poe_forum_markdown::get_content(&html) {
-                                let markdown = truncate_to_max_chars(&markdown, 4095);
-                                embed = embed.description(markdown);
-                            }
-                        }
-                        Err(err) => eprintln!("Could not fetch post html {err}"),
-                    }
+                    let embed = prepare_embed(thread, lang, subforum).await;
 
                     if let Err(err) = channel_id
                         .send_message(ctx, CreateMessage::new().embed(embed))
@@ -122,6 +94,42 @@ async fn watch_subforum(
             Err(err) => eprintln!("{err:?}"),
         }
     }
+}
+
+pub async fn prepare_embed(
+    thread: NewsThreadInfo,
+    lang: WebsiteLanguage,
+    subforum: Subforum,
+) -> CreateEmbed {
+    let mut embed = CreateEmbed::new()
+        .title(&thread.title)
+        .url(&thread.url)
+        .field(
+            "Posted date",
+            format!("<t:{}>", thread.posted_date.timestamp()),
+            false,
+        )
+        .footer(CreateEmbedFooter::new(subforum_title(lang, subforum)));
+
+    if let Some(author) = &thread.author {
+        embed = embed.author(CreateEmbedAuthor::new(author));
+    }
+
+    if let Ok(timestamp) = Timestamp::from_millis(thread.posted_date.timestamp_millis()) {
+        embed = embed.timestamp(timestamp);
+    }
+
+    match fetch_post_html(&thread.url).await {
+        Ok(html) => {
+            if let Some(markdown) = poe_forum_markdown::get_content(&html) {
+                let markdown = truncate_to_max_chars(&markdown, 4095);
+                embed = embed.description(markdown);
+            }
+        }
+        Err(err) => eprintln!("Could not fetch post html {err}"),
+    };
+
+    embed
 }
 
 pub fn subforum_title(lang: WebsiteLanguage, subforum: Subforum) -> String {
