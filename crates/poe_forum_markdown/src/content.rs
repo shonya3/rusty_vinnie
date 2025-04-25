@@ -1,4 +1,3 @@
-use crate::selectors::create_selector;
 use scraper::{ElementRef, Html};
 use std::fmt::Write;
 
@@ -13,11 +12,7 @@ pub fn clean_text(text: &str) -> String {
 
 pub fn get_content(html: &str) -> Option<String> {
     let document = Html::parse_document(html);
-    let el_content = document
-        .select(&create_selector("tr.staff"))
-        .next()?
-        .select(&create_selector(".content"))
-        .next()?;
+    let el_content = crate::selectors::content(&document)?;
 
     Some(html_to_markdown(&el_content))
 }

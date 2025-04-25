@@ -1,4 +1,4 @@
-use poe_forum_markdown::markdown;
+use poe_forum_markdown::content;
 use scraper::{Html, Selector};
 
 fn create_selector(selectors: &str) -> Selector {
@@ -23,7 +23,7 @@ fn html_to_markdown() {
         .next()
         .unwrap();
 
-    let markdown_content = markdown::html_to_markdown(&el_content);
+    let markdown_content = content::html_to_markdown(&el_content);
 
     assert_eq!(expected, markdown_content);
 }
