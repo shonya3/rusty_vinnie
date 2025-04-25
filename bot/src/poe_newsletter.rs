@@ -103,10 +103,10 @@ async fn watch_subforum(
 
                     match fetch_post_html(&thread.url).await {
                         Ok(html) => {
-                            let markdown = poe_forum_markdown::get_markdown(&html);
-                            let markdown = truncate_to_max_chars(&markdown, 4095);
-
-                            embed = embed.description(markdown);
+                            if let Some(markdown) = poe_forum_markdown::get_content(&html) {
+                                let markdown = truncate_to_max_chars(&markdown, 4095);
+                                embed = embed.description(markdown);
+                            }
                         }
                         Err(err) => eprintln!("Could not fetch post html {err}"),
                     }
@@ -198,15 +198,11 @@ pub async fn debug_send_embed(ctx: &SerenityContext) {
 
     let patch_notes_html = fetch_post_html(&info.url).await.unwrap();
 
-    let markdown = poe_forum_markdown::get_markdown(&patch_notes_html);
-    let markdown = truncate_to_max_chars(&markdown, 4095);
-
     let millis = info.posted_date.timestamp_millis();
 
     let mut embed = CreateEmbed::new()
         .title(&info.title)
         .url(&info.url)
-        .description(markdown)
         .field(
             "Posted date",
             format!("<t:{}>", info.posted_date.timestamp()),
@@ -217,6 +213,12 @@ pub async fn debug_send_embed(ctx: &SerenityContext) {
             Subforum::EarlyAccessPatchNotesEn,
         )))
         .timestamp(Timestamp::from_millis(info.posted_date.timestamp_millis()).unwrap());
+
+    if let Some(markdown) = poe_forum_markdown::get_content(&patch_notes_html) {
+        let markdown = truncate_to_max_chars(&markdown, 4095);
+        embed = embed.description(markdown);
+    }
+
     if let Some(author) = &info.author {
         println!("Author is set {}", author);
         embed = embed.author(CreateEmbedAuthor::new(author));

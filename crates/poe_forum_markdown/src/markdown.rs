@@ -11,20 +11,15 @@ pub fn clean_text(text: &str) -> String {
         .join("\n")
 }
 
-pub fn get_markdown(html: &str) -> String {
+pub fn get_content(html: &str) -> Option<String> {
     let document = Html::parse_document(html);
-
-    let patch_notes_post = document
+    let el_content = document
         .select(&create_selector("tr.staff"))
-        .next()
-        .unwrap();
-
-    let el_content = patch_notes_post
+        .next()?
         .select(&create_selector(".content"))
-        .next()
-        .unwrap();
+        .next()?;
 
-    html_to_markdown(&el_content)
+    Some(html_to_markdown(&el_content))
 }
 
 pub fn html_to_markdown(element: &ElementRef) -> String {
