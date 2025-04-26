@@ -5,44 +5,37 @@ use rand::seq::SliceRandom;
 pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
     let mut emojis: Vec<VinnieEmoji> = vec![];
 
-    let m = msg.content.to_lowercase();
+    let message = msg.content.to_lowercase();
+    let has = |s: &str| message.contains(s);
+    let has_any = |patterns: &[&str]| patterns.iter().any(|p| has(p));
 
-    if m.contains("jab") || m.contains("жаб") {
+    if has("jab") || has("жаб") {
         emojis.push(VinnieEmoji::Jaba);
     };
 
-    if m.contains("нивазможн") || m.contains("невозможн") || m.contains("nivazmojn")
-    {
+    if has_any(&["нивазможн", "невозможн", "nivazmojn"]) {
         emojis.push(VinnieEmoji::Nivazmojna);
     };
 
-    if m.contains("утр") || m.contains("бдо") {
+    if has_any(&["утр", "бдо"]) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
-    if m.contains("икра") {
+    if has("икр") {
         emojis.push(VinnieEmoji::Eggplant);
     }
 
-    if m.contains("rust")
-        || m.contains("раст")
-        || m.contains("краб")
-        || m.contains("crab")
-        || m.contains("🦀")
-    {
-        let crab_emojis = [
+    if has_any(&["rust", "раст", "краб", "crab", "🦀"]) {
+        let emoji = [
             VinnieEmoji::Zdruste,
             VinnieEmoji::Crab,
             VinnieEmoji::RustHappy,
-        ];
-
-        let mut rng = rand::thread_rng();
-        let emoji = crab_emojis
-            .choose(&mut rng)
-            .unwrap_or(&VinnieEmoji::Zdruste);
+        ]
+        .choose(&mut rand::thread_rng())
+        .unwrap_or(&VinnieEmoji::Zdruste);
 
         emojis.push(*emoji);
-    };
+    }
 
     for emoji in emojis {
         if let Err(err) = msg.react(&ctx, emoji).await {
