@@ -69,12 +69,7 @@ async fn main(
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![
-                commands::patchnotes(),
-                // crate::teasers::populate_teasers(),
-                crate::commands::ascendancies1(),
-                crate::commands::ascendancies2(),
-            ],
+            commands: vec![],
             ..Default::default()
         })
         .build();
