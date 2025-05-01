@@ -5,6 +5,7 @@ use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
     Timestamp,
 };
+use unicode_segmentation::UnicodeSegmentation;
 
 pub async fn watch_subforums(
     ctx: &SerenityContext,
@@ -63,7 +64,7 @@ pub async fn prepare_embed(
         .field(
             "Posted date",
             format!("<t:{}>", thread.posted_date.timestamp()),
-            false,
+            true,
         )
         .footer(CreateEmbedFooter::new(subforum_title(lang, subforum)));
 
@@ -78,7 +79,14 @@ pub async fn prepare_embed(
     match fetch_post_html(&thread.url).await {
         Ok(html) => {
             if let Some(details) = poe_forum_markdown::get_details(&html) {
+                embed = embed.field(
+                    "Words",
+                    details.content.unicode_words().count().to_string(),
+                    true,
+                );
+
                 let markdown = truncate_to_max_chars(&details.content, 4095);
+
                 embed = embed.description(markdown);
 
                 if let Some(image_src) = &details.image_src {
