@@ -21,7 +21,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
-    if has("икр") {
+    if has_any(&["икр", "баклажан"]) {
         emojis.push(VinnieEmoji::Eggplant);
     }
 
