@@ -7,25 +7,25 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
 
     let message = msg.content.to_lowercase();
     let has = |s: &str| message.contains(s);
-    let has_any = |patterns: &[&str]| patterns.iter().any(|p| has(p));
+    let any = |patterns: &[&str]| patterns.iter().any(|p| has(p));
 
-    if has("jab") || has("жаб") {
+    if any(&["жаб", "jab"]) {
         emojis.push(VinnieEmoji::Jaba);
     };
 
-    if has_any(&["нивазможн", "невозможн", "nivazmojn"]) {
+    if any(&["нивазможн", "невозможн", "nivazmojn"]) {
         emojis.push(VinnieEmoji::Nivazmojna);
     };
 
-    if has_any(&["утр", "бдо"]) {
+    if any(&["утр", "бдо"]) {
         emojis.push(VinnieEmoji::Utrechka);
     };
 
-    if has_any(&["икр", "баклажан"]) {
+    if any(&["икр", "баклажан"]) {
         emojis.push(VinnieEmoji::Eggplant);
     }
 
-    if has_any(&["rust", "раст", "краб", "crab", "🦀"]) {
+    if any(&["rust", "раст", "краб", "crab", "🦀"]) {
         let emoji = [
             VinnieEmoji::Zdruste,
             VinnieEmoji::Crab,
