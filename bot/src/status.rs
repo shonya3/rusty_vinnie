@@ -11,7 +11,6 @@ pub async fn watch_status<On, Off, Fut>(
     Off: Fn() -> Fut,
 {
     let mut status = get_status();
-    println!("Start watching. Initial status: {status:?}");
     let mut interval = tokio::time::interval(Duration::from_secs(30));
     loop {
         interval.tick().await;
