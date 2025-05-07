@@ -5,7 +5,6 @@ use std::collections::HashSet;
 
 mod channel;
 mod commands;
-pub mod ea_live_updates;
 mod interval;
 mod last_epoch;
 mod message_handler;
