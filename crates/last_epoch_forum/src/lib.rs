@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+pub mod content;
+
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub async fn fetch_subforum_threads_list(
@@ -26,6 +28,8 @@ pub struct NewsThreadInfo {
     pub url: String,
     pub title: String,
     pub datetime: DateTime<Utc>,
+    pub content: Option<String>,
+    pub author: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -68,11 +72,11 @@ pub mod html {
         Ok(html)
     }
 
-    pub async fn prepare_threads_info(html: &str) -> Vec<NewsThreadInfo> {
-        let html = html.to_owned();
+    pub async fn prepare_threads_info(subforum_threads_page_html: &str) -> Vec<NewsThreadInfo> {
+        let subforum_threads_page_html = subforum_threads_page_html.to_owned();
 
         let parse_result = tokio::task::spawn_blocking(move || {
-            let document = Html::parse_document(&html);
+            let document = Html::parse_document(&subforum_threads_page_html);
             let tr_selector = create_selector("table tbody tr");
 
             document
@@ -91,12 +95,16 @@ pub mod html {
 
         let mut results = Vec::new();
         for (url, title) in parse_result {
-            if let Ok(post_markup) = fetch_post_markup(&url).await {
-                if let Some(datetime) = get_datetime(&post_markup) {
+            if let Ok(post_page_html) = fetch_post_markup(&url).await {
+                let document = Html::parse_document(&post_page_html);
+
+                if let Some(datetime) = get_datetime(&document) {
                     results.push(NewsThreadInfo {
                         url,
                         title,
                         datetime,
+                        content: crate::content::get_content(&document),
+                        author: get_author(&document),
                     });
                 }
             }
@@ -143,6 +151,13 @@ pub mod html {
     //     //     .await
     // }
 
+    fn get_author(document: &Html) -> Option<String> {
+        document
+            .select(&create_selector(".creator"))
+            .next()
+            .map(|creator| creator.text().collect::<String>())
+    }
+
     fn title_selector() -> Selector {
         create_selector("a.title")
     }
@@ -171,8 +186,7 @@ pub mod html {
         )
     }
 
-    fn get_datetime(post_markup: &str) -> Option<DateTime<Utc>> {
-        let document = Html::parse_document(post_markup);
+    fn get_datetime(document: &Html) -> Option<DateTime<Utc>> {
         let selector = create_selector(".topic-body time");
         let datetime_str = document.select(&selector).next()?.attr("datetime")?;
         let datetime: DateTime<Utc> = datetime_str.parse().ok()?;

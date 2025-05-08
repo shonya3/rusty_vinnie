@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Last Epoch Patch 1.2.3 Notes - Patch Notes - Last Epoch Forums</title>
+		<meta
+			name="description"
+			content="The team is currently aware of a bug with WASD in the 1.2.3 Patch and will be deploying a hotfix as soon as possible. 
+Bug Fixes
+Skills
+
+Fixed an issue where player was unable to properly use Flame Rush while channeling &amp;hellip;"
+		/>
+		<meta
+			name="generator"
+			content="Discourse 3.2.0.beta4-dev - https://github.com/discourse/discourse version 6388d929d6742f14981df2f2bc4a6b16517d5987"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			href="https://forum.lastepoch.com/uploads/default/optimized/2X/8/88735a70000fb90a5e98830b58da768b41c6d817_2_32x32.png"
+		/>
+		<link
+			rel="apple-touch-icon"
+			type="image/png"
+			href="https://forum.lastepoch.com/uploads/default/optimized/2X/c/ca0fa6e9f1049895b24c0c849e1663624bd2817f_2_180x180.gif"
+		/>
+		<meta name="theme-color" media="all" content="#111111" />
+
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover"
+		/>
+		<link rel="canonical" href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541" />
+
+		<link
+			rel="search"
+			type="application/opensearchdescription+xml"
+			href="https://forum.lastepoch.com/opensearch.xml"
+			title="Last Epoch Forums Search"
+		/>
+
+		<link
+			href="/stylesheets/color_definitions_dark_1_1_f2d48a89f35d93dc69ffdbea2c48ebc3a42dfaf6.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			class="light-scheme"
+		/>
+
+		<link
+			href="/stylesheets/desktop_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="desktop"
+		/>
+
+		<link
+			href="/stylesheets/badges-below-avatar_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="badges-below-avatar"
+		/>
+		<link
+			href="/stylesheets/checklist_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="checklist"
+		/>
+		<link
+			href="/stylesheets/discourse-akismet_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-akismet"
+		/>
+		<link
+			href="/stylesheets/discourse-assign_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-assign"
+		/>
+		<link
+			href="/stylesheets/discourse-data-explorer_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-data-explorer"
+		/>
+		<link
+			href="/stylesheets/discourse-details_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-details"
+		/>
+		<link
+			href="/stylesheets/discourse-group-tracker_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-group-tracker"
+		/>
+		<link
+			href="/stylesheets/discourse-lazy-videos_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-lazy-videos"
+		/>
+		<link
+			href="/stylesheets/discourse-local-dates_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-local-dates"
+		/>
+		<link
+			href="/stylesheets/discourse-narrative-bot_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-narrative-bot"
+		/>
+		<link
+			href="/stylesheets/discourse-presence_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-presence"
+		/>
+		<link
+			href="/stylesheets/discourse-solved_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-solved"
+		/>
+		<link
+			href="/stylesheets/discourse-staff-notes_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-staff-notes"
+		/>
+		<link
+			href="/stylesheets/discourse-voting_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-voting"
+		/>
+		<link
+			href="/stylesheets/docker_manager_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="docker_manager"
+		/>
+		<link
+			href="/stylesheets/footnote_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="footnote"
+		/>
+		<link
+			href="/stylesheets/poll_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="poll"
+		/>
+		<link
+			href="/stylesheets/spoiler-alert_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="spoiler-alert"
+		/>
+		<link
+			href="/stylesheets/discourse-voting_desktop_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="discourse-voting_desktop"
+		/>
+		<link
+			href="/stylesheets/poll_desktop_694e22d46cc9dc6b047b81ea0ca0add90f5bf859.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="poll_desktop"
+		/>
+
+		<link
+			href="/stylesheets/desktop_theme_1_589290730866df9e628b5a809c74f98203436f0f.css?__ws=forum.lastepoch.com"
+			media="all"
+			rel="stylesheet"
+			data-target="desktop_theme"
+			data-theme-id="1"
+			data-theme-name="dark"
+		/>
+
+		<link href="https://fonts.googleapis.com/css?family=Cinzel|Forum" rel="stylesheet" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+		/>
+
+		<link href="https://fonts.googleapis.com/css?family=Cinzel|Forum" rel="stylesheet" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+		/>
+		<link
+			rel="preload"
+			href="/theme-javascripts/4a4802a0814e56057b2f0b09553b1838ffbe410c.js?__ws=forum.lastepoch.com"
+			as="script"
+		/>
+		<script
+			defer=""
+			src="/theme-javascripts/4a4802a0814e56057b2f0b09553b1838ffbe410c.js?__ws=forum.lastepoch.com"
+			data-theme-id="1"
+		></script>
+
+		<link
+			rel="alternate nofollow"
+			type="application/rss+xml"
+			title="RSS feed of &#39;Last Epoch Patch 1.2.3 Notes&#39;"
+			href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541.rss"
+		/>
+		<meta property="og:site_name" content="Last Epoch Forums" />
+		<meta property="og:type" content="website" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta
+			name="twitter:image"
+			content="https://forum.lastepoch.com/uploads/default/original/2X/5/5c175ed1fa21413c0cfc3084cd724ac8c6130e41.png"
+		/>
+		<meta
+			property="og:image"
+			content="https://forum.lastepoch.com/uploads/default/original/2X/5/5c175ed1fa21413c0cfc3084cd724ac8c6130e41.png"
+		/>
+		<meta property="og:url" content="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541" />
+		<meta name="twitter:url" content="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541" />
+		<meta property="og:title" content="Last Epoch Patch 1.2.3 Notes" />
+		<meta name="twitter:title" content="Last Epoch Patch 1.2.3 Notes" />
+		<meta
+			property="og:description"
+			content="The team is currently aware of a bug with WASD in the 1.2.3 Patch and will be deploying a hotfix as soon as possible.  Bug Fixes Skills  Fixed an issue where player was unable to properly use Flame Rush while channeling Focus with Mana Guide equipped. Fixed Crest of Unity not forcing Elemental Nova to have all elemental tags. Fixed a bug with Volatile Reversal where allocating Immutable Past did not prevent triggering effects that require being able to jump backwards in time, such as Warped Time..."
+		/>
+		<meta
+			name="twitter:description"
+			content="The team is currently aware of a bug with WASD in the 1.2.3 Patch and will be deploying a hotfix as soon as possible.  Bug Fixes Skills  Fixed an issue where player was unable to properly use Flame Rush while channeling Focus with Mana Guide equipped. Fixed Crest of Unity not forcing Elemental Nova to have all elemental tags. Fixed a bug with Volatile Reversal where allocating Immutable Past did not prevent triggering effects that require being able to jump backwards in time, such as Warped Time..."
+		/>
+		<meta property="og:article:section" content="Patch Notes" />
+		<meta property="og:article:section:color" content="F7941D" />
+		<meta name="twitter:label1" value="Reading time" />
+		<meta name="twitter:data1" value="5 mins 🕑" />
+		<meta name="twitter:label2" value="Likes" />
+		<meta name="twitter:data2" value="23 ❤" />
+		<meta property="article:published_time" content="2025-05-08T16:00:00+00:00" />
+		<meta property="og:ignore_canonical" content="true" />
+
+		<link rel="next" href="/t/last-epoch-patch-1-2-3-notes/77541?page=2" />
+	</head>
+	<body class="crawler">
+		<style>
+			.sidenav {
+				height: 100%;
+				width: 0;
+				position: fixed;
+				z-index: 1200;
+				top: 0;
+				left: 0;
+				background-color: #111;
+				overflow-x: hidden;
+				transition: 0.5s;
+				padding-top: 15px;
+			}
+
+			.sidenav a {
+				padding: 8px 8px 8px 32px;
+				text-decoration: none;
+				font-size: 25px;
+				color: #818181;
+				display: block;
+				transition: 0.31s;
+			}
+
+			.sidenav a:hover {
+				color: #f1f1f1;
+			}
+
+			.sidenav .closebtn {
+				position: absolute;
+				top: 0;
+				right: 25px;
+				font-size: 36px;
+				margin-left: 50px;
+			}
+
+			@media screen and (max-height: 450px) {
+				.sidenav {
+					padding-top: 15px;
+				}
+				.sidenav a {
+					font-size: 18px;
+				}
+			}
+
+			/* Style the sidenav links and the dropdown button */
+			.sidenav a:not(:first-child),
+			.dropdown-btn {
+				padding: 6px 8px 6px 16px;
+				text-decoration: none;
+				font-size: 20px;
+				color: #818181;
+				display: block;
+				border: none;
+				background: none;
+				width: 100%;
+				text-align: left;
+				cursor: pointer;
+				outline: none;
+			}
+
+			/* On mouse-over */
+			.sidenav a:hover,
+			.dropdown-btn:hover {
+				color: #f1f1f1 !important;
+				background: #383838 !important;
+			}
+
+			/* Main content */
+			.main {
+				margin-left: 200px; /* Same as the width of the sidenav */
+				font-size: 20px; /* Increased text to enable scrolling */
+				padding: 0px 10px;
+			}
+
+			/* Add an active class to the active dropdown button */
+			.active {
+				background-color: #111111;
+				color: white;
+			}
+
+			/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+			.dropdown-container {
+				display: none;
+				background-color: #262626;
+				padding-left: 8px;
+			}
+
+			/* Optional: Style the caret down icon */
+			.fa-angle-down,
+			.fa-angle-right {
+				float: right;
+				padding-right: 8px;
+			}
+		</style>
+		<!--//////////////////////////////////////////////-->
+
+		<style>
+			.epoch-header {
+				text-align: center;
+				//background: #030511;
+				height: 115px;
+			}
+			.epoch-header > div {
+				text-align: center;
+				max-width: 1250px;
+				margin: 0 auto;
+				display: block;
+			}
+			.epoch-header ul {
+				marign: 0 !important;
+			}
+			.epoch-header li {
+				list-style: none;
+			}
+			.epoch-header li a {
+				color: #fcf6e3;
+			}
+			.epoch-header ul > li {
+				display: inline-block;
+			}
+			.epoch-header ul > li a {
+				display: block;
+				font-size: 20px;
+				font-family: 'Last Epoch';
+				padding: 0.5em 0.8em;
+				text-decoration: none;
+			}
+			.epoch-header ul > li a:hover {
+				color: #fff;
+			}
+			.epoch-header ul > li > ul {
+				display: none;
+			}
+			.epoch-header ul > li:hover ul {
+				display: block;
+				position: absolute;
+				z-index: 9999;
+				min-width: 140px;
+				background: #030511;
+			}
+			.epoch-header ul > li ul li {
+				display: block;
+			}
+
+			/*.has-subnav span {background:url('https://i.imgur.com/vIOvfgB.png') no-repeat center center; display:inline-block; width:20px; height:15px; }*/
+			/*.has-subnav a:hover span {background:url('https://i.imgur.com/N3NSrmL.png') no-repeat center center;}*/
+
+			/* .epoch-header .supporter {text-shadow:0 0 20px orange,0px 0 10px orange,0 0 3px orange !important}
+    .epoch-header .supporter:hover {text-shadow:0 0 20px orange,0px 0 10px orange,0 0 3px orange, 0px 0 10px orange !important} */
+			.epoch-header .logo-menu-item img {
+				width: 250px;
+			}
+
+			/*My Custom Coding*/
+			li.logo-menu-item {
+				width: 360px;
+				position: relative !important;
+			}
+			li.logo-menu-item a {
+				position: absolute;
+				top: -118px;
+				left: 0;
+				right: 0;
+			}
+			ul.desktop_menu {
+				padding-top: 40px;
+				padding-left: 0;
+			}
+			ul.desktop_menu > li {
+				padding-top: 15px;
+			}
+			li.has-subnav ul {
+				padding-left: 0;
+			}
+			.mobile_logo,
+			.mobile_menu {
+				display: none;
+			}
+			.desktop_menu span.fa.fa-angle-down {
+				float: initial;
+			}
+			span.mobile_nav_icon {
+				display: none;
+			}
+
+			@media screen and (max-width: 1024px) {
+				.my_account {
+					display: none;
+				}
+				.desktop_menu {
+					display: none;
+				}
+				span.mobile_nav_icon {
+					display: block;
+				}
+				.mobile_logo {
+					position: absolute;
+					top: 10px;
+					left: 0;
+					right: 0;
+					display: block;
+					text-align: center;
+				}
+				.mobile_logo img {
+					max-width: 200px;
+				}
+				.mobile_menu {
+					display: block;
+				}
+				span.mobile_nav_icon {
+					border-color: #704706 !important;
+
+					color: #fff;
+					position: absolute;
+					right: 5%;
+					top: 40px;
+					padding: 5px 10px 3px 9px;
+					border-radius: 4px;
+					font-size: 21px !important;
+				}
+				span.mobile_nav_icon {
+					background: url('https://lastepochgame.com/wp-content/uploads/2019/04/SecondaryButtonSpriteSheet.jpg') !important;
+					background-size: auto;
+					background-size: 100% 400% !important;
+					transform: none;
+					transition: none !important;
+					background: #333;
+				}
+				span.mobile_nav_icon:hover {
+					background-position: 0 -100% !important;
+				}
+
+				.sidenav .closebtn {
+					position: static;
+					top: auto;
+					left: auto;
+					font-size: 36px;
+					margin-left: 18px;
+					/*height: 33px;*/
+					padding: 0;
+					right: auto;
+					margin-top: -3px;
+				}
+				div#mySidenav > a:not(:first-child),
+				div#mySidenav .dropdown-container > a,
+				.dropdown-btn {
+					font-size: 14px;
+					padding: 18px 20px;
+					border-bottom: 1px solid #3a3a3a;
+					color: #767676;
+				}
+				.sidenav a:hover,
+				.dropdown-btn:hover {
+					color: #f1f1f1;
+					background: #3c3c3c;
+				}
+				a.closebtn:hover {
+					background: #111111 !important;
+				}
+			}
+			.my_account {
+				position: absolute;
+				top: 10px;
+				right: 20px;
+				color: #fff !important;
+				font-size: 15px !important;
+			}
+			.epoch-header ul li a.supporter {
+				background: linear-gradient(180deg, #141115, #0e0b10), #100e0e;
+				box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25), inset 0 4px 4px rgba(0, 0, 0, 0.25);
+				border-style: solid;
+				border-image-slice: 1;
+				border-width: 1px;
+				border-image-source: linear-gradient(0deg, #d0b782, #fff);
+				font-size: 1.125rem;
+				padding: 1rem 2rem;
+				position: relative;
+				display: inline-block;
+				text-align: center;
+				text-transform: uppercase;
+				line-height: 1;
+				font-family: Last Epoch, Trajan Pro, Georgia, serif;
+				width: 100%;
+			}
+			.my_account:hover {
+				color: #be9151 !important;
+			}
+			.epoch-header ul li a {
+				text-transform: uppercase;
+				color: #fff;
+				font-size: 20px;
+				padding: 0.5rem;
+				letter-spacing: 1.5px;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+			}
+			ul.desktop_menu {
+				margin-left: -50px;
+			}
+			.desktop_menu > li {
+				min-width: 12.5%;
+				text-align: left;
+			}
+			.desktop_menu li.logo-menu-item {
+				width: 360px;
+				position: relative !important;
+				margin-left: -50px;
+				margin-right: 25px;
+			}
+			.desktop_menu li.has-subnav li a {
+				font-size: 16px;
+				padding: 0.875rem 1rem;
+			}
+			.desktop_menu li.has-subnav ul {
+				margin-left: 0px !important;
+			}
+			.desktop_menu li.has-subnav li {
+				border-top: 1px solid hsla(0, 0%, 100%, 0.1);
+			}
+			.desktop_menu li.has-subnav ul {
+				border: 1px solid hsla(0, 0%, 100%, 0.1);
+			}
+			.epoch-header li a:hover {
+				color: #d0b782 !important;
+				background-color: #030511;
+			}
+		</style>
+
+		<div class="epoch-header">
+			<a href="https://portal.lastepoch.com" class="my_account">My Account</a>
+			<div>
+				<ul class="desktop_menu">
+					<li class="has-subnav">
+						<a>News <span class="nav-arrow top-level fa fa-angle-down" style=""></span></a>
+						<ul>
+							<li><a href="/c/announcements">Announcements</a></li>
+							<li><a href="/c/patch-notes">Patch Notes</a></li>
+							<li><a href="/c/dev-blog">Developer Blogs</a></li>
+							<li><a href="https://lastepoch.com/careers">Careers</a></li>
+						</ul>
+					</li>
+					<li class="has-subnav">
+						<a href="">Game <span class="nav-arrow top-level fa fa-angle-down" style=""></span></a>
+						<ul>
+							<li><a href="https://lastepoch.com/classes/">Classes</a></li>
+							<li><a href="https://lastepoch.com/skills/">Skills</a></li>
+							<li><a href="https://lastepoch.com/items/">Items</a></li>
+							<li><a href="https://lastepoch.com/end-game/">End Game Systems</a></li>
+							<li><a href="https://lastepoch.com/world-story/">World &amp; Story</a></li>
+						</ul>
+					</li>
+					<li><a class="forums" href="https://forum.lastepoch.com/">Forum</a></li>
+					<li class="logo-menu-item">
+						<a href="https://lastepoch.com/">
+							<img src="/uploads/default/original/2X/4/485f366a543d75d290539bb44f67e2ab7453a0e6.png" />
+						</a>
+					</li>
+					<li class="has-subnav">
+						<a href="">Ladder <span class="nav-arrow top-level fa fa-angle-down" style=""></span></a>
+						<ul>
+							<li><a href="https://lastepoch.com/arena-ladder/">Arena Ladder</a></li>
+							<li><a href="https://lastepoch.com/level-ladder/">Level Ladder</a></li>
+						</ul>
+					</li>
+
+					<li><a class="supporter" href="https://portal.lastepoch.com/editions">Buy Now </a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!--Side Menu for Mobile-->
+		<!--Mobile Logo-->
+		<div class="mobile_logo">
+			<a href="https://lastepochgame.com/">
+				<img src="/uploads/default/original/2X/4/485f366a543d75d290539bb44f67e2ab7453a0e6.png" />
+			</a>
+		</div>
+		<div id="mySidenav" class="sidenav mobile_menu">
+			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+			<button class="dropdown-btn">
+				Home
+				<i class="fa fa-angle-right"></i>
+			</button>
+			<a href="https://portal.lastepoch.com">My Account</a>
+			<div class="dropdown-container">
+				<a href="/c/announcement">Announcements</a>
+				<a href="/c/patch-notes">Patch Notes</a>
+				<a href="/c/dev-blog">Developers Blog</a>
+			</div>
+			<button class="dropdown-btn">
+				The Game
+				<i class="fa fa-angle-right"></i>
+			</button>
+			<div class="dropdown-container">
+				<a href="https://lastepoch.com/classes/">Classes</a>
+				<a href="https://lastepoch.com/skills/">Skill System</a>
+				<a href="https://lastepoch.com/items/">Items</a>
+				<a href="https://lastepoch.com/world-story/">World &amp; Story</a>
+				<a href="https://lastepoch.com/end-game/">End Game Systems</a>
+			</div>
+			<a href="https://forum.lastepoch.com">Forum</a>
+			<a href="https://lastepoch.com/supporter-packs/">Buy Now</a>
+		</div>
+		<span style="font-size: 30px; cursor: pointer" class="mobile_nav_icon" onclick="openNav()">☰</span>
+
+		<link
+			rel="preload"
+			href="/theme-javascripts/eb6a41d2176dec6ca9a5a963be1957dc49805fcc.js?__ws=forum.lastepoch.com"
+			as="script"
+		/>
+		<script
+			defer=""
+			src="/theme-javascripts/eb6a41d2176dec6ca9a5a963be1957dc49805fcc.js?__ws=forum.lastepoch.com"
+			data-theme-id="1"
+		></script>
+
+		<header>
+			<a href="/"> Last Epoch Forums </a>
+		</header>
+
+		<div id="main-outlet" class="wrap" role="main">
+			<div id="topic-title">
+				<h1>
+					<a href="/t/last-epoch-patch-1-2-3-notes/77541">Last Epoch Patch 1.2.3 Notes</a>
+				</h1>
+
+				<div class="topic-category" itemscope itemtype="http://schema.org/BreadcrumbList">
+					<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+						<a href="/c/patch-notes/39" class="badge-wrapper bullet" itemprop="item">
+							<span class="badge-category-bg" style="background-color: #f7941d"></span>
+							<span class="badge-category clear-badge">
+								<span class="category-name" itemprop="name">Patch Notes</span>
+							</span>
+						</a>
+						<meta itemprop="position" content="1" />
+					</span>
+				</div>
+			</div>
+
+			<div itemscope itemtype="http://schema.org/DiscussionForumPosting">
+				<meta itemprop="headline" content="Last Epoch Patch 1.2.3 Notes" />
+				<meta itemprop="articleSection" content="Patch Notes" />
+				<meta itemprop="keywords" content="" />
+				<div itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+					<meta itemprop="name" content="Eleventh Hour Games" />
+				</div>
+
+				<div id="post_1" class="topic-body crawler-post">
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Averielle"
+								><span itemprop="name">Averielle</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:00:00Z" class="post-time">
+								May 8, 2025, 4:00pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:54:50Z" />
+							<span itemprop="position">1</span>
+						</span>
+					</div>
+					<div class="post" itemprop="articleBody">
+						<p>
+							The team is currently aware of a bug with WASD in the 1.2.3 Patch and will be deploying a
+							hotfix as soon as possible.
+						</p>
+						<h1><a name="bug-fixes-1" class="anchor" href="#bug-fixes-1"></a>Bug Fixes</h1>
+						<h2><a name="skills-2" class="anchor" href="#skills-2"></a>Skills</h2>
+						<ul>
+							<li>
+								Fixed an issue where player was unable to properly use Flame Rush while channeling Focus
+								with Mana Guide equipped.
+							</li>
+							<li>Fixed Crest of Unity not forcing Elemental Nova to have all elemental tags.</li>
+							<li>
+								Fixed a bug with Volatile Reversal where allocating Immutable Past did not prevent
+								triggering effects that require being able to jump backwards in time, such as Warped
+								Time.
+							</li>
+							<li>
+								Fixed a display bug with Volatile Reversal where allocating ‘Immutable Past’ did not
+								remove the buff UI icon displaying how long you have remaining on your ability to
+								re-activate Volatile Reversal to jump a second time.
+							</li>
+							<li>
+								Fixed an issue where Shield Throw would create multiple shields if Void Knight mastery
+								was selected.
+							</li>
+							<li>
+								Fixed a bug with Rebuke where Burst of Speed was not granting Haste, and was instead
+								granting 25% increased movement speed.
+							</li>
+							<li>
+								Fixed a bug where, under certain conditions, Fallen From Grace and Order of Lagon could
+								fail to convert Smite’s base damage to void or lightning respectively.
+							</li>
+							<li>
+								Fixed a bug with the Forge Guard passive tree where many sources of Haste didn’t have
+								their effects converted to block chance by Forgemaster’s Might.
+							</li>
+							<li>Fixed a bug where Heartseeker would target invulnerable enemies.</li>
+							<li>
+								Fixed a bug where Heartseeker would prioritize targeting certain enemy types over
+								others. For example, Exiled Mages could not be targeted unless there were no other
+								enemies in range.
+							</li>
+							<li>
+								In the Bladedancer passive tree, Argent Veil has been clarified to state that it only
+								triggers when damage taken by enemies puts you below 70% health (rather than any means
+								of dropping below 70% health).
+							</li>
+							<li>
+								The alt text for Shadow Cascade now has additional information clarifying that Shadow
+								Cascade has 10% base critical strike chance, instead of the typical 5%.
+							</li>
+							<li>
+								Fixed a bug where the visual trails for Umbral Blades would travel less distance than
+								the blades in the ground.
+							</li>
+							<li>
+								Fixed a bug where a portion of Dread Shade visuals would be inside of the minion they
+								were attached to.
+							</li>
+							<li>Fixed a bug where Thorn Shield stayed in spawn place after scene transitions.</li>
+							<li>
+								The Blizzard’s Wrath, Thunderous Storm, and Grand Cyclone nodes now display subskill
+								tooltips for Tempest Strike’s spells, allowing their descriptions and tags to be viewed.
+								They do not currently offer DPS estimates.
+							</li>
+							<li>
+								Fixed a bug where changing summoned minions in town could cause both types of minions to
+								be auto re-summoned when exiting the town.
+							</li>
+							<li>
+								Fixed an issue where players could get stuck after using movement abilities in the
+								Tundra near the inactive bridge.
+							</li>
+						</ul>
+						<h2>
+							<a name="imprinted-items-3" class="anchor" href="#imprinted-items-3"></a>Imprinted Items
+						</h2>
+						<p>Made a number of fixes and changes to Imprinted items:</p>
+						<ul>
+							<li>
+								Fixed an issue where altering the original imprinted item could affect the imprint
+								itself.
+							</li>
+							<li>
+								Fixed a bug where imprinted Unique, Set, and Legendary items were unable to result in
+								generating different Uniques or Sets than the imprinted one.
+							</li>
+							<li>
+								Fixed imprinted item remaining Weavers Will and Affix tiers not correctly corresponding
+								to dropped item average Weaver’s Will for imprinted Legendary Weaver’s Will items.
+							</li>
+							<li>
+								Fixed an issue where replacing an imprinted item on the Weaver Tree sometimes didn’t
+								remove the other item visually.
+							</li>
+							<li>
+								Added a chance for imprinted normal/magic/rare/exalted items to result in drops of
+								Unique and Set items of the same item type.
+							</li>
+							<li>
+								Reworked Forging Potential roll for similar items. Low and medium Forging Potential
+								imprinted items result in drops with higher FP on average, and even low Forging
+								Potential imprinted items have a chance to result in items with normal Forging
+								Potential.
+							</li>
+							<li>
+								Guests’ Imprint nodes now work as long as the Host has the same imprint node. The
+								guests’ imprinted items are used for their drops instead of the Host’s. This does not
+								include Woven Echo imprint nodes.
+							</li>
+						</ul>
+						<h2>
+							<a
+								name="dungeon-monolith-and-quest-4"
+								class="anchor"
+								href="#dungeon-monolith-and-quest-4"
+							></a
+							>Dungeon, Monolith and Quest
+						</h2>
+						<ul>
+							<li>
+								Fixed a bug where using Portal charms would result in one more mod than intended for
+								dungeon tiers where a mod was added when you started the dungeon.
+							</li>
+							<li>
+								Fixed a bug where the each cast of the Imperial Soulmage’s Hungering Soul ability would
+								permanently increase the damage of any Flaming Soul cast by the Imperial Pyromancer.
+							</li>
+							<li>
+								Fixed an issue where dying on the Monolith Hub with items around you could visually
+								duplicate the items on the floor.
+							</li>
+							<li>
+								Fixed a bug that prevented the quest pulse directing you to the Temple of Eterra from
+								appearing after defeating the Giant Weather Statue boss in the Courtyard.
+							</li>
+							<li>Fixed an issue where the Eternity Cache would not play its reveal visual effect.</li>
+							<li>Fixed an issue where you could see Memory Amber remaining from previous zones.</li>
+							<li>
+								Fixed an issue where players could interact with a echo portal and a Cemetery
+								entrance/exit in the same frame, causing transition errors and preventing movement.
+							</li>
+						</ul>
+						<h2><a name="items-5" class="anchor" href="#items-5"></a>Items</h2>
+						<ul>
+							<li>
+								Fixed a bug where the Loom Walker idol (increased stun chance and added stun avoidance)
+								was acting as a multiplier to other sources of increased stun chance, rather than adding
+								to them.
+							</li>
+							<li>
+								Fixed a bug where Mantle of the Pale Ox was giving an amount of increased health for the
+								player that was different from what was stated. For existing items, the listed values
+								for “20-32% increased health for you and your minions” will change to accurately reflect
+								the amount of increased health it was granting to the player.
+							</li>
+							<li>
+								Fixed a bug where Grasp of the Blood Mage’s mana spent reflected to you as damage could
+								set you to 1 health after taking you out of Reaper Form. It can still take you out of
+								Reaper Form, but your health will be restored to full as usual.
+							</li>
+						</ul>
+						<h2><a name="input-6" class="anchor" href="#input-6"></a>Input</h2>
+						<ul>
+							<li>Fixed an issue where players could use Warpath without moving when using WASD.</li>
+							<li>
+								Fixed an issue on controller where UI fields would be skipped while navigating Unique
+								item names in the Bazaar.
+							</li>
+						</ul>
+						<h2><a name="uivisual-7" class="anchor" href="#uivisual-7"></a>UI/Visual</h2>
+						<ul>
+							<li>
+								Fixed an issue where CTRL+F hotkey didn’t work for selecting the Weaver Tree search
+								field.
+							</li>
+							<li>
+								Fixed an issue where the Skill panel’s blinking indicator for when a “+X to Skill” affix
+								is removed did not function.
+							</li>
+							<li>
+								Fixed an issue where gold could be lost when attempting to swap to an incompatible
+								Blessing.
+							</li>
+							<li>
+								Fixed a bug which could cause the Blessing Reward Replacement Panel to display the wrong
+								Blessing to be replaced.
+							</li>
+							<li>Fixed a bug where Champion icons could remain on the map after they died.</li>
+							<li>
+								Fixed a bug where Argolos the Blessed had a pink object rotating around him when in his
+								final phase.
+							</li>
+							<li>Fixed a visual issue where loot labels would stay stuck on the screen.</li>
+							<li>Fixed layout issues for ability tooltips when shown for the first time.</li>
+							<li>
+								Fixed a visual bug where having one rune in the Forge displayed as having zero available
+								runes instead.
+							</li>
+							<li>
+								Fixed incorrect stat color on Advent of the Erased – "Less Damage Over Time Taken While
+								You Have Haste”.
+							</li>
+							<li>
+								Fixed the format of the “Potion Health Gain Converted to Ward” stat on the Character
+								Stats panel.
+							</li>
+						</ul>
+						<h2><a name="other-8" class="anchor" href="#other-8"></a>Other</h2>
+						<ul>
+							<li>
+								Fixed the Tangled Lasers from the Possessed Witch mod to counting as a hit, so it could
+								stun and crit. It now correctly counts as a DoT.
+								<ul>
+									<li>Tangled Lasers now deal 52% less damage.</li>
+								</ul>
+							</li>
+							<li>Fixed a bug where Admiral Harton’s staff could continue spinning after death.</li>
+							<li>Fixed Warpath MTX from sometimes spawning doubled visual effects.</li>
+							<li>
+								Screenshots submitted through the in-game bug reporting tool will now correctly capture
+								tooltips on screen.
+							</li>
+							<li>
+								Fixed issue where Champion’s Gate would no longer change to its music when returning
+								from an Arena run.
+							</li>
+							<li>Fixed various random selection systems being biased towards specific outcomes.</li>
+							<li>Fixed a hitch when talking to an NPC for the first time in each scene.</li>
+						</ul>
+						<h1><a name="improvements-9" class="anchor" href="#improvements-9"></a>Improvements</h1>
+						<h2><a name="input-10" class="anchor" href="#input-10"></a>Input</h2>
+						<ul>
+							<li>
+								The Elemental Nova ability now targets enemies correctly when playing with the Arcane
+								Projection node on a controller.
+							</li>
+							<li>
+								Added an alternative interaction mode for WASD that disables ground movement with the
+								left mouse button while allowing rebinding for ability, to be used for both regular
+								interactions and ability casting.
+							</li>
+							<li>Improved controller navigation on the Mastery respec panel.</li>
+							<li>Added prompt on controller for the “View Stall” button in the Bazaar Panel.</li>
+						</ul>
+						<h2><a name="gameplay-11" class="anchor" href="#gameplay-11"></a>Gameplay</h2>
+						<ul>
+							<li>
+								Defeating a Timeline boss in Empowered timelines now takes you to Echo of a World
+								instead of the Monolith Hub area.
+							</li>
+							<li>
+								Added a new UI reminder below the chat screen that shows up when ground item tooltips
+								are hidden to make it clearer when this setting is enabled.
+							</li>
+							<li>
+								Updated the pickup radius of Tomes of Experience and Tomes of Favor in line with the
+								overall pickup radius increase done for 1.2.
+							</li>
+							<li>
+								Adjusted positions of several objects that were obstructing statue interaction in the
+								Courtyard and updated minimap for the scene for better navigation.
+							</li>
+						</ul>
+						<h2><a name="combat-12" class="anchor" href="#combat-12"></a>Combat</h2>
+						<ul>
+							<li>
+								The Storm Swells created by Champions with the Whirlpool mod now move and turn more
+								slowly.
+							</li>
+							<li>
+								Fateweaver Atropos’ Necrospin now hits less frequently (4 times per second, reduced from
+								8).
+							</li>
+							<li>Reduced the jitter in the Draal Queen’s Corrosive Bile projectile online.</li>
+							<li>
+								Reduced the jitter in the movement of the projectiles created by the crystals in the
+								Majasa encounter.
+							</li>
+						</ul>
+						<h2>
+							<a name="ui-visuals-and-movement-13" class="anchor" href="#ui-visuals-and-movement-13"></a
+							>UI, Visuals and Movement
+						</h2>
+						<ul>
+							<li>
+								Adjusted Rogue movement animations and shield joint to reduce clipping between large
+								shields and Rogue armor sets.
+							</li>
+							<li>
+								Fixed clipping issues affecting the Sentinel’s T28 Body Armor when combined with certain
+								boot models.
+							</li>
+							<li>Improved visuals for Wolves that have been converted to deal cold damage.</li>
+							<li>Improved pet movement on sloped surfaces.</li>
+							<li>
+								Reduced visual noise created by Phoenix Flamethrower ability from Phoenix’s Shrine buff.
+							</li>
+							<li>Improved Character Stats panel text scaling and wrapping.</li>
+						</ul>
+						<p>Made several Stash search improvements:</p>
+						<ul>
+							<li>
+								Increased vertical stash tab text limit to 30 characters to match the individual tab
+								search
+							</li>
+							<li>Stash searching now supports macros, expressions, and regex</li>
+							<li>
+								Updated some in-zone item UIs (e.g. Nemesis, Woven Offering), to<br />
+								automatically set a relevant search macro or expression based on the<br />
+								restrictions of the item slot when opening the stash
+							</li>
+							<li>
+								Regex
+								<ul>
+									<li>Wrap your search in <code>/</code> to search using case-insensitive regex</li>
+									<li>e.g. <code>/1[4-9] attunement/</code> to find items with 14-19 attunement</li>
+								</ul>
+							</li>
+							<li>
+								Macros
+								<ul>
+									<li>
+										Macros are short hands that match supported properties of items e.g.
+										<ul>
+											<li><code>LP0</code> (is unique with no legendary potential)</li>
+											<li><code>T6+</code> (has tier 6 or higher affix)</li>
+											<li><code>prefixes2</code> (has 2 prefixes)</li>
+										</ul>
+									</li>
+									<li>
+										Item Potential
+										<ul>
+											<li><code>LP</code> (is non-WW unique)</li>
+											<li><code>WW</code> (is WW unique or legendary)</li>
+											<li><code>WT</code> (is enchantable idol)</li>
+											<li><code>FP</code> (is forgeable equipment)</li>
+										</ul>
+									</li>
+									<li>
+										Item Types
+										<ul>
+											<li><code>Set</code> (grants set bonus)</li>
+											<li><code>RealSet</code> (is set item)</li>
+											<li><code>ReforgedSet</code> (is reforged set item)</li>
+											<li><code>Experimentable</code> (is boots/gloves/belt)</li>
+										</ul>
+									</li>
+									<li>
+										Equipment Requirements
+										<ul>
+											<li><code>lvl</code> (required level)</li>
+											<li><code>CoF</code> (Circle of Fortune tagged)</li>
+											<li><code>MG</code> (Merchant’s Guild tagged)</li>
+											<li><code>trade</code> (can be traded)</li>
+										</ul>
+									</li>
+									<li>
+										Affix Tier
+										<ul>
+											<li><code>T</code> (at least 1 affix tier matches)</li>
+										</ul>
+									</li>
+									<li>
+										Affix Counts
+										<ul>
+											<li><code>Prefixes</code></li>
+											<li><code>Suffixes</code></li>
+											<li><code>Affixes</code></li>
+											<li><code>Sealed</code></li>
+											<li><code>Experimental</code></li>
+											<li><code>Personal</code></li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li>
+								Expressions
+								<ul>
+									<li>
+										Macros can be combined into expressions using <code>|</code> or
+										<code>&amp;</code> e.g.
+										<ul>
+											<li><code>LP3+|WW20+</code> to find high potential uniques</li>
+											<li><code>prefixes1&amp;T7</code> to find T7 exalts with an open prefix</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+						<h2><a name="audio-14" class="anchor" href="#audio-14"></a>Audio</h2>
+						<ul>
+							<li>The Ring of Shields sub-skill, Shrapnel, now plays audio when triggered.</li>
+							<li>Cinematic audio now plays through your selected audio device.</li>
+							<li>
+								Added new emerging and death sound effects to the crystals that can be destroyed during
+								the encounter against Majasa.
+							</li>
+						</ul>
+						<h2><a name="other-changes-15" class="anchor" href="#other-changes-15"></a>Other Changes</h2>
+						<ul>
+							<li>Added “Bow Mastery” before Marksman passive bonuses to improve text clarity.</li>
+							<li>The appearance inventory now shows the correct equipped items when changing scenes.</li>
+							<li>
+								Reduced cases where issues with Parties could lead to players either disconnecting or
+								needing to wait for a long time to get into the game.
+							</li>
+						</ul>
+						<h1><a name="known-issues-16" class="anchor" href="#known-issues-16"></a>Known Issues</h1>
+						<p>
+							Please be aware that our team is still working to correct more issues and improve many more
+							areas of Last Epoch. To see a short, non-exhaustive list of what we are still working on,
+							please check here on our
+							<a href="https://forum.lastepoch.com/t/known-issues/73801">Forum Known Bugs Lists </a> or
+							ask our Community Managers in <a href="https://www.discord.gg/lastepoch">Discord </a>!
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="12" />
+						<span class="post-likes">12 Likes</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="7" />
+					</div>
+				</div>
+				<div
+					id="post_2"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Burb"
+								><span itemprop="name">Burb</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:03:35Z" class="post-time">
+								May 8, 2025, 4:03pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:33:00Z" />
+							<span itemprop="position">2</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							Wow! That’s a lot. Bummer about the Volatile Reversal Frenzy trigger fix, ah well. The
+							post-monolith-boss-dump-to-hub is S-tier QoL…
+						</p>
+						<p>But this… STASH SEARCH CAPABILITIES? AMAZING! THANK YOU!</p>
+						<p>
+							<img
+								src="https://forum.lastepoch.com/images/emoji/apple/mantelpiece_clock.png?v=12"
+								title=":mantelpiece_clock:"
+								class="emoji only-emoji"
+								alt=":mantelpiece_clock:"
+								loading="lazy"
+								width="20"
+								height="20"
+							/>
+							<img
+								src="https://forum.lastepoch.com/images/emoji/apple/european_castle.png?v=12"
+								title=":european_castle:"
+								class="emoji only-emoji"
+								alt=":european_castle:"
+								loading="lazy"
+								width="20"
+								height="20"
+							/>
+							<img
+								src="https://forum.lastepoch.com/images/emoji/apple/arrow_forward.png?v=12"
+								title=":arrow_forward:"
+								class="emoji only-emoji"
+								alt=":arrow_forward:"
+								loading="lazy"
+								width="20"
+								height="20"
+							/>
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_3"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/mePanther"
+								><span itemprop="name">mePanther</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:06:53Z" class="post-time">
+								May 8, 2025, 4:06pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:06:53Z" />
+							<span itemprop="position">3</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<aside class="quote group-EHG" data-username="Averielle" data-post="1" data-topic="77541">
+							<div class="title">
+								<div class="quote-controls"></div>
+								<img
+									loading="lazy"
+									alt=""
+									width="24"
+									height="24"
+									src="https://forum.lastepoch.com/user_avatar/forum.lastepoch.com/averielle/48/9976_2.png"
+									class="avatar"
+								/>
+								Averielle:
+							</div>
+							<blockquote>
+								<p>
+									Fixed the Tangled Lasers from the Possessed Witch mod to counting as a hit, so it
+									could stun and crit. It now correctly counts as a DoT.
+								</p>
+								<ul>
+									<li>Tangled Lasers now deal 52% less damage.</li>
+								</ul>
+							</blockquote>
+						</aside>
+						<p>I’m so happy, I could cry.</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_4"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/rastignac"
+								><span itemprop="name">rastignac</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:08:15Z" class="post-time">
+								May 8, 2025, 4:08pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:08:15Z" />
+							<span itemprop="position">4</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>Amazing ! Good job !</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_5"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/mePanther"
+								><span itemprop="name">mePanther</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:08:38Z" class="post-time">
+								May 8, 2025, 4:08pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:08:38Z" />
+							<span itemprop="position">5</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<aside class="quote group-EHG" data-username="Averielle" data-post="1" data-topic="77541">
+							<div class="title">
+								<div class="quote-controls"></div>
+								<img
+									loading="lazy"
+									alt=""
+									width="24"
+									height="24"
+									src="https://forum.lastepoch.com/user_avatar/forum.lastepoch.com/averielle/48/9976_2.png"
+									class="avatar"
+								/>
+								Averielle:
+							</div>
+							<blockquote>
+								<p>Stash searching now supports macros, expressions, and regex</p>
+							</blockquote>
+						</aside>
+						<p>OMG. Yes!</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_6"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Souleater1"
+								><span itemprop="name">Souleater1</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:08:47Z" class="post-time">
+								May 8, 2025, 4:08pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:08:47Z" />
+							<span itemprop="position">6</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>Hype stuff</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_7"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/t00b"
+								><span itemprop="name">t00b</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:08:50Z" class="post-time">
+								May 8, 2025, 4:08pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:08:50Z" />
+							<span itemprop="position">7</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<aside
+							class="quote group-EHG"
+							data-username="Averielle"
+							data-post="1"
+							data-topic="77541"
+							data-full="true"
+						>
+							<div class="title">
+								<div class="quote-controls"></div>
+								<img
+									loading="lazy"
+									alt=""
+									width="24"
+									height="24"
+									src="https://forum.lastepoch.com/user_avatar/forum.lastepoch.com/averielle/48/9976_2.png"
+									class="avatar"
+								/>
+								Averielle:
+							</div>
+							<blockquote>
+								<ul>
+									<li>Stash searching now supports macros, expressions, and regex</li>
+								</ul>
+							</blockquote>
+						</aside>
+						<p>this is a great addition !</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_8"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/xotikorukx"
+								><span itemprop="name">xotikorukx</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:08:58Z" class="post-time">
+								May 8, 2025, 4:08pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:08:58Z" />
+							<span itemprop="position">8</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							Sure would be nice if there was a “realm is restarting in X minutes” warning so I don’t get
+							kicked out of a fight where boss was down to 10% after I had been working towards being able
+							to kill it for hours and failed several times. Turned that fun and sense of accomplishment
+							right into “f*ck you, I’m going to bed. I’ll try again in 6 months”.
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="3" />
+					</div>
+				</div>
+				<div
+					id="post_9"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Demonparty"
+								><span itemprop="name">Demonparty</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:09:30Z" class="post-time">
+								May 8, 2025, 4:09pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:09:30Z" />
+							<span itemprop="position">9</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							People are gonna go nuts to see you added macros to searching! Hope rax makes a video on how
+							to use them.
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+					</div>
+				</div>
+				<div
+					id="post_10"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Tartos"
+								><span itemprop="name">Tartos</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:10:22Z" class="post-time">
+								May 8, 2025, 4:10pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:10:22Z" />
+							<span itemprop="position">10</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<blockquote>
+							<ul>
+								<li>
+									Defeating a Timeline boss in Empowered timelines now takes you to Echo of a World
+									instead of the Monolith Hub area.
+								</li>
+							</ul>
+						</blockquote>
+						<p>Thanks ! That was anoying</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_11"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Slashchop"
+								><span itemprop="name">Slashchop</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:11:20Z" class="post-time">
+								May 8, 2025, 4:11pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:11:20Z" />
+							<span itemprop="position">11</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							So great improvements!<br />
+							Thanks
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_12"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/jstamour"
+								><span itemprop="name">jstamour</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:11:36Z" class="post-time">
+								May 8, 2025, 4:11pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:11:36Z" />
+							<span itemprop="position">12</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							I saw notifications at 1 hour, 30 minutes, 1 minute, 30 seconds, then 5, 4, 3… I might have
+							even missed some. Seems like maybe you weren’t paying attention?
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="2" />
+					</div>
+				</div>
+				<div
+					id="post_13"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/ArcticPotato"
+								><span itemprop="name">ArcticPotato</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:14:20Z" class="post-time">
+								May 8, 2025, 4:14pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:14:20Z" />
+							<span itemprop="position">13</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>Oh lawd those stash improvements made me cream</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_14"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/mePanther"
+								><span itemprop="name">mePanther</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:15:03Z" class="post-time">
+								May 8, 2025, 4:15pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:15:03Z" />
+							<span itemprop="position">14</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<aside class="quote no-group" data-username="jstamour" data-post="12" data-topic="77541">
+							<div class="title">
+								<div class="quote-controls"></div>
+								<img
+									loading="lazy"
+									alt=""
+									width="24"
+									height="24"
+									src="https://forum.lastepoch.com/user_avatar/forum.lastepoch.com/jstamour/48/1818_2.png"
+									class="avatar"
+								/>
+								jstamour:
+							</div>
+							<blockquote>
+								<p>
+									I saw notifications at 1 hour, 30 minutes, 1 minute, 30 seconds, then 5, 4, 3… I
+									might have even missed some.
+								</p>
+							</blockquote>
+						</aside>
+						<p>Same here.</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_15"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/ResplendentEgo"
+								><span itemprop="name">ResplendentEgo</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:18:01Z" class="post-time">
+								May 8, 2025, 4:18pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:18:01Z" />
+							<span itemprop="position">15</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							Literally notified everyone 30 minutes before and regularly until restart. It appeared above
+							the chat window.
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_16"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/xotikorukx"
+								><span itemprop="name">xotikorukx</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:19:35Z" class="post-time">
+								May 8, 2025, 4:19pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:19:35Z" />
+							<span itemprop="position">16</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							Ah, yes, the half-transparent dark red bar that stays onscreen for 5 seconds in an
+							incredibly dark landscape with incredibly bright skills that I had to go watch the gameplay
+							video to see was there? My bad.
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+					</div>
+				</div>
+				<div
+					id="post_17"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/r3lik"
+								><span itemprop="name">r3lik</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:20:32Z" class="post-time">
+								May 8, 2025, 4:20pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:20:32Z" />
+							<span itemprop="position">17</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>great work, thanks!</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_18"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/cannolisquid"
+								><span itemprop="name">cannolisquid</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:23:57Z" class="post-time">
+								May 8, 2025, 4:23pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:23:57Z" />
+							<span itemprop="position">18</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<aside class="quote group-EHG" data-username="Averielle" data-post="1" data-topic="77541">
+							<div class="title">
+								<div class="quote-controls"></div>
+								<img
+									loading="lazy"
+									alt=""
+									width="24"
+									height="24"
+									src="https://forum.lastepoch.com/user_avatar/forum.lastepoch.com/averielle/48/9976_2.png"
+									class="avatar"
+								/>
+								Averielle:
+							</div>
+							<blockquote>
+								<p>Made several Stash search improvements:</p>
+							</blockquote>
+						</aside>
+						<p>ARE YOU KIDDING ME?! THIS IS GREAT! THANK YOU!</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+						<span class="post-likes"></span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+				<div
+					id="post_19"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/R4mpaMckvak"
+								><span itemprop="name">R4mpaMckvak</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:25:29Z" class="post-time">
+								May 8, 2025, 4:25pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:25:29Z" />
+							<span itemprop="position">19</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>Action button in WSAD mode not work some time after patch …</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="3" />
+					</div>
+				</div>
+				<div
+					id="post_20"
+					itemprop="comment"
+					itemscope
+					itemtype="http://schema.org/Comment"
+					class="topic-body crawler-post"
+				>
+					<div class="crawler-post-meta">
+						<span class="creator" itemprop="author" itemscope itemtype="http://schema.org/Person">
+							<a itemprop="url" href="https://forum.lastepoch.com/u/Moxjet200"
+								><span itemprop="name">Moxjet200</span></a
+							>
+						</span>
+
+						<link
+							itemprop="mainEntityOfPage"
+							href="https://forum.lastepoch.com/t/last-epoch-patch-1-2-3-notes/77541"
+						/>
+
+						<span class="crawler-post-infos">
+							<time itemprop="datePublished" datetime="2025-05-08T16:27:02Z" class="post-time">
+								May 8, 2025, 4:27pm
+							</time>
+							<meta itemprop="dateModified" content="2025-05-08T16:27:02Z" />
+							<span itemprop="position">20</span>
+						</span>
+					</div>
+					<div class="post" itemprop="text">
+						<p>
+							Yea we see the reports rolling in. Likely results in a quick hotfix in the upcoming hours
+							but we’re discussing now.
+						</p>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/LikeAction" />
+						<meta itemprop="userInteractionCount" content="1" />
+						<span class="post-likes">1 Like</span>
+					</div>
+
+					<div itemprop="interactionStatistic" itemscope itemtype="http://schema.org/InteractionCounter">
+						<meta itemprop="interactionType" content="http://schema.org/CommentAction" />
+						<meta itemprop="userInteractionCount" content="0" />
+					</div>
+				</div>
+			</div>
+
+			<div
+				role="navigation"
+				itemscope
+				itemtype="http://schema.org/SiteNavigationElement"
+				class="topic-body crawler-post"
+			>
+				<span itemprop="name"
+					><b
+						><a rel="next" itemprop="url" href="/t/last-epoch-patch-1-2-3-notes/77541?page=2"
+							>next page →</a
+						></b
+					></span
+				>
+			</div>
+		</div>
+		<footer class="container wrap">
+			<nav class="crawler-nav">
+				<ul>
+					<li itemscope itemtype="http://schema.org/SiteNavigationElement">
+						<span itemprop="name">
+							<a href="/" itemprop="url">Home </a>
+						</span>
+					</li>
+					<li itemscope itemtype="http://schema.org/SiteNavigationElement">
+						<span itemprop="name">
+							<a href="/categories" itemprop="url">Categories </a>
+						</span>
+					</li>
+					<li itemscope itemtype="http://schema.org/SiteNavigationElement">
+						<span itemprop="name">
+							<a href="/guidelines" itemprop="url">FAQ/Guidelines </a>
+						</span>
+					</li>
+					<li itemscope itemtype="http://schema.org/SiteNavigationElement">
+						<span itemprop="name">
+							<a href="https://lastepoch.com/legal/" itemprop="url">Terms of Service </a>
+						</span>
+					</li>
+					<li itemscope itemtype="http://schema.org/SiteNavigationElement">
+						<span itemprop="name">
+							<a href="https://lastepoch.com/legal/" itemprop="url">Privacy Policy </a>
+						</span>
+					</li>
+				</ul>
+			</nav>
+			<p class="powered-by-link">
+				Powered by <a href="https://www.discourse.org">Discourse</a>, best viewed with JavaScript enabled
+			</p>
+		</footer>
+	</body>
+</html>
