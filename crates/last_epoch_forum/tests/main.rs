@@ -49,7 +49,7 @@ async fn prepares_threads_info_based_on_markup() {
         datetime: "2025-04-15T16:02:00Z".parse().unwrap(),
     };
 
-    assert!([a, b, c].iter().any(|t| partials.contains(t)));
+    assert!([a, b, c].iter().all(|t| partials.contains(t)));
 }
 
 #[tokio::test]
