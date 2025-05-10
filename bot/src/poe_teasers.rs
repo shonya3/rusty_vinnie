@@ -68,26 +68,21 @@ async fn send_teaser(
     channel_id: ChannelId,
     teaser: &Teaser,
 ) -> Result<(), String> {
-    let embed = CreateEmbed::new()
-        .title(teaser.forum_thread.title())
-        .url(teaser.forum_thread.url())
-        .author(create_vinnie_bot_author_embed())
-        .description(&teaser.heading);
-
-    let images_embeds: Vec<CreateEmbed> = teaser
-        .images_urls
-        .iter()
-        .map(|image_url| {
+    let message = CreateMessage::new().embeds(
+        std::iter::once(
+            CreateEmbed::new()
+                .title(teaser.forum_thread.title())
+                .url(teaser.forum_thread.url())
+                .author(create_vinnie_bot_author_embed())
+                .description(&teaser.heading),
+        )
+        .chain(teaser.images_urls.iter().map(|image_url| {
             CreateEmbed::new()
                 .image(image_url)
                 .url(teaser.forum_thread.url())
-        })
-        .collect();
-
-    let mut embeds = vec![embed];
-    embeds.extend(images_embeds);
-
-    let message = CreateMessage::new().embeds(embeds);
+        }))
+        .collect(),
+    );
 
     if let Err(err) = channel_id.send_message(&ctx, message).await {
         return Err(format!("Could not send teaser to {channel_id}. {err}"));
