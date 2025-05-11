@@ -1,6 +1,6 @@
 use poise::serenity_prelude as serenity;
 use poise::serenity_prelude::{EmojiId, Message, ReactionType};
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 
 pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
     let mut emojis: Vec<VinnieEmoji> = vec![];
@@ -31,7 +31,7 @@ pub async fn handle_message(ctx: &serenity::Context, msg: &Message) {
             VinnieEmoji::Crab,
             VinnieEmoji::RustHappy,
         ]
-        .choose(&mut rand::thread_rng())
+        .choose(&mut rand::rng())
         .unwrap_or(&VinnieEmoji::Zdruste);
 
         emojis.push(*emoji);

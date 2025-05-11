@@ -8,12 +8,12 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}
-rand = "0.8.5"
+rand = "0.9.1"
 tokio = { workspace = true }
 reqwest.workspace = true
 chrono = { workspace = true }
-shuttle-runtime = "0.53.0"
-shuttle-serenity = "0.53.0"
+shuttle-runtime = "0.54.0"
+shuttle-serenity = "0.54.0"
 shuttle-persist = "0.51.0"
 serde_json.workspace = true
 futures = "0.3.31"

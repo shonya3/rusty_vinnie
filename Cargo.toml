@@ -12,8 +12,8 @@ repository = "https://github.com/shonya3/rusty_vinnie"
 
 [workspace.dependencies]
 tokio = { version = "1", features = ["full"] }
-chrono = { version = "0.4.38", features = ["serde"]}
+chrono = { version = "0.4.41", features = ["serde"]}
 serde = { version = "1", features = ["derive"] }
 scraper = "0.23.1"
-reqwest = { version = "0.12.7", features = ["json", "rustls-tls"] }
-serde_json = "1.0.114"
+reqwest = { version = "0.12.15", features = ["json", "rustls-tls"] }
+serde_json = "1.0.140"
