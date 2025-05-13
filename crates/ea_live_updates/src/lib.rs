@@ -2,8 +2,6 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
-
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 #[serde(transparent)]
 pub struct EarlyAccessDay(pub u32);
@@ -49,9 +47,7 @@ impl LiveUpdatesThread {
 pub async fn get_live_updates(
     live_updates_thread: LiveUpdatesThread,
 ) -> Result<Vec<LiveUpdate>, reqwest::Error> {
-    let markup = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?
+    let markup = http_client::client()
         .get(live_updates_thread.url())
         .send()
         .await?

@@ -120,10 +120,7 @@ pub fn subforum_title(lang: WebsiteLanguage, subforum: Subforum) -> String {
 }
 
 pub async fn fetch_post_html(url: &str) -> Result<String, reqwest::Error> {
-    let client = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?;
-    client
+    http_client::client()
         .get(url)
         .send()
         .await?
@@ -131,8 +128,6 @@ pub async fn fetch_post_html(url: &str) -> Result<String, reqwest::Error> {
         .text()
         .await
 }
-
-const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 fn truncate_to_max_chars(s: &str, max_chars: usize) -> String {
     let mut char_indices = s.char_indices();

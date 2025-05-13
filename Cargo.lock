@@ -489,6 +489,7 @@ dependencies = [
 name = "ea_live_updates"
 version = "0.1.0"
 dependencies = [
+ "http_client",
  "regex",
  "reqwest 0.12.15",
  "serde",
@@ -898,6 +899,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "http_client"
+version = "0.1.0"
+dependencies = [
+ "reqwest 0.12.15",
+]
+
+[[package]]
 name = "httparse"
 version = "1.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1227,6 +1235,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "futures",
+ "http_client",
  "markdown",
  "reqwest 0.12.15",
  "scraper",
@@ -1627,6 +1636,7 @@ name = "poe_forum"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "http_client",
  "markdown",
  "reqwest 0.12.15",
  "scraper",
@@ -1638,6 +1648,7 @@ dependencies = [
 name = "poe_teasers"
 version = "0.1.0"
 dependencies = [
+ "http_client",
  "reqwest 0.12.15",
  "scraper",
  "serde",
@@ -2159,6 +2170,7 @@ dependencies = [
  "dotenv",
  "ea_live_updates",
  "futures",
+ "http_client",
  "last_epoch_forum",
  "poe_forum",
  "poe_teasers",

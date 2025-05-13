@@ -3,15 +3,10 @@ use serde::{Deserialize, Serialize};
 
 pub mod content;
 
-const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
-
 pub async fn fetch_subforum_threads_list(
     subforum: Subforum,
 ) -> Result<Vec<NewsThreadInfo>, reqwest::Error> {
-    let client = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?;
-    let html = client
+    let html = http_client::client()
         .get(format!("https://forum.lastepoch.com/c/{subforum}"))
         .send()
         .await?
@@ -59,17 +54,13 @@ pub mod html {
     use scraper::{ElementRef, Html, Selector};
 
     async fn fetch_post_markup(url: &str) -> Result<String, reqwest::Error> {
-        let client = reqwest::ClientBuilder::new()
-            .user_agent(super::USER_AGENT)
-            .build()?;
-        let html = client
+        http_client::client()
             .get(url)
             .send()
             .await?
             .error_for_status()?
             .text()
-            .await?;
-        Ok(html)
+            .await
     }
 
     pub async fn prepare_threads_info(subforum_threads_page_html: &str) -> Vec<NewsThreadInfo> {

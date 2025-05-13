@@ -1,6 +1,5 @@
 use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
-const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub use post::get_post_details;
 
@@ -19,10 +18,8 @@ pub async fn fetch_subforum_threads_list(
             format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
         }
     };
-    let client = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?;
-    let html = client.get(url).send().await?.text().await?;
+
+    let html = http_client::client().get(url).send().await?.text().await?;
     Ok(html::parse(&html, subforum, lang, time_offset))
 }
 

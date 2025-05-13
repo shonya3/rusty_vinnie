@@ -13,6 +13,7 @@ chrono.workspace = true
 futures = "0.3.31"
 
 markdown = { path = "../markdown" }
+http_client = { path = "../http_client" }
 
 [dev-dependencies]
 tokio.workspace = true

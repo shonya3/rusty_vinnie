@@ -2,16 +2,13 @@ use error::Error;
 use scraper::{selectable::Selectable, ElementRef, Html, Selector};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
-const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
 pub mod error;
 
 pub async fn download_teasers_from_thread(
     forum_thread: TeasersForumThread,
 ) -> Result<Vec<Teaser>, Error> {
-    let thread_markup = reqwest::ClientBuilder::new()
-        .user_agent(USER_AGENT)
-        .build()?
+    let thread_markup = http_client::client()
         .get(forum_thread.url())
         .send()
         .await?
