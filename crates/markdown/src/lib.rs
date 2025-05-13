@@ -60,25 +60,35 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                     write!(&mut output, " **{}** ", clean_text(&text)).unwrap();
                 }
                 "a" => {
-                    let el = ElementRef::wrap(node).unwrap();
-                    let text: String = el.text().collect();
-                    let text = clean_text(&text);
+                    let a = ElementRef::wrap(node).unwrap();
 
-                    match el.attr("href") {
-                        Some(href) => {
-                            match el.select(&Selector::parse("img").unwrap()).next() {
-                                Some(_) => write!(&mut output, "\n\n[{text}]({href})\n\n").unwrap(),
-                                None => write!(&mut output, " [{text}]({href}) ").unwrap(),
-                            };
-                            // write!(&mut output, " [{text}]({href}) ").unwrap()
+                    match a.select(&Selector::parse("img").unwrap()).next() {
+                        Some(img) => {
+                            if let Some(href) = a.attr("href") {
+                                let text = img
+                                    .attr("alt")
+                                    .map(|alt| format!("Image {alt}"))
+                                    .unwrap_or("Image".to_owned());
+                                write!(&mut output, "\n\n[{text}]({href})\n\n").unwrap()
+                            }
                         }
-                        None => write!(&mut output, "{text}").unwrap(),
-                    };
+                        None => {
+                            let text: String = a.text().collect();
+                            let text = clean_text(&text);
+                            match a.attr("href") {
+                                Some(href) => write!(&mut output, " [{text}]({href}) ").unwrap(),
+                                None => write!(&mut output, "{text}").unwrap(),
+                            }
+                        }
+                    }
                 }
                 "img" => {
-                    let el = ElementRef::wrap(node).unwrap();
-                    if let Some(src) = el.attr("src") {
-                        let text = el.attr("alt").unwrap_or("Image");
+                    let img = ElementRef::wrap(node).unwrap();
+                    if let Some(src) = img.attr("src") {
+                        let text = img
+                            .attr("alt")
+                            .map(|alt| format!("Image {alt}"))
+                            .unwrap_or("Image".to_owned());
                         write!(&mut output, "\n\n[{text}]({src})\n\n").unwrap()
                     }
                 }
