@@ -23,10 +23,10 @@ pub async fn fetch_subforum_threads_list(
         .user_agent(USER_AGENT)
         .build()?;
     let html = client.get(url).send().await?.text().await?;
-    Ok(html::parse(&html, lang, time_offset))
+    Ok(html::parse(&html, subforum, lang, time_offset))
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Subforum {
     News,
     PatchNotes,
@@ -49,7 +49,7 @@ impl std::fmt::Display for Subforum {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum WebsiteLanguage {
     Ru,
     En,
@@ -72,26 +72,30 @@ pub struct NewsThreadInfo {
     pub posted_date: DateTime<Utc>,
     pub title: String,
     pub author: Option<String>,
+    pub lang: WebsiteLanguage,
+    pub subforum: Subforum,
 }
 
 mod html {
-    use crate::{NewsThreadInfo, WebsiteLanguage};
+    use crate::{NewsThreadInfo, Subforum, WebsiteLanguage};
     use chrono::{DateTime, FixedOffset, Local, NaiveDateTime, Offset, ParseError, TimeZone, Utc};
     use scraper::{ElementRef, Html, Selector};
 
     pub fn parse(
         html: &str,
+        subforum: Subforum,
         lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Vec<NewsThreadInfo> {
         Html::parse_document(html)
             .select(&Selector::parse("table tbody tr").unwrap())
-            .filter_map(|row| parse_tr(&row, lang, time_offset))
+            .filter_map(|row| parse_tr(&row, subforum, lang, time_offset))
             .collect()
     }
 
     pub fn parse_tr(
         tr: &ElementRef,
+        subforum: Subforum,
         lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Option<NewsThreadInfo> {
@@ -106,6 +110,8 @@ mod html {
             posted_date: get_posted_date(tr, lang, time_offset)?,
             title: get_thread_title(tr)?,
             author: get_author(tr),
+            lang,
+            subforum,
         })
     }
 

@@ -38,7 +38,7 @@ async fn watch_subforum(
                 for thread in threads.into_iter().filter(|thread| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.posted_date)
                 }) {
-                    let embed = prepare_embed(thread, lang, subforum).await;
+                    let embed = prepare_embed(thread).await;
 
                     if let Err(err) = channel_id
                         .send_message(ctx, CreateMessage::new().embed(embed))
@@ -53,11 +53,7 @@ async fn watch_subforum(
     }
 }
 
-pub async fn prepare_embed(
-    thread: NewsThreadInfo,
-    lang: WebsiteLanguage,
-    subforum: Subforum,
-) -> CreateEmbed {
+pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
     let mut embed = CreateEmbed::new()
         .title(&thread.title)
         .url(&thread.url)
@@ -66,7 +62,10 @@ pub async fn prepare_embed(
             format!("<t:{}>", thread.posted_date.timestamp()),
             true,
         )
-        .footer(CreateEmbedFooter::new(subforum_title(lang, subforum)));
+        .footer(CreateEmbedFooter::new(subforum_title(
+            thread.lang,
+            thread.subforum,
+        )));
 
     if let Some(author) = &thread.author {
         embed = embed.author(CreateEmbedAuthor::new(author));
@@ -154,6 +153,7 @@ fn truncate_to_max_chars(s: &str, max_chars: usize) -> String {
 pub mod debug {
     use chrono::FixedOffset;
     use poe_forum::{NewsThreadInfo, Subforum, WebsiteLanguage};
+    use poise::serenity_prelude::CreateEmbed;
 
     pub fn offset() -> Option<FixedOffset> {
         FixedOffset::east_opt(3 * 3600)
@@ -161,6 +161,8 @@ pub mod debug {
 
     pub enum Threads {
         News020e,
+        News020hFirst,
+        News020hSecond,
     }
 
     impl Threads {
@@ -171,20 +173,30 @@ pub mod debug {
                     posted_date: "2025-04-17T08:28:24Z".parse().unwrap(),
                     title: "Upcoming Plans for 0.2.0g".to_owned(),
                     author: Some("Community_Team".to_owned()),
+                    subforum: Subforum::EarlyAccessAnnouncementsEn,
+                    lang: WebsiteLanguage::En,
+                },
+                Threads::News020hFirst => NewsThreadInfo {
+                    url: "https://www.pathofexile.com/forum/view-thread/3780473".to_owned(),
+                    posted_date: "2025-05-12T20:50:10Z".parse().unwrap(),
+                    title: "0.2.0h Patch Summary".to_owned(),
+                    author: Some("Community_Team".to_owned()),
+                    subforum: Subforum::EarlyAccessAnnouncementsEn,
+                    lang: WebsiteLanguage::En,
+                },
+                Threads::News020hSecond => NewsThreadInfo {
+                    url: "https://www.pathofexile.com/forum/view-thread/3779014".to_owned(),
+                    posted_date: "2025-05-08T19:59:34Z".parse().unwrap(),
+                    title: "Upcoming Plans for Patch 0.2.0h".to_owned(),
+                    author: Some("Community_Team".to_owned()),
+                    subforum: Subforum::EarlyAccessAnnouncementsEn,
+                    lang: WebsiteLanguage::En,
                 },
             }
         }
 
-        pub fn lang(&self) -> WebsiteLanguage {
-            match self {
-                Threads::News020e => WebsiteLanguage::En,
-            }
-        }
-
-        pub fn subforum(&self) -> Subforum {
-            match self {
-                Threads::News020e => Subforum::EarlyAccessAnnouncementsEn,
-            }
+        pub async fn embed(&self) -> CreateEmbed {
+            super::prepare_embed(self.thread()).await
         }
     }
 }
