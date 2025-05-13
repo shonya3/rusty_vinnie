@@ -75,7 +75,7 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
         embed = embed.timestamp(timestamp);
     }
 
-    match fetch_post_html(&thread.url).await {
+    match http_client::text(&thread.url).await {
         Ok(html) => {
             if let Some(details) = poe_forum::get_post_details(&html) {
                 embed = embed.field(
@@ -117,16 +117,6 @@ pub fn subforum_title(lang: WebsiteLanguage, subforum: Subforum) -> String {
     };
 
     format!("{} [{}] {}", subforum_name, lang_str, emoji)
-}
-
-pub async fn fetch_post_html(url: &str) -> Result<String, reqwest::Error> {
-    http_client::client()
-        .get(url)
-        .send()
-        .await?
-        .error_for_status()?
-        .text()
-        .await
 }
 
 fn truncate_to_max_chars(s: &str, max_chars: usize) -> String {
