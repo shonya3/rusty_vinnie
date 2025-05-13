@@ -1,4 +1,4 @@
-use scraper::ElementRef;
+use scraper::{ElementRef, Selector};
 use std::fmt::Write;
 
 pub fn clean_text(text: &str) -> String {
@@ -57,7 +57,7 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                 }
                 "strong" => {
                     let text = ElementRef::wrap(node).unwrap().text().collect::<String>();
-                    write!(&mut output, "**{}**", clean_text(&text)).unwrap();
+                    write!(&mut output, " **{}** ", clean_text(&text)).unwrap();
                 }
                 "a" => {
                     let el = ElementRef::wrap(node).unwrap();
@@ -65,7 +65,13 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                     let text = clean_text(&text);
 
                     match el.attr("href") {
-                        Some(href) => write!(&mut output, " [{text}]({href}) ").unwrap(),
+                        Some(href) => {
+                            match el.select(&Selector::parse("img").unwrap()).next() {
+                                Some(_) => write!(&mut output, "\n\n[{text}]({href})\n\n").unwrap(),
+                                None => write!(&mut output, " [{text}]({href}) ").unwrap(),
+                            };
+                            // write!(&mut output, " [{text}]({href}) ").unwrap()
+                        }
                         None => write!(&mut output, "{text}").unwrap(),
                     };
                 }
@@ -73,7 +79,7 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                     let el = ElementRef::wrap(node).unwrap();
                     if let Some(src) = el.attr("src") {
                         let text = el.attr("alt").unwrap_or("Image");
-                        write!(&mut output, "\n[{text}]({src})\n").unwrap()
+                        write!(&mut output, "\n\n[{text}]({src})\n\n").unwrap()
                     }
                 }
                 _ => {
