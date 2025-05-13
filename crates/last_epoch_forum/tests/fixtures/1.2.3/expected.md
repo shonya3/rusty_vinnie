@@ -208,5 +208,5 @@ needing to wait for a long time to get into the game.
 # Known Issues
 Please be aware that our team is still working to correct more issues and improve many more
 areas of Last Epoch. To see a short, non-exhaustive list of what we are still working on,
-please check here on ourForum Known Bugs Listsor
-ask our Community Managers inDiscord!
+please check here on our [Forum Known Bugs Lists](https://forum.lastepoch.com/t/known-issues/73801) or
+ask our Community Managers in [Discord](https://www.discord.gg/lastepoch) !
