@@ -7,7 +7,7 @@ pub async fn fetch_subforum_threads_list(
     subforum: Subforum,
 ) -> Result<Vec<NewsThreadInfo>, reqwest::Error> {
     let html = http::text(&format!("https://forum.lastepoch.com/c/{subforum}")).await?;
-    Ok(html::prepare_threads_info(&html).await)
+    Ok(html::prepare_threads_info(&html, subforum).await)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
@@ -18,9 +18,10 @@ pub struct NewsThreadInfo {
     pub datetime: DateTime<Utc>,
     pub content: Option<String>,
     pub author: Option<String>,
+    pub subforum: Subforum,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Subforum {
     Announcements,
     News,
@@ -42,11 +43,14 @@ impl std::fmt::Display for Subforum {
 }
 
 pub mod html {
-    use crate::NewsThreadInfo;
+    use crate::{NewsThreadInfo, Subforum};
     use chrono::{DateTime, Utc};
     use scraper::{ElementRef, Html, Selector};
 
-    pub async fn prepare_threads_info(subforum_threads_page_html: &str) -> Vec<NewsThreadInfo> {
+    pub async fn prepare_threads_info(
+        subforum_threads_page_html: &str,
+        subforum: Subforum,
+    ) -> Vec<NewsThreadInfo> {
         let subforum_threads_page_html = subforum_threads_page_html.to_owned();
 
         let parse_result = tokio::task::spawn_blocking(move || {
@@ -79,6 +83,7 @@ pub mod html {
                         datetime,
                         content: crate::content::get_content(&document),
                         author: get_author(&document),
+                        subforum,
                     });
                 }
             }

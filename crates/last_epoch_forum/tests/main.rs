@@ -5,7 +5,8 @@ use scraper::Html;
 #[tokio::test]
 async fn prepares_threads_info_based_on_markup() {
     let html = std::fs::read_to_string("./tests/fixtures/announcements.html").unwrap();
-    let threads = last_epoch_forum::html::prepare_threads_info(&html).await;
+    let threads =
+        last_epoch_forum::html::prepare_threads_info(&html, Subforum::Announcements).await;
 
     assert_eq!(3, threads.len());
 

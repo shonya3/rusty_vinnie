@@ -29,7 +29,7 @@ async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
                 for thread in threads.into_iter().filter(|thread| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.datetime)
                 }) {
-                    let embed = prepare_embed(thread, subforum).await;
+                    let embed = prepare_embed(thread).await;
                     if let Err(err) = channel_id
                         .send_message(ctx, CreateMessage::new().embed(embed))
                         .await
@@ -43,7 +43,7 @@ async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
     }
 }
 
-pub async fn prepare_embed(thread: NewsThreadInfo, subforum: Subforum) -> CreateEmbed {
+pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
     let mut embed = CreateEmbed::new()
         .title(&thread.title)
         .url(&thread.url)
@@ -52,7 +52,7 @@ pub async fn prepare_embed(thread: NewsThreadInfo, subforum: Subforum) -> Create
             format!("<t:{}>", thread.datetime.timestamp()),
             true,
         )
-        .footer(CreateEmbedFooter::new(subforum_title(subforum)));
+        .footer(CreateEmbedFooter::new(subforum_title(thread.subforum)));
 
     if let Some(author) = &thread.author {
         embed = embed.author(CreateEmbedAuthor::new(author));
