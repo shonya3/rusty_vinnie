@@ -1227,6 +1227,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "futures",
+ "markdown",
  "reqwest 0.12.15",
  "scraper",
  "serde",
@@ -1278,6 +1279,13 @@ name = "mac"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c41e0c4fef86961ac6d6f8a82609f55f31b05e4fce149ac5710e439df7619ba4"
+
+[[package]]
+name = "markdown"
+version = "0.1.0"
+dependencies = [
+ "scraper",
+]
 
 [[package]]
 name = "markup5ever"
@@ -1619,18 +1627,7 @@ name = "poe_forum"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "reqwest 0.12.15",
- "scraper",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "poe_forum_markdown"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "poise",
+ "markdown",
  "reqwest 0.12.15",
  "scraper",
  "serde",
@@ -2164,7 +2161,6 @@ dependencies = [
  "futures",
  "last_epoch_forum",
  "poe_forum",
- "poe_forum_markdown",
  "poe_teasers",
  "poise",
  "rand 0.9.1",

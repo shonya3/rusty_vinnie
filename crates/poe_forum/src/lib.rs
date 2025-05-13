@@ -2,6 +2,10 @@ use chrono::{DateTime, FixedOffset, Utc};
 use serde::{Deserialize, Serialize};
 const USER_AGENT: &str = "rusty_vinnie/0.1 (contact: poeshonya3@gmail.com)";
 
+pub use post::get_post_details;
+
+pub mod post;
+
 pub async fn fetch_subforum_threads_list(
     lang: WebsiteLanguage,
     subforum: Subforum,

@@ -12,3 +12,5 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 scraper.workspace = true
 reqwest.workspace = true
+
+markdown = { path = "../markdown" }

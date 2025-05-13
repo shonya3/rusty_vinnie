@@ -1,4 +1,4 @@
-use scraper::{ElementRef, Html};
+use scraper::ElementRef;
 use std::fmt::Write;
 
 pub fn clean_text(text: &str) -> String {
@@ -8,13 +8,6 @@ pub fn clean_text(text: &str) -> String {
         .filter(|line| !line.is_empty())
         .collect::<Vec<_>>()
         .join("\n")
-}
-
-pub fn get_content(html: &str) -> Option<String> {
-    let document = Html::parse_document(html);
-    let el_content = crate::selectors::content(&document)?;
-
-    Some(html_to_markdown(&el_content))
 }
 
 pub fn html_to_markdown(element: &ElementRef) -> String {

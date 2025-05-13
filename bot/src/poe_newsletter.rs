@@ -78,7 +78,7 @@ pub async fn prepare_embed(
 
     match fetch_post_html(&thread.url).await {
         Ok(html) => {
-            if let Some(details) = poe_forum_markdown::get_details(&html) {
+            if let Some(details) = poe_forum::get_post_details(&html) {
                 embed = embed.field(
                     "Words",
                     details.content.unicode_words().count().to_string(),

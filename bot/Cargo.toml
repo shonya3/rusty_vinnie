@@ -22,5 +22,4 @@ poe_forum = {path = "../crates/poe_forum"}
 last_epoch_forum = { path = "../crates/last_epoch_forum" }
 poe_teasers = { path = "../crates/poe_teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
-poe_forum_markdown = { path = "../crates/poe_forum_markdown" }
 unicode-segmentation = "1.12.0"
