@@ -14,4 +14,4 @@ scraper.workspace = true
 reqwest.workspace = true
 
 markdown = { path = "../markdown" }
-http_client = { path = "../http_client" }
+http = { path = "../http" }

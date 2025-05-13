@@ -6,7 +6,7 @@ pub mod content;
 pub async fn fetch_subforum_threads_list(
     subforum: Subforum,
 ) -> Result<Vec<NewsThreadInfo>, reqwest::Error> {
-    let html = http_client::text(&format!("https://forum.lastepoch.com/c/{subforum}")).await?;
+    let html = http::text(&format!("https://forum.lastepoch.com/c/{subforum}")).await?;
     Ok(html::prepare_threads_info(&html).await)
 }
 
@@ -69,7 +69,7 @@ pub mod html {
 
         let mut results = Vec::new();
         for (url, title) in parse_result {
-            if let Ok(post_page_html) = http_client::text(&url).await {
+            if let Ok(post_page_html) = http::text(&url).await {
                 let document = Html::parse_document(&post_page_html);
 
                 if let Some(datetime) = get_datetime(&document) {

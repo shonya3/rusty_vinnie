@@ -19,7 +19,7 @@ pub async fn fetch_subforum_threads_list(
         }
     };
 
-    let html = http_client::text(&url).await?;
+    let html = http::text(&url).await?;
     Ok(html::parse(&html, subforum, lang, time_offset))
 }
 

@@ -8,7 +8,7 @@ pub mod error;
 pub async fn download_teasers_from_thread(
     forum_thread: TeasersForumThread,
 ) -> Result<Vec<Teaser>, Error> {
-    let thread_markup = http_client::text(forum_thread.url()).await?;
+    let thread_markup = http::text(forum_thread.url()).await?;
     Ok(parse_teasers_thread(&thread_markup, forum_thread)?)
 }
 

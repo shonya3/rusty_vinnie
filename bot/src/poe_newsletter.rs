@@ -75,7 +75,7 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
         embed = embed.timestamp(timestamp);
     }
 
-    match http_client::text(&thread.url).await {
+    match http::text(&thread.url).await {
         Ok(html) => {
             if let Some(details) = poe_forum::get_post_details(&html) {
                 embed = embed.field(

@@ -47,7 +47,7 @@ impl LiveUpdatesThread {
 pub async fn get_live_updates(
     live_updates_thread: LiveUpdatesThread,
 ) -> Result<Vec<LiveUpdate>, reqwest::Error> {
-    let markup = http_client::text(live_updates_thread.url()).await?;
+    let markup = http::text(live_updates_thread.url()).await?;
     Ok(parse_live_updates_thread(&markup, live_updates_thread))
 }
 

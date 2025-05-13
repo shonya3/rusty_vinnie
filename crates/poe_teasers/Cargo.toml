@@ -8,7 +8,7 @@ repository.workspace = true
 scraper.workspace = true
 reqwest.workspace = true
 serde.workspace = true
-http_client = { path = "../http_client" }
+http = { path = "../http" }
 
 [dev-dependencies]
 tokio.workspace = true
