@@ -73,7 +73,7 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                     let el = ElementRef::wrap(node).unwrap();
                     if let Some(src) = el.attr("src") {
                         let text = el.attr("alt").unwrap_or("Image");
-                        write!(&mut output, " [{text}]({src}) ").unwrap()
+                        write!(&mut output, "\n[{text}]({src})\n").unwrap()
                     }
                 }
                 _ => {
