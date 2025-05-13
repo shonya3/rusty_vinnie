@@ -69,6 +69,13 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                         None => write!(&mut output, "{text}").unwrap(),
                     };
                 }
+                "img" => {
+                    let el = ElementRef::wrap(node).unwrap();
+                    if let Some(src) = el.attr("src") {
+                        let text = el.attr("alt").unwrap_or("Image");
+                        write!(&mut output, " [{text}]({src}) ").unwrap()
+                    }
+                }
                 _ => {
                     if in_list {
                         in_list = false;
