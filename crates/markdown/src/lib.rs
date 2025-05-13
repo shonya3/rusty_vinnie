@@ -59,6 +59,16 @@ pub fn html_to_markdown(element: &ElementRef) -> String {
                     let text = ElementRef::wrap(node).unwrap().text().collect::<String>();
                     write!(&mut output, "**{}**", clean_text(&text)).unwrap();
                 }
+                "a" => {
+                    let el = ElementRef::wrap(node).unwrap();
+                    let text: String = el.text().collect();
+                    let text = clean_text(&text);
+
+                    match el.attr("href") {
+                        Some(href) => write!(&mut output, " [{text}]({href}) ").unwrap(),
+                        None => write!(&mut output, "{text}").unwrap(),
+                    };
+                }
                 _ => {
                     if in_list {
                         in_list = false;
