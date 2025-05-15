@@ -12,12 +12,12 @@ pub async fn watch_subforums(
     configs: Vec<(WebsiteLanguage, Subforum)>,
     offset: Option<FixedOffset>,
 ) {
-    let tasks = configs
-        .into_iter()
-        .map(|(lang, subforum)| watch_subforum(ctx, lang, subforum, offset))
-        .collect::<Vec<_>>();
-
-    futures::future::join_all(tasks).await;
+    futures::future::join_all(
+        configs
+            .into_iter()
+            .map(|(lang, subforum)| watch_subforum(ctx, lang, subforum, offset)),
+    )
+    .await;
 }
 
 async fn watch_subforum(

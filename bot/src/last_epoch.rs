@@ -9,12 +9,12 @@ use poise::serenity_prelude::{
 use unicode_segmentation::UnicodeSegmentation;
 
 pub async fn watch_subforums(ctx: &SerenityContext, subforums: Vec<Subforum>) {
-    let tasks = subforums
-        .into_iter()
-        .map(|subforum| watch_subforum(ctx, subforum))
-        .collect::<Vec<_>>();
-
-    futures::future::join_all(tasks).await;
+    futures::future::join_all(
+        subforums
+            .into_iter()
+            .map(|subforum| watch_subforum(ctx, subforum)),
+    )
+    .await;
 }
 
 async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
