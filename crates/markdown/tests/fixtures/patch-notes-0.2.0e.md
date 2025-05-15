@@ -46,7 +46,7 @@ generation changes in this patch.
 
 ### Player Balance Changes
 
-**Bleed/Chaos Innoculation Changes**
+ **Bleed/Chaos Innoculation Changes** 
 
 - Bleeding no longer only considers damage dealt to the
 target's life. Damage dealt to energy shield (or mana) can
@@ -67,7 +67,7 @@ on your maximum Energy Shield now rolls 1-2% (previously 1%).
 Existing items can be improved to the new ranges by using a
 Divine Orb.
 
-**Sorceress Specific Changes**
+ **Sorceress Specific Changes** 
 
 - Arc now releases damaging pulses when Shocked enemies are Hit,
 but can no longer Shock. It does not consume the Shock. The Arc
@@ -102,7 +102,7 @@ Cracklecreep Unique Ring, now occurs after a 1 second delay
 - Wildfire Support now causes ignite to spread to enemies within a
 1.5 metre radius (previously 2 metre).
 
-**Huntress Specific Changes**
+ **Huntress Specific Changes** 
 
 - Parried enemies can no longer evade your attacks.
 - Rapid Assault's Explosion now inflicts Bleeding on Hit, and
@@ -116,7 +116,7 @@ levels 5-20 (previously 17-37%).
 Unique monsters when they explode, allowing you to use Ritual
 Sacrifice on the Rare monsters.
 
-**Warrior Specific Changes**
+ **Warrior Specific Changes** 
 
 - The Temper Weapon Skill, granted by the Smith of Kitava's
 Against the Anvil Ascendancy Passive Skill, now causes each
@@ -134,7 +134,7 @@ player to take increased physical damage. Fully broken armour on
 non-players remains unchanged at 20% increased physical damage
 taken from hits.
 
-**Ranger Specific Changes**
+ **Ranger Specific Changes** 
 
 - Stormcaller Arrow's Bolt now has an impact radius of
 1.6-2.4 metres at Gem levels 3-20 (previously 1.1-1.9 metres).
@@ -149,14 +149,14 @@ seconds (previously 12).
 - Tornado Shot now has a maximum Tornado duration of 15 seconds at
 all Gem levels (previously 7-7.9 at Gem levels 11-20).
 
-**Other Player Balance**
+ **Other Player Balance** 
 
 - Rally support is no longer restricted to Strikes or Slams, and
 can now support any Melee Attack you use yourself.
 - Glory (used by Hammer of the Gods and Spear of Solaris) is now
 no longer consumed if you are interrupted while using the skill.
 
-**New Support Gem**
+ **New Support Gem** 
 
 - We have added a support gem called Inhibitor that prevents
 charges being consumed but increases the damage of the supported
@@ -185,7 +185,7 @@ things that were attacking very fast as it caused the monsters
 to be relentlessly able to pursue and attack you giving you no
 time to engage or use skills between their attacks.
 
-**Act 1**
+ **Act 1** 
 
 - The Haste Aura Monster modifier no longer appears on monsters
 that are already fast.
@@ -213,7 +213,7 @@ effect to match the visual more closely.
 - Reduced the overall density of more challenging monsters in
 Ogham Manor.
 
-**Act 2**
+ **Act 2** 
 
 - Boulder Ants have been replaced by Risen Maraketh in the Valley
 of the Titans. The density of Monsters in this area has also
@@ -221,7 +221,7 @@ been adjusted.
 - The Faridun have all been modified to remove the interrupt
 events on their attacks as described above.
 
-**Act 3**
+ **Act 3** 
 
 - Diretusk Boar and Antlion Charger's are now more likely to
 push you to the side instead of pushing you along with them when
