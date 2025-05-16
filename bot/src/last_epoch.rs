@@ -64,8 +64,13 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
 
     if let Some(content) = &thread.content {
         embed = embed.field("Words", content.unicode_words().count().to_string(), true);
-        let markdown = truncate_to_max_chars(content, 4095);
-        embed = embed.description(markdown);
+
+        embed = embed.description(
+            content
+                .chars()
+                .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
+                .collect::<String>(),
+        );
     }
 
     embed
@@ -80,19 +85,4 @@ pub fn subforum_title(subforum: Subforum) -> String {
     };
 
     format!("{} {}", subforum_name, emoji)
-}
-
-fn truncate_to_max_chars(s: &str, max_chars: usize) -> String {
-    let mut char_indices = s.char_indices();
-    for _ in 0..max_chars {
-        if char_indices.next().is_none() {
-            return s.to_string();
-        }
-    }
-
-    if let Some((idx, _)) = char_indices.next() {
-        s[..idx].to_string()
-    } else {
-        s.to_string()
-    }
 }

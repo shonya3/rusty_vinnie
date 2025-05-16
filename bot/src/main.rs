@@ -14,6 +14,8 @@ mod ready_handler;
 mod status;
 mod unused;
 
+pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
+
 async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
