@@ -70,7 +70,7 @@ async fn main(
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![],
+            commands: vec![last_epoch::epoch_thread()],
             ..Default::default()
         })
         .build();

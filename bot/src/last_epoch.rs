@@ -1,10 +1,13 @@
-use crate::interval;
+use crate::{interval, Context, Error};
 
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
-use poise::serenity_prelude::{
-    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
-    CreateMessage, Timestamp,
+use poise::{
+    serenity_prelude::{
+        ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
+        CreateMessage, Timestamp,
+    },
+    CreateReply,
 };
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -85,4 +88,56 @@ pub fn subforum_title(subforum: Subforum) -> String {
     };
 
     format!("{} {}", subforum_name, emoji)
+}
+
+/// Fetch a specific thread from the Last Epoch forums
+#[poise::command(slash_command)]
+pub async fn epoch_thread(
+    ctx: Context<'_>,
+    #[description = "Select a subforum"] subforum: SubforumSlash,
+    #[description = "Nth thread to fetch"]
+    #[min = 1]
+    #[max = 3]
+    nth: usize,
+) -> Result<(), Error> {
+    ctx.defer().await?;
+
+    match last_epoch_forum::fetch_subforum_threads_list(subforum.into()).await {
+        Ok(threads) => {
+            if let Some(thread) = threads.into_iter().nth(nth - 1) {
+                let embed = prepare_embed(thread).await;
+                ctx.send(CreateReply::default().embed(embed)).await.unwrap();
+            } else {
+                ctx.say("Not found").await?;
+            }
+        }
+        Err(err) => {
+            ctx.say(format!("Failed to fetch threads {err}")).await?;
+        }
+    };
+
+    Ok(())
+}
+
+#[derive(poise::ChoiceParameter)]
+enum SubforumSlash {
+    #[name = "announcements"]
+    Announcements,
+    #[name = "news"]
+    News,
+    #[name = "developer_blogs"]
+    DeveloperBlogs,
+    #[name = "patch_notes"]
+    PatchNotes,
+}
+
+impl From<SubforumSlash> for Subforum {
+    fn from(value: SubforumSlash) -> Self {
+        match value {
+            SubforumSlash::Announcements => Subforum::Announcements,
+            SubforumSlash::News => Subforum::News,
+            SubforumSlash::DeveloperBlogs => Subforum::DeveloperBlogs,
+            SubforumSlash::PatchNotes => Subforum::PatchNotes,
+        }
+    }
 }
