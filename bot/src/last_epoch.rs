@@ -104,7 +104,8 @@ pub async fn epoch_thread(
 
     match last_epoch_forum::fetch_subforum_threads_list(subforum.into()).await {
         Ok(threads) => {
-            if let Some(thread) = threads.into_iter().nth(nth - 1) {
+            if let Some(thread) = threads.into_iter().filter(|t| !t.is_pinned).nth(nth - 1) {
+                // if let Some(thread) = threads.into_iter().nth(nth - 1) {
                 let embed = prepare_embed(thread).await;
                 ctx.send(CreateReply::default().embed(embed)).await.unwrap();
             } else {
