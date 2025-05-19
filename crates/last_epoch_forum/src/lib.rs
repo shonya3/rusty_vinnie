@@ -66,8 +66,8 @@ pub mod html {
                 .enumerate()
                 .filter_map(|(index, row)| {
                     Some((
-                        get_thread_url(&row)?.to_owned(),
-                        get_thread_title(&row)?.to_owned(),
+                        get_thread_url(&row)?,
+                        get_thread_title(&row)?,
                         is_pinneds
                             .as_ref()
                             .and_then(|is_pinneds| is_pinneds.get(index).copied())
