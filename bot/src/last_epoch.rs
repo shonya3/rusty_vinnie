@@ -41,16 +41,7 @@ pub fn create_message(thread: &NewsThreadInfo) -> MessageWithThreadedDetails {
     MessageWithThreadedDetails {
         message: CreateMessage::new().embed(create_summary_embed(thread)),
         thread_name: thread.title.clone(),
-        thread_message: thread.content.as_ref().map(|content| {
-            CreateMessage::new().embed(
-                CreateEmbed::new().description(
-                    content
-                        .chars()
-                        .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
-                        .collect::<String>(),
-                ),
-            )
-        }),
+        details_content: thread.content.clone(),
     }
 }
 

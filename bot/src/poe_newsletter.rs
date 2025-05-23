@@ -55,17 +55,7 @@ pub async fn create_message(thread: &NewsThreadInfo) -> MessageWithThreadedDetai
     MessageWithThreadedDetails {
         message: CreateMessage::new().embed(create_summary_embed(thread, post_details.as_ref())),
         thread_name: thread.title.clone(),
-        thread_message: post_details.map(|details| {
-            CreateMessage::new().embed(
-                CreateEmbed::new().description(
-                    details
-                        .content
-                        .chars()
-                        .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
-                        .collect::<String>(),
-                ),
-            )
-        }),
+        details_content: post_details.map(|post| post.content),
     }
 }
 
