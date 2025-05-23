@@ -1,13 +1,10 @@
-use crate::{interval, Context, Error};
+use crate::{interval, message::MessageWithThreadedDetails, Context, Error};
 
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
-use poise::{
-    serenity_prelude::{
-        ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
-        CreateMessage, Timestamp,
-    },
-    CreateReply,
+use poise::serenity_prelude::{
+    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
+    CreateMessage, Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -32,13 +29,7 @@ async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
                 for thread in threads.into_iter().filter(|thread| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.datetime)
                 }) {
-                    let embed = prepare_embed(thread).await;
-                    if let Err(err) = channel_id
-                        .send_message(ctx, CreateMessage::new().embed(embed))
-                        .await
-                    {
-                        eprintln!("{err:?}");
-                    }
+                    create_message(&thread).send(ctx, channel_id).await
                 }
             }
             Err(err) => eprintln!("{err:?}"),
@@ -46,7 +37,24 @@ async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
     }
 }
 
-pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
+pub fn create_message(thread: &NewsThreadInfo) -> MessageWithThreadedDetails {
+    MessageWithThreadedDetails {
+        message: CreateMessage::new().embed(create_summary_embed(thread)),
+        thread_name: thread.title.clone(),
+        thread_message: thread.content.as_ref().map(|content| {
+            CreateMessage::new().embed(
+                CreateEmbed::new().description(
+                    content
+                        .chars()
+                        .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
+                        .collect::<String>(),
+                ),
+            )
+        }),
+    }
+}
+
+pub fn create_summary_embed(thread: &NewsThreadInfo) -> CreateEmbed {
     let mut embed = CreateEmbed::new()
         .title(&thread.title)
         .url(&thread.url)
@@ -67,13 +75,6 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
 
     if let Some(content) = &thread.content {
         embed = embed.field("Words", content.unicode_words().count().to_string(), true);
-
-        embed = embed.description(
-            content
-                .chars()
-                .take(crate::EMBED_DESCRIPTION_CUSTOM_MAX_CHARS)
-                .collect::<String>(),
-        );
     }
 
     embed
@@ -100,14 +101,14 @@ pub async fn epoch_thread(
     #[max = 3]
     nth: usize,
 ) -> Result<(), Error> {
-    ctx.defer().await?;
-
+    ctx.defer_ephemeral().await?;
     match last_epoch_forum::fetch_subforum_threads_list(subforum.into()).await {
         Ok(threads) => {
-            if let Some(thread) = threads.into_iter().filter(|t| !t.is_pinned).nth(nth - 1) {
-                // if let Some(thread) = threads.into_iter().nth(nth - 1) {
-                let embed = prepare_embed(thread).await;
-                ctx.send(CreateReply::default().embed(embed)).await.unwrap();
+            if let Some(thread) = threads.into_iter().nth(nth - 1) {
+                create_message(&thread)
+                    .send(ctx.serenity_context(), ctx.channel_id())
+                    .await;
+                ctx.say("Done !").await?;
             } else {
                 ctx.say("Not found").await?;
             }
