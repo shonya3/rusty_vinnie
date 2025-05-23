@@ -15,6 +15,7 @@ mod status;
 mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
+pub const EMBED_DESCRIPTION_CUSTOM_MAX_CHARS: usize = 1000;
 
 async fn event_handler(
     ctx: &serenity::Context,

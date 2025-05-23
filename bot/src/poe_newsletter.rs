@@ -88,7 +88,7 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
                     details
                         .content
                         .chars()
-                        .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
+                        .take(crate::EMBED_DESCRIPTION_CUSTOM_MAX_CHARS)
                         .collect::<String>(),
                 );
 
