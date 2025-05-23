@@ -7,6 +7,7 @@ mod channel;
 mod commands;
 mod interval;
 mod last_epoch;
+mod message;
 mod message_handler;
 mod poe_newsletter;
 pub mod poe_teasers;

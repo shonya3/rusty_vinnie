@@ -1,6 +1,6 @@
-use crate::{channel::AppChannel, interval};
+use crate::{channel::AppChannel, interval, message::MessageWithThreadedDetails};
 use chrono::FixedOffset;
-use poe_forum::{NewsThreadInfo, Subforum, WebsiteLanguage};
+use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
     Timestamp,
@@ -38,14 +38,7 @@ async fn watch_subforum(
                 for thread in threads.into_iter().filter(|thread| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.posted_date)
                 }) {
-                    let embed = prepare_embed(thread).await;
-
-                    if let Err(err) = channel_id
-                        .send_message(ctx, CreateMessage::new().embed(embed))
-                        .await
-                    {
-                        eprintln!("{err:?}");
-                    }
+                    create_message(&thread).await.send(ctx, channel_id).await;
                 }
             }
             Err(err) => eprintln!("{err:?}"),
@@ -53,7 +46,33 @@ async fn watch_subforum(
     }
 }
 
-pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
+pub async fn create_message(thread: &NewsThreadInfo) -> MessageWithThreadedDetails {
+    let post_details = http::text(&thread.url)
+        .await
+        .ok()
+        .and_then(|html| poe_forum::get_post_details(&html));
+
+    MessageWithThreadedDetails {
+        message: CreateMessage::new().embed(create_summary_embed(thread, post_details.as_ref())),
+        thread_name: thread.title.clone(),
+        thread_message: post_details.map(|details| {
+            CreateMessage::new().embed(
+                CreateEmbed::new().description(
+                    details
+                        .content
+                        .chars()
+                        .take(crate::EMBED_DESCRIPTION_MAX_CHARS)
+                        .collect::<String>(),
+                ),
+            )
+        }),
+    }
+}
+
+pub fn create_summary_embed(
+    thread: &NewsThreadInfo,
+    post_details: Option<&PostDetails>,
+) -> CreateEmbed {
     let mut embed = CreateEmbed::new()
         .title(&thread.title)
         .url(&thread.url)
@@ -75,30 +94,17 @@ pub async fn prepare_embed(thread: NewsThreadInfo) -> CreateEmbed {
         embed = embed.timestamp(timestamp);
     }
 
-    match http::text(&thread.url).await {
-        Ok(html) => {
-            if let Some(details) = poe_forum::get_post_details(&html) {
-                embed = embed.field(
-                    "Words",
-                    details.content.unicode_words().count().to_string(),
-                    true,
-                );
+    if let Some(details) = post_details {
+        embed = embed.field(
+            "Words",
+            details.content.unicode_words().count().to_string(),
+            true,
+        );
 
-                embed = embed.description(
-                    details
-                        .content
-                        .chars()
-                        .take(crate::EMBED_DESCRIPTION_CUSTOM_MAX_CHARS)
-                        .collect::<String>(),
-                );
-
-                if let Some(image_src) = &details.image_src {
-                    embed = embed.image(image_src);
-                }
-            }
+        if let Some(image_src) = &details.image_src {
+            embed = embed.image(image_src);
         }
-        Err(err) => eprintln!("Could not fetch post html {err}"),
-    };
+    }
 
     embed
 }
@@ -121,56 +127,4 @@ pub fn subforum_title(lang: WebsiteLanguage, subforum: Subforum) -> String {
     };
 
     format!("{} [{}] {}", subforum_name, lang_str, emoji)
-}
-
-#[allow(unused)]
-pub mod debug {
-    use chrono::FixedOffset;
-    use poe_forum::{NewsThreadInfo, Subforum, WebsiteLanguage};
-    use poise::serenity_prelude::CreateEmbed;
-
-    pub fn offset() -> Option<FixedOffset> {
-        FixedOffset::east_opt(3 * 3600)
-    }
-
-    pub enum Threads {
-        News020e,
-        News020hFirst,
-        News020hSecond,
-    }
-
-    impl Threads {
-        pub fn thread(&self) -> NewsThreadInfo {
-            match self {
-                Threads::News020e => NewsThreadInfo {
-                    url: "https://www.pathofexile.com/forum/view-thread/3765101".to_owned(),
-                    posted_date: "2025-04-17T08:28:24Z".parse().unwrap(),
-                    title: "Upcoming Plans for 0.2.0g".to_owned(),
-                    author: Some("Community_Team".to_owned()),
-                    subforum: Subforum::EarlyAccessAnnouncementsEn,
-                    lang: WebsiteLanguage::En,
-                },
-                Threads::News020hFirst => NewsThreadInfo {
-                    url: "https://www.pathofexile.com/forum/view-thread/3780473".to_owned(),
-                    posted_date: "2025-05-12T20:50:10Z".parse().unwrap(),
-                    title: "0.2.0h Patch Summary".to_owned(),
-                    author: Some("Community_Team".to_owned()),
-                    subforum: Subforum::EarlyAccessAnnouncementsEn,
-                    lang: WebsiteLanguage::En,
-                },
-                Threads::News020hSecond => NewsThreadInfo {
-                    url: "https://www.pathofexile.com/forum/view-thread/3779014".to_owned(),
-                    posted_date: "2025-05-08T19:59:34Z".parse().unwrap(),
-                    title: "Upcoming Plans for Patch 0.2.0h".to_owned(),
-                    author: Some("Community_Team".to_owned()),
-                    subforum: Subforum::EarlyAccessAnnouncementsEn,
-                    lang: WebsiteLanguage::En,
-                },
-            }
-        }
-
-        pub async fn embed(&self) -> CreateEmbed {
-            super::prepare_embed(self.thread()).await
-        }
-    }
 }
