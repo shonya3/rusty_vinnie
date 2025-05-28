@@ -34,13 +34,21 @@ async fn send_new_teasers(
         }
     };
 
+    let conn = match data.db.connect() {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("DB connection error in send_new_teasers: {}", e);
+            return;
+        }
+    };
+
     if thread_teasers.is_empty() {
         // No teasers found for this thread, nothing to do.
         return;
     }
 
     let published_teaser_headings = {
-        match db_layer::load_published_teaser_headings(&data.conn, forum_thread.url()).await {
+        match db_layer::load_published_teaser_headings(&conn, forum_thread.url()).await {
             Ok(headings) => headings,
             Err(err) => {
                 eprintln!(
@@ -77,7 +85,7 @@ async fn send_new_teasers(
 
     if !newly_published_headings.is_empty() {
         if let Err(err) = db_layer::save_newly_published_teaser_headings(
-            &data.conn,
+            &conn,
             forum_thread.url(),
             &newly_published_headings,
         )
