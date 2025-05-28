@@ -1,7 +1,6 @@
-use ::ea_live_updates::LiveUpdate;
 use dotenv::dotenv;
 use poise::serenity_prelude::{self as serenity, futures::lock::Mutex};
-use std::collections::HashSet;
+use std::sync::Arc;
 
 mod channel;
 mod commands;
@@ -17,6 +16,8 @@ mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
 pub const EMBED_DESCRIPTION_CUSTOM_MAX_CHARS: usize = 1000;
+
+pub type DbClient = libsql_client::Client;
 
 async fn event_handler(
     ctx: &serenity::Context,
@@ -41,8 +42,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {
-    #[allow(unused)]
-    published_live_updates: Mutex<HashSet<LiveUpdate>>,
+    pub db: Arc<Mutex<DbClient>>,
 }
 
 #[shuttle_runtime::main]
@@ -63,8 +63,11 @@ async fn main(
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                let db_client = DbClient::from_env()
+                .await
+                .expect("Failed to create DbClient from environment. Ensure LIBSQL_CLIENT_URL and LIBSQL_CLIENT_TOKEN are set.");
                 Ok(Data {
-                    published_live_updates: Mutex::new(HashSet::new()),
+                    db: Arc::new(Mutex::new(db_client)),
                 })
             })
         })
