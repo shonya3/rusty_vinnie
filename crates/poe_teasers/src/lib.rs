@@ -115,6 +115,8 @@ pub enum TeasersForumThread {
     Poe2(Lang),
     Poe1_3_25Russian,
     Poe2_02(Lang),
+    Poe1_3_26Ru,
+    Poe1_3_26En,
 }
 
 impl TeasersForumThread {
@@ -131,6 +133,12 @@ impl TeasersForumThread {
                 Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3726161",
                 Lang::En => "https://www.pathofexile.com/forum/view-thread/3726160",
             },
+            TeasersForumThread::Poe1_3_26Ru => {
+                "https://ru.pathofexile.com/forum/view-thread/3784649"
+            }
+            TeasersForumThread::Poe1_3_26En => {
+                "https://www.pathofexile.com/forum/view-thread/3784648"
+            }
         }
     }
 
@@ -145,6 +153,8 @@ impl TeasersForumThread {
                 Lang::Ru => "Тизеры Path of Exile 2 0.2.0",
                 Lang::En => "Path of Exile 2 - 0.2.0 Teasers",
             },
+            TeasersForumThread::Poe1_3_26Ru => "Тизеры Path of Exile: Секреты Атласа",
+            TeasersForumThread::Poe1_3_26En => "Path of Exile: Secrets of the Atlas Teasers",
         }
     }
 }

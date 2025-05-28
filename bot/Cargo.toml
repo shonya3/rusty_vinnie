@@ -24,5 +24,8 @@ poe_teasers = { path = "../crates/poe_teasers" }
 ea_live_updates = { path = "../crates/ea_live_updates" }
 http = { path = "../crates/http" }
 unicode-segmentation = "1.12.0"
-libsql-client = "0.33.4"
 url = "2.5.4"
+libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["remote", "tls"] }
+
+[dev-dependencies]
+libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["core"] }

@@ -1,6 +1,6 @@
 use dotenv::dotenv;
-use poise::serenity_prelude::{self as serenity, futures::lock::Mutex};
-use std::sync::Arc;
+use libsql::Connection;
+use poise::serenity_prelude::{self as serenity};
 
 mod channel;
 mod commands;
@@ -17,7 +17,6 @@ mod unused;
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
 pub const EMBED_DESCRIPTION_CUSTOM_MAX_CHARS: usize = 1000;
 
-pub type DbClient = libsql_client::Client;
 
 async fn event_handler(
     ctx: &serenity::Context,
@@ -42,7 +41,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {
-    pub db: Arc<Mutex<DbClient>>,
+    pub conn: Connection
 }
 
 #[shuttle_runtime::main]
@@ -63,11 +62,21 @@ async fn main(
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                let db_client = DbClient::from_env()
-                .await
-                .expect("Failed to create DbClient from environment. Ensure LIBSQL_CLIENT_URL and LIBSQL_CLIENT_TOKEN are set.");
+                
+                let db_url = secrets.get("DB_URL")
+                    .expect("DB_URL environment variable not set.");
+                let db_token = secrets.get("DB_TOKEN")
+                    .expect("DB_TOKEN environment variable not set."); 
+
+                let db = libsql::Builder::new_remote(db_url, db_token)
+                    .build()
+                    .await
+                    .expect("Failed to create Database from environment. Ensure DB_URL and DB_TOKEN are set and valid.");
+                let conn = db.connect().unwrap();
+                poe_teasers::db_layer::ensure_schema_exists(&conn).await
+                    .expect("Failed to ensure database schema exists.");
                 Ok(Data {
-                    db: Arc::new(Mutex::new(db_client)),
+                    conn
                 })
             })
         })

@@ -3,7 +3,7 @@ use poe_teasers::{Teaser, TeasersForumThread};
 use poise::serenity_prelude::{
     ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
 };
-use std::{collections::HashSet, time::Duration};
+use std::time::Duration;
 
 pub async fn watch_teasers_threads(
     ctx: &SerenityContext,
@@ -22,7 +22,7 @@ pub async fn watch_teasers_threads(
 
 async fn send_new_teasers(
     ctx: &SerenityContext,
-    _data: &Data,
+    data: &Data,
     forum_thread: TeasersForumThread,
     channel_id: ChannelId,
 ) {
@@ -33,34 +33,59 @@ async fn send_new_teasers(
             return;
         }
     };
-    let published_teasers = load_published_teasers();
+
+    if thread_teasers.is_empty() {
+        // No teasers found for this thread, nothing to do.
+        return;
+    }
+
+    let published_teaser_headings = {
+        match db_layer::load_published_teaser_headings(&data.conn, forum_thread.url()).await {
+            Ok(headings) => headings,
+            Err(err) => {
+                eprintln!(
+                    "Failed to load published teaser headings for {}: {}",
+                    forum_thread.url(),
+                    err
+                );
+                return;
+            }
+        }
+    };
+    let mut newly_published_headings = Vec::new();
 
     for teaser in &thread_teasers {
-        if !published_teasers.contains(teaser) {
-            send_teaser(ctx, channel_id, teaser)
-                .await
-                .unwrap_or_else(|err| eprintln!("publish_new_teasers Error:{err}"))
+        // Use teaser.heading as the unique identifier within a thread.
+        if !published_teaser_headings.contains(&teaser.heading) {
+            match send_teaser(ctx, channel_id, teaser).await {
+                Ok(_) => {
+                    newly_published_headings.push(teaser.heading.clone());
+                }
+                Err(err) => {
+                    eprintln!(
+                        "Failed to send teaser ({} - {}): {}",
+                        forum_thread.title(),
+                        teaser.heading,
+                        err
+                    );
+                    // If sending fails, we don't add it to newly_published_headings,
+                    // so it will be retried in the next cycle.
+                }
+            }
         };
     }
 
-    let mut set = HashSet::<Teaser>::from_iter(published_teasers);
-    set.extend(thread_teasers);
-
-    let _unique_teasers: Vec<Teaser> = set.into_iter().collect();
-
-    if let Err(err) = save_published_teasers() {
-        println!("Could not persist thread teasers: {err}");
+    if !newly_published_headings.is_empty() {
+        if let Err(err) = db_layer::save_newly_published_teaser_headings(
+            &data.conn,
+            forum_thread.url(),
+            &newly_published_headings,
+        )
+        .await
+        {
+            eprintln!("CRITICAL: Could not persist new teaser headings for {} after sending: {}. Teasers might be re-posted.", forum_thread.url(), err);
+        };
     };
-}
-
-// TODO Use the actual storage
-fn load_published_teasers() -> Vec<Teaser> {
-    Vec::new()
-}
-
-// TODO Use the actual storage
-fn save_published_teasers() -> Result<(), String> {
-    Ok(())
 }
 
 async fn send_teaser(
@@ -109,13 +134,9 @@ fn create_vinnie_bot_author_embed() -> CreateEmbedAuthor {
         .url("https://github.com/shonya3/rusty_vinnie")
 }
 
-#[allow(unused)]
-mod db_layer {
-    use crate::DbClient;
-    use libsql_client::{Statement, Value};
+pub mod db_layer {
+    use libsql::{params, Connection, Error as LibsqlError};
     use std::collections::HashSet;
-
-    type LibsqlError = Box<dyn std::error::Error>;
 
     pub const CREATE_IF_NOT_EXISTS: &str = r#"
     CREATE TABLE IF NOT EXISTS published_poe_teasers (
@@ -125,47 +146,55 @@ mod db_layer {
         PRIMARY KEY (thread_url, teaser_heading)
     ) STRICT;"#;
 
-    pub async fn ensure_schema_exists(db: &DbClient) -> Result<(), LibsqlError> {
-        db.execute(CREATE_IF_NOT_EXISTS).await?;
-
+    pub async fn ensure_schema_exists(conn: &Connection) -> Result<(), LibsqlError> {
+        conn.execute(CREATE_IF_NOT_EXISTS, ()).await?;
         Ok(())
     }
 
-    pub async fn load_published_teaser_heading(
-        db: &DbClient,
+    pub async fn load_published_teaser_headings(
+        conn: &Connection, // Changed to take a connection
         thread_url: &str,
     ) -> Result<HashSet<String>, String> {
-        let stmt = Statement::with_args(
-            "SELECT
-                teaser_heading 
-            FROM 
+        let mut rows = conn
+            .query(
+                "SELECT
+                teaser_heading
+            FROM
                 published_poe_teasers
             WHERE
-                thread_url = ?
-                ",
-            &[Value::from(thread_url)],
-        );
-
-        let rows = db.execute(stmt).await.unwrap();
+                thread_url = ?",
+                params![thread_url],
+            )
+            .await
+            .map_err(|e| {
+                format!(
+                    "DB query failed for load_published_teaser_heading [{}]: {}",
+                    thread_url, e
+                )
+            })?;
 
         let mut headings = HashSet::new();
-        for row in rows.rows {
-            if row.values.is_empty() {
-                return Err(format!(
-                    "DB row has no columns for thread_url: {}",
-                    thread_url
-                ));
-            }
-            match &row.values[0] {
-                Value::Text {
-                    value: heading_text,
-                } => {
-                    headings.insert(heading_text.clone());
+        // Iterate over rows using next().await
+        while let Some(row) = rows
+            .next()
+            .await
+            .map_err(|e| format!("Failed to get next row: {}", e))?
+        {
+            // Get value by column index (0 for teaser_heading)
+            match row.get_value(0) {
+                Ok(libsql::Value::Text(heading_text)) => {
+                    headings.insert(heading_text);
                 }
-                _ => {
+                Ok(_) => {
                     return Err(format!(
                         "Unexpected data type for teaser_heading in DB row for thread_url: {}",
                         thread_url
+                    ))
+                }
+                Err(e) => {
+                    return Err(format!(
+                        "Failed to get value from row for thread_url {}: {}",
+                        thread_url, e
                     ))
                 }
             }
@@ -175,7 +204,7 @@ mod db_layer {
     }
 
     pub async fn save_newly_published_teaser_headings(
-        db: &DbClient,
+        conn: &Connection,
         thread_url: &str,
         headings: &[String],
     ) -> Result<(), String> {
@@ -183,20 +212,26 @@ mod db_layer {
             return Ok(());
         }
 
-        let mut stmts = Vec::new();
+        let tx = conn
+            .transaction()
+            .await
+            .map_err(|e| format!("Failed to start transaction: {}", e))?;
+
         for heading in headings {
-            stmts.push(Statement::with_args(
+            tx.execute(
                 "INSERT OR IGNORE INTO
                      published_poe_teasers (thread_url, teaser_heading) 
                      VALUES 
                         (?, ?)",
-                &[Value::from(thread_url), Value::from(heading.as_str())],
-            ));
+                params![thread_url, heading.as_str()],
+            )
+            .await
+            .map_err(|e| format!("DB execute failed for heading '{}': {}", heading, e))?;
         }
 
-        db.batch(stmts).await.map_err(|e| {
+        tx.commit().await.map_err(|e| {
             format!(
-                "DB batch insert failed for save_newly_published_teaser_headings [{}]: {}",
+                "DB transaction commit failed for save_newly_published_teaser_headings [{}]: {}",
                 thread_url, e
             )
         })?;
@@ -207,33 +242,37 @@ mod db_layer {
 #[cfg(test)]
 mod db_layer_tests {
     use crate::poe_teasers::db_layer::*;
-    use libsql_client::Client;
+    use libsql::{Builder, Connection}; // For creating in-memory DB for tests
     use std::collections::HashSet;
 
-    async fn memory_db_client() -> Client {
-        Client::in_memory().unwrap()
+    async fn memory_db_client() -> Connection {
+        let db = Builder::new_local(":memory:").build().await.unwrap();
+        db.connect().unwrap()
     }
 
     #[tokio::test]
     async fn test_ensure_schema_exists() {
-        let db = memory_db_client().await;
+        let conn = memory_db_client().await;
 
         // First run
-        let result = ensure_schema_exists(&db).await;
+        let result = ensure_schema_exists(&conn).await;
         assert!(result.is_ok(), "Schema creation failed: {:?}", result.err());
 
         // Second run (idempotency check)
-        let result_idempotent = ensure_schema_exists(&db).await;
+        let result_idempotent = ensure_schema_exists(&conn).await;
         assert!(
             result_idempotent.is_ok(),
             "Schema creation on existing table failed: {:?}",
             result_idempotent.err()
         );
 
-        // Optional: Try a simple insert to confirm table structure (basic check)
-        let insert_result = db.execute(
-            "INSERT INTO published_poe_teasers (thread_url, teaser_heading) VALUES ('test_url', 'test_heading')"
-        ).await;
+        // Try a simple insert on the SAME connection
+        let insert_result = conn
+            .execute(
+                "INSERT INTO published_poe_teasers (thread_url, teaser_heading) VALUES (?, ?)",
+                libsql::params!["test_url", "test_heading"],
+            )
+            .await;
         assert!(
             insert_result.is_ok(),
             "Insert after schema creation failed: {:?}",
@@ -242,15 +281,16 @@ mod db_layer_tests {
     }
 
     #[tokio::test]
-    async fn test_save_and_load_published_teaser_headings() {
-        let db = memory_db_client().await;
-        ensure_schema_exists(&db).await.unwrap();
+    async fn test_save_and_load_published_teaser_headingss() {
+        let conn = memory_db_client().await;
+
+        ensure_schema_exists(&conn).await.unwrap();
 
         let thread_url1 = "https://example.com/thread1";
         let thread_url2 = "https://example.com/thread2";
 
         // 1. Load from empty table
-        let initial_headings = load_published_teaser_heading(&db, thread_url1)
+        let initial_headings = load_published_teaser_headings(&conn, thread_url1)
             .await
             .unwrap();
         assert!(
@@ -261,7 +301,7 @@ mod db_layer_tests {
         // 2. Save some new headings for thread_url1
         let headings_to_save1 = vec!["Teaser A".to_string(), "Teaser B".to_string()];
         let save_result1 =
-            save_newly_published_teaser_headings(&db, thread_url1, &headings_to_save1).await;
+            save_newly_published_teaser_headings(&conn, thread_url1, &headings_to_save1).await;
         assert!(
             save_result1.is_ok(),
             "Failed to save headings for thread1: {:?}",
@@ -269,7 +309,7 @@ mod db_layer_tests {
         );
 
         // 3. Load them back for thread_url1
-        let loaded_headings1 = load_published_teaser_heading(&db, thread_url1)
+        let loaded_headings1 = load_published_teaser_headings(&conn, thread_url1)
             .await
             .unwrap();
         let expected_headings1: HashSet<String> = headings_to_save1.into_iter().collect();
@@ -281,7 +321,8 @@ mod db_layer_tests {
         // 4. Try to save the same headings again + a new one for thread_url1 (OR IGNORE should handle duplicates)
         let headings_to_save_again1 = vec!["Teaser A".to_string(), "Teaser C".to_string()];
         let save_again_result1 =
-            save_newly_published_teaser_headings(&db, thread_url1, &headings_to_save_again1).await;
+            save_newly_published_teaser_headings(&conn, thread_url1, &headings_to_save_again1)
+                .await;
         assert!(
             save_again_result1.is_ok(),
             "Failed to save headings again for thread1: {:?}",
@@ -289,7 +330,7 @@ mod db_layer_tests {
         );
 
         // 5. Load again for thread_url1, should include "Teaser C" and not duplicate "Teaser A"
-        let final_loaded_headings1 = load_published_teaser_heading(&db, thread_url1)
+        let final_loaded_headings1 = load_published_teaser_headings(&conn, thread_url1)
             .await
             .unwrap();
         let mut final_expected_headings1 = expected_headings1.clone();
@@ -302,7 +343,7 @@ mod db_layer_tests {
         // 6. Save headings for a different thread_url2
         let headings_to_save2 = vec!["Teaser X".to_string()];
         let save_result2 =
-            save_newly_published_teaser_headings(&db, thread_url2, &headings_to_save2).await;
+            save_newly_published_teaser_headings(&conn, thread_url2, &headings_to_save2).await;
         assert!(
             save_result2.is_ok(),
             "Failed to save headings for thread2: {:?}",
@@ -310,7 +351,7 @@ mod db_layer_tests {
         );
 
         // 7. Load for thread_url2
-        let loaded_headings2 = load_published_teaser_heading(&db, thread_url2)
+        let loaded_headings2 = load_published_teaser_headings(&conn, thread_url2)
             .await
             .unwrap();
         let expected_headings2: HashSet<String> = headings_to_save2.into_iter().collect();
@@ -320,7 +361,7 @@ mod db_layer_tests {
         );
 
         // 8. Ensure loading thread_url1 again still gives its correct set
-        let re_loaded_headings1 = load_published_teaser_heading(&db, thread_url1)
+        let re_loaded_headings1 = load_published_teaser_headings(&conn, thread_url1)
             .await
             .unwrap();
         assert_eq!(
@@ -331,12 +372,12 @@ mod db_layer_tests {
         // 9. Test saving empty list
         let empty_headings: Vec<String> = Vec::new();
         let save_empty_result =
-            save_newly_published_teaser_headings(&db, thread_url1, &empty_headings).await;
+            save_newly_published_teaser_headings(&conn, thread_url1, &empty_headings).await;
         assert!(
             save_empty_result.is_ok(),
             "Saving empty headings list failed"
         );
-        let headings_after_empty_save = load_published_teaser_heading(&db, thread_url1)
+        let headings_after_empty_save = load_published_teaser_headings(&conn, thread_url1)
             .await
             .unwrap();
         assert_eq!(
@@ -345,7 +386,7 @@ mod db_layer_tests {
         );
     }
 
-    // TODO: Add tests for error cases in load_published_teaser_heading,
+    // TODO: Add tests for error cases in load_published_teaser_headings,
     // e.g., what happens if the DB connection fails mid-operation (harder to simulate without mocking),
     // or if data is malformed (though STRICT table should prevent some of this).
 }

@@ -7,16 +7,25 @@ use crate::{
 };
 use chrono::FixedOffset;
 use poe_forum::{Subforum, WebsiteLanguage};
+use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
 
-pub async fn handle_ready(ctx: &serenity::Context, _data: &Data) {
+pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
 
-    set_watchers(ctx).await;
+    set_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &serenity::Context) {
+async fn set_watchers(ctx: &serenity::Context, data: &Data) {
     tokio::join!(
+        crate::poe_teasers::watch_teasers_threads(
+            ctx,
+            data,
+            &[
+                TeasersForumThread::Poe1_3_26En,
+                TeasersForumThread::Poe1_3_26Ru,
+            ],
+        ),
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
