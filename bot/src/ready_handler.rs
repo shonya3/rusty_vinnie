@@ -7,7 +7,6 @@ use crate::{
 };
 use chrono::FixedOffset;
 use poe_forum::{Subforum, WebsiteLanguage};
-use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
 
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
@@ -16,16 +15,8 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     set_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &serenity::Context, data: &Data) {
+async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
     tokio::join!(
-        crate::poe_teasers::watch_teasers_threads(
-            ctx,
-            data,
-            &[
-                TeasersForumThread::Poe1_3_26En,
-                TeasersForumThread::Poe1_3_26Ru,
-            ],
-        ),
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
