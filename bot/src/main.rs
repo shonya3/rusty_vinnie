@@ -1,6 +1,8 @@
 use dotenv::dotenv;
+use ::ea_live_updates::LiveUpdate;
+use futures::lock::Mutex;
 use poise::serenity_prelude::{self as serenity};
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 mod channel;
 mod commands;
@@ -12,6 +14,7 @@ mod poe_newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
+mod ea_live_updates;
 mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
@@ -43,6 +46,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 // Custom user data passed to all command functions
 pub struct Data {
     pub db: Arc<DbClient>,
+    pub published_live_updates: Arc<Mutex<HashSet<LiveUpdate>>>
 }
 
 #[shuttle_runtime::main]
@@ -77,7 +81,7 @@ async fn main(
                 let conn = db.connect().expect("Failed to get connection for schema setup");
                 poe_teasers::db_layer::ensure_schema_exists(&conn).await
                     .expect("Failed to ensure database schema exists.");
-                Ok(Data { db: Arc::new(db) })
+                Ok(Data {db:Arc::new(db), published_live_updates: Default::default() })
             })
         })
         .options(poise::FrameworkOptions {

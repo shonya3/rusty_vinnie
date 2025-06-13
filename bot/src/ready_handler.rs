@@ -1,11 +1,13 @@
 use crate::{
     channel::AppChannel,
+    ea_live_updates::spin_ea_live_updates_loop,
     last_epoch::{self, Subforum as LastEpochSubforum},
     poe_newsletter,
     status::{get_kroiya_status, watch_status},
     Data,
 };
 use chrono::FixedOffset;
+use ea_live_updates::LiveUpdatesThread;
 use poe_forum::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{self as serenity};
 
@@ -15,8 +17,16 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     set_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
+async fn set_watchers(ctx: &serenity::Context, data: &Data) {
+    let poe_channel = AppChannel::Poe.id();
+
     tokio::join!(
+        spin_ea_live_updates_loop(
+            ctx,
+            data,
+            &[LiveUpdatesThread::En, LiveUpdatesThread::Ru],
+            &poe_channel
+        ),
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),

@@ -29,17 +29,15 @@ pub enum LiveUpdatesThread {
 impl LiveUpdatesThread {
     pub fn url(&self) -> &'static str {
         match self {
-            LiveUpdatesThread::Ru => "https://ru.pathofexile.com/forum/view-thread/3741051",
-            LiveUpdatesThread::En => "https://www.pathofexile.com/forum/view-thread/3741050",
+            LiveUpdatesThread::Ru => "https://ru.pathofexile.com/forum/view-thread/3789613",
+            LiveUpdatesThread::En => "https://www.pathofexile.com/forum/view-thread/3789612",
         }
     }
 
     pub fn title(&self) -> &'static str {
         match self {
-            LiveUpdatesThread::Ru => {
-                "Запуск Path of Exile 2: Начало охоты - Обновления в реальном времени 🔴"
-            }
-            LiveUpdatesThread::En => "Path of Exile 2: Dawn of the Hunt Launch - Live Updates 🔴",
+            LiveUpdatesThread::Ru => "Запуск Секретов Атласа - Обновления в реальном времени🔴",
+            LiveUpdatesThread::En => "Secrets of the Atlas Launch - Live Updates 🔴",
         }
     }
 }
