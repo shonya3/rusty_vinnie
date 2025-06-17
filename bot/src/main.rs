@@ -14,6 +14,7 @@ mod poe_newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
+#[allow(unused)]
 mod ea_live_updates;
 mod unused;
 
