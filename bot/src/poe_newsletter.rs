@@ -9,26 +9,28 @@ use unicode_segmentation::UnicodeSegmentation;
 
 pub async fn watch_subforums(
     ctx: &SerenityContext,
+    channel: AppChannel,
     configs: Vec<(WebsiteLanguage, Subforum)>,
     offset: Option<FixedOffset>,
 ) {
     futures::future::join_all(
         configs
             .into_iter()
-            .map(|(lang, subforum)| watch_subforum(ctx, lang, subforum, offset)),
+            .map(|(lang, subforum)| watch_subforum(ctx, channel, lang, subforum, offset)),
     )
     .await;
 }
 
 async fn watch_subforum(
     ctx: &SerenityContext,
+    channel: AppChannel,
     lang: WebsiteLanguage,
     subforum: Subforum,
     time_offset: Option<FixedOffset>,
 ) {
     let mut interval =
         tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
-    let channel_id = AppChannel::Poe.id();
+    let channel_id = channel.id();
 
     loop {
         interval.tick().await;

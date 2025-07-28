@@ -33,11 +33,19 @@ async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
         ),
         poe_newsletter::watch_subforums(
             ctx,
+            AppChannel::Poe,
             vec![
                 (WebsiteLanguage::En, Subforum::News),
                 (WebsiteLanguage::Ru, Subforum::News),
                 (WebsiteLanguage::En, Subforum::PatchNotes),
                 (WebsiteLanguage::Ru, Subforum::PatchNotes),
+            ],
+            Timezone::BritishSummer.offset(),
+        ),
+        poe_newsletter::watch_subforums(
+            ctx,
+            AppChannel::Poe2,
+            vec![
                 (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
                 (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
                 (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
