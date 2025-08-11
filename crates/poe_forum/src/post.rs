@@ -25,7 +25,7 @@ mod selectors {
         Selector::parse(selectors).unwrap()
     }
 
-    fn content_post(document: &Html) -> Option<ElementRef> {
+    fn content_post(document: &Html) -> Option<ElementRef<'_>> {
         document
             .select(&create_selector("tr.staff"))
             .next()
@@ -41,7 +41,7 @@ mod selectors {
             .map(|src| src.to_string())
     }
 
-    pub fn content(document: &Html) -> Option<ElementRef> {
+    pub fn content(document: &Html) -> Option<ElementRef<'_>> {
         content_post(document).and_then(|post| post.select(&create_selector(".content")).next())
     }
 
