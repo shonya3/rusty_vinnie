@@ -58,7 +58,6 @@ async fn main(
     dotenv().ok();
 
     let token = secrets.get("DISCORD_TOKEN").expect("no DISCORD_TOKEN env");
-    println!("{token}");
     let intents = serenity::GatewayIntents::non_privileged()
         | serenity::GatewayIntents::MESSAGE_CONTENT
         | serenity::GatewayIntents::GUILD_MEMBERS
