@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, Utc};
 use thiserror::Error;
 
 const URL: &str = "https://www.wowhead.com/diablo-4/blue-tracker?rss";
