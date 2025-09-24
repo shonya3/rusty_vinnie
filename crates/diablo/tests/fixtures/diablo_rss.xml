@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Wowhead Blue Tracker</title>
+    <link>https://www.wowhead.com/diablo-4/blue-tracker</link>
+    <description>World of Warcraft Database</description>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 24 Sep 2025 11:37:19 -0500</lastBuildDate>
+    <ttl>3</ttl>
+    <item>
+      <description>HOTFIX 1 - September 23, 2025 - 2.4.0 BUG FIXES Fixed an issue where Legendary items were dropping more frequently than intended at lower levels, and far less often in higher difficulties.&lt;br&gt;&lt;br&gt;By &lt;a href="https://www.wowhead.com/diablo-4/blue-tracker/author/filthierich"&gt;filthierich&lt;/a&gt; on 2025/09/23 at 7:20 PM&lt;/description&gt;
+      <title>A title</title>
+      <link>https://www.wowhead.com/diablo-4/blue-tracker/topic/us/231178</link>
+      <guid>https://www.wowhead.com/diablo-4/blue-tracker/topic/us/231178</guid>
+      <pubDate>Tue, 23 Sep 2025 19:20:43 -0500</pubDate>
+    </item>
+  </channel>
+</rss>

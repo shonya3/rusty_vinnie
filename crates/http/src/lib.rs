@@ -1,3 +1,5 @@
+pub use reqwest::{Client, Error};
+
 const USER_AGENT: &str =
     "rusty_vinnie/0.1 https://github.com/shonya3/rusty_vinnie (email: poeshonya3@gmail.com)";
 

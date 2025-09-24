@@ -1,0 +1,14 @@
+[package]
+name = "diablo"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+rss = "2.0"
+tokio = { version = "1", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }
+http = { path = "../http" }
+thiserror = "1.0"
+
+
