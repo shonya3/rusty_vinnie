@@ -68,6 +68,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::TimeZone;
 
     #[tokio::test]
     async fn test_fetch_posts() {
@@ -86,6 +87,11 @@ mod tests {
         assert_eq!(
             first_post.link,
             "https://www.wowhead.com/diablo-4/blue-tracker/topic/us/231178"
+        );
+
+        assert_eq!(
+            first_post.pub_date,
+            Utc.with_ymd_and_hms(2025, 9, 24, 0, 20, 43).unwrap()
         );
     }
 }
