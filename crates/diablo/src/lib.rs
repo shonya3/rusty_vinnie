@@ -18,7 +18,7 @@ pub enum Error {
     #[error("rss parse error: {0}")]
     Rss(#[from] rss::Error),
     #[error("item parse error on item {1:?}: {0}")]
-    ItemParse(#[source] ItemParseError, rss::Item),
+    ItemParse(#[source] ItemParseError, Box<rss::Item>),
 }
 
 #[derive(Debug, Clone)]
@@ -59,7 +59,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
     let posts = channel
         .into_items()
         .into_iter()
-        .map(|item| parse_item(&item).map_err(|e| Error::ItemParse(e, item.clone())))
+        .map(|item| parse_item(&item).map_err(|e| Error::ItemParse(e, Box::new(item.clone()))))
         .collect::<Result<Vec<_>, _>>()?;
 
     Ok(posts)
