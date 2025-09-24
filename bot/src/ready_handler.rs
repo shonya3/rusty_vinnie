@@ -1,5 +1,6 @@
 use crate::{
     channel::AppChannel,
+    diablo_newsletter,
     last_epoch::{self, Subforum as LastEpochSubforum},
     poe_newsletter,
     status::{get_kroiya_status, watch_status},
@@ -53,6 +54,7 @@ async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
             ],
             Timezone::BritishSummer.offset(),
         ),
+        diablo_newsletter::watch_diablo_news(ctx),
     );
 }
 

@@ -8,6 +8,7 @@ pub enum AppChannel {
     Poe2,
     LastEpoch,
     Dev,
+    Diablo,
 }
 
 impl AppChannel {
@@ -26,6 +27,7 @@ impl AppChannel {
             AppChannel::Poe2 => ChannelId::new(1399352084515520654),
             AppChannel::LastEpoch => ChannelId::new(1362313267879350363),
             AppChannel::Dev => ChannelId::new(841929108829372460),
+            AppChannel::Diablo => ChannelId::new(1420445617976774657),
         }
     }
 }

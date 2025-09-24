@@ -11,6 +11,7 @@ mod last_epoch;
 mod message;
 mod message_handler;
 mod poe_newsletter;
+mod diablo_newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
