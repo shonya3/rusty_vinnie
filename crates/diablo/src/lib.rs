@@ -56,7 +56,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> 
         .map(|raw_post| DiabloPost {
             title: raw_post.title,
             id: raw_post.id,
-            description: raw_post.description,
+            description: html_escape::decode_html_entities(&raw_post.description).to_string(),
             url: format!("{}{}", BASE_URL, raw_post.pathname),
             pub_date: raw_post.pub_date,
         })
@@ -92,6 +92,11 @@ mod tests {
         assert_eq!(
             first_post.pub_date.with_nanosecond(0).unwrap(),
             Utc.with_ymd_and_hms(2025, 9, 25, 17, 6, 22).unwrap()
+        );
+
+        assert_eq!(
+            first_post.description,
+            "<a href=\"https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png\">[Embody the Sector’s Finest with StarCraft x Diablo IV]</a> Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  <a href=\"https://news.blizzard.com/en-us/article/24224371\">View Full Article</a>"
         );
     }
 }

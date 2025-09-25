@@ -7,10 +7,9 @@ repository.workspace = true
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-serde_with = "3.8"
 tokio = { version = "1", features = ["full"] }
 chrono = { version = "0.4", features = ["serde"] }
 http = { path = "../http" }
 thiserror = "1.0"
-
+html-escape = "0.2.13"
 
