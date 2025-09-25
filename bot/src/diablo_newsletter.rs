@@ -1,7 +1,8 @@
 use crate::{channel::AppChannel, interval};
 use diablo::{DiabloPost, PostKind};
 use poise::serenity_prelude::{
-    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
+    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
+    Timestamp,
 };
 
 pub async fn watch_diablo_news(ctx: &SerenityContext) {
@@ -32,7 +33,7 @@ pub fn create_summary_embed(post: &DiabloPost) -> CreateEmbed {
         .url(&post.url)
         .author(
             CreateEmbedAuthor::new(&post.user.username)
-                .url(&post.user.profile_url())
+                .url(post.user.profile_url())
                 .icon_url(&post.user.avatar_url),
         )
         .description(&post.description)

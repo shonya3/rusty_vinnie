@@ -5,6 +5,7 @@ use thiserror::Error;
 
 const POSTS_URL: &str = "https://us.forums.blizzard.com/en/d4/groups/blizzard-tracker/posts.json";
 const BASE_URL: &str = "https://us.forums.blizzard.com/en/d4";
+const WEBSITE_DOMAIN_URL: &str = "https://us.forums.blizzard.com";
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -111,7 +112,11 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
             let user = User {
                 id: raw_post.user.id,
                 username: raw_post.user.username,
-                avatar_url: format!("{}{}", BASE_URL, raw_post.user.avatar_template.replace("{size}", "128")),
+                avatar_url: format!(
+                    "{}{}",
+                    WEBSITE_DOMAIN_URL,
+                    raw_post.user.avatar_template.replace("{size}", "128")
+                ),
             };
 
             DiabloPost {
