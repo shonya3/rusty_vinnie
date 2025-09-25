@@ -16,11 +16,11 @@ pub enum Error {
     Regex(#[from] regex::Error),
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct User {
     pub id: u32,
     pub username: String,
-    pub avatar_template: String,
+    pub avatar_url: String,
 }
 
 impl User {
@@ -54,6 +54,13 @@ pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
 
 pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
     #[derive(Debug, Clone, Deserialize)]
+    struct RawUser {
+        pub id: u32,
+        pub username: String,
+        pub avatar_template: String,
+    }
+
+    #[derive(Debug, Clone, Deserialize)]
     struct RawDiabloPost {
         #[serde(rename = "topic_title")]
         pub title: String,
@@ -64,7 +71,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
         pub pathname: String,
         #[serde(rename = "created_at")]
         pub pub_date: DateTime<Utc>,
-        pub user: User,
+        pub user: RawUser,
     }
 
     #[derive(Debug, Clone, Deserialize)]
@@ -101,13 +108,19 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
                 (PostKind::Other, description)
             };
 
+            let user = User {
+                id: raw_post.user.id,
+                username: raw_post.user.username,
+                avatar_url: format!("{}{}", BASE_URL, raw_post.user.avatar_template.replace("{size}", "128")),
+            };
+
             DiabloPost {
                 title: raw_post.title,
                 id: raw_post.id,
                 description,
                 url: format!("{}{}", BASE_URL, raw_post.pathname),
                 pub_date: raw_post.pub_date,
-                user: raw_post.user,
+                user,
                 kind,
             }
         })
@@ -163,5 +176,6 @@ mod tests {
             first_post.user.profile_url(),
             "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity"
         );
+        assert_eq!(first_post.user.avatar_url, "https://us.forums.blizzard.com/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png");
     }
 }
