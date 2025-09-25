@@ -122,7 +122,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
             DiabloPost {
                 title: raw_post.title,
                 id: raw_post.id,
-                description,
+                description: html2md::parse_html(&description).trim().to_string(),
                 url: format!("{}{}", BASE_URL, raw_post.pathname),
                 pub_date: raw_post.pub_date,
                 user,
@@ -165,7 +165,7 @@ mod tests {
 
         assert_eq!(
             first_post.description,
-            " Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  <a href=\"https://news.blizzard.com/en-us/article/24224371\">View Full Article</a>"
+            "Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time. [View Full Article](https://news.blizzard.com/en-us/article/24224371)"
         );
 
         match &first_post.kind {
