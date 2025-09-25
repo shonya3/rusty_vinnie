@@ -83,15 +83,15 @@ mod tests {
         assert_eq!(posts.len(), 20);
 
         let first_post = &posts[0];
-        assert_eq!(first_post.id, 1989634);
+        assert_eq!(first_post.id, 1989745);
         assert_eq!(
             first_post.url,
-            "https://us.forums.blizzard.com/en/d4/t/are-chaos-items-bugged/231417/2"
+            "https://us.forums.blizzard.com/en/d4/t/embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv/231450/1"
         );
 
         assert_eq!(
             first_post.pub_date.with_nanosecond(0).unwrap(),
-            Utc.with_ymd_and_hms(2025, 9, 25, 14, 45, 46).unwrap()
+            Utc.with_ymd_and_hms(2025, 9, 25, 17, 6, 22).unwrap()
         );
     }
 }

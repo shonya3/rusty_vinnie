@@ -1,6 +1,80 @@
 {
 	"posts": [
 		{
+			"excerpt": "\u003Ca href=\"https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png\"\u003E[Embody the Sector’s Finest with StarCraft x Diablo IV]\u003C/a\u003E Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  \u003Ca href=\"https://news.blizzard.com/en-us/article/24224371\"\u003EView Full Article\u003C/a\u003E",
+			"truncated": true,
+			"id": 1989745,
+			"created_at": "2025-09-25T17:06:22.692Z",
+			"topic_id": 231450,
+			"topic_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+			"topic_slug": "embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv",
+			"topic_html_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+			"url": "/t/embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv/231450/1",
+			"category_id": 5,
+			"post_number": 1,
+			"posts_count": 5,
+			"post_type": 1,
+			"username": "BlizzardEntertainment",
+			"name": "Blizzard Entertainment",
+			"avatar_template": "/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png",
+			"user_title": "Blizzard News",
+			"primary_group_name": "api_users",
+			"user": {
+				"id": 1,
+				"username": "BlizzardEntertainment",
+				"name": "Blizzard Entertainment",
+				"avatar_template": "/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png",
+				"title": "Blizzard News",
+				"primary_group_name": "api_users",
+				"animated_avatar": null,
+				"post_count": 0
+			},
+			"topic": {
+				"id": 231450,
+				"title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+				"fancy_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+				"slug": "embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv",
+				"posts_count": 5
+			}
+		},
+		{
+			"excerpt": "\u003Ca href=\"https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png\"\u003E[Embody the Sector’s Finest with StarCraft x Diablo IV]\u003C/a\u003E Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  \u003Ca href=\"https://news.blizzard.com/en-us/article/24224371\"\u003EView Full Article\u003C/a\u003E",
+			"truncated": true,
+			"id": 1989744,
+			"created_at": "2025-09-25T17:06:21.759Z",
+			"topic_id": 231449,
+			"topic_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+			"topic_slug": "embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv",
+			"topic_html_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+			"url": "/t/embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv/231449/1",
+			"category_id": 5,
+			"post_number": 1,
+			"posts_count": 1,
+			"post_type": 1,
+			"username": "BlizzardEntertainment",
+			"name": "Blizzard Entertainment",
+			"avatar_template": "/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png",
+			"user_title": "Blizzard News",
+			"primary_group_name": "api_users",
+			"user": {
+				"id": 1,
+				"username": "BlizzardEntertainment",
+				"name": "Blizzard Entertainment",
+				"avatar_template": "/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png",
+				"title": "Blizzard News",
+				"primary_group_name": "api_users",
+				"animated_avatar": null,
+				"post_count": 0
+			},
+			"topic": {
+				"id": 231449,
+				"title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+				"fancy_title": "Embody the Sector’s Finest with StarCraft x Diablo IV",
+				"slug": "embody-the-sector%E2%80%99s-finest-with-starcraft-x-diablo-iv",
+				"posts_count": 1
+			}
+		},
+		{
 			"excerpt": "This issue is known to the team and being looked into, thanks for reporting!",
 			"id": 1989634,
 			"created_at": "2025-09-25T14:45:46.185Z",
@@ -654,78 +728,6 @@
 				"fancy_title": "March of the Goblins Event Issue",
 				"slug": "march-of-the-goblins-event-issue",
 				"posts_count": 5
-			}
-		},
-		{
-			"excerpt": "This should resolve shortly",
-			"id": 1957550,
-			"created_at": "2025-07-16T00:26:23.741Z",
-			"topic_id": 227915,
-			"topic_title": "Cannot log in after patch just now",
-			"topic_slug": "cannot-log-in-after-patch-just-now",
-			"topic_html_title": "Cannot log in after patch just now",
-			"url": "/t/cannot-log-in-after-patch-just-now/227915/18",
-			"category_id": 5,
-			"post_number": 18,
-			"posts_count": 70,
-			"post_type": 1,
-			"username": "Lyricana",
-			"name": null,
-			"avatar_template": "/en/d4/user_avatar/us.forums.blizzard.com/lyricana/{size}/265_2.png",
-			"user_title": "Community Manager",
-			"primary_group_name": "community-manager",
-			"user": {
-				"id": 37932,
-				"username": "Lyricana",
-				"name": null,
-				"avatar_template": "/en/d4/user_avatar/us.forums.blizzard.com/lyricana/{size}/265_2.png",
-				"title": "Community Manager",
-				"primary_group_name": "community-manager",
-				"animated_avatar": null,
-				"post_count": 104
-			},
-			"topic": {
-				"id": 227915,
-				"title": "Cannot log in after patch just now",
-				"fancy_title": "Cannot log in after patch just now",
-				"slug": "cannot-log-in-after-patch-just-now",
-				"posts_count": 70
-			}
-		},
-		{
-			"excerpt": "Patch 2.3.1 is now live again for all platforms. We appreciate your patience!",
-			"id": 1957533,
-			"created_at": "2025-07-16T00:22:02.465Z",
-			"topic_id": 227822,
-			"topic_title": "PC - Patch 2.3.1. Rollback",
-			"topic_slug": "pc-patch-231-rollback",
-			"topic_html_title": "PC - Patch 2.3.1. Rollback",
-			"url": "/t/pc-patch-231-rollback/227822/5",
-			"category_id": 5,
-			"post_number": 5,
-			"posts_count": 6,
-			"post_type": 1,
-			"username": "Lyricana",
-			"name": null,
-			"avatar_template": "/en/d4/user_avatar/us.forums.blizzard.com/lyricana/{size}/265_2.png",
-			"user_title": "Community Manager",
-			"primary_group_name": "community-manager",
-			"user": {
-				"id": 37932,
-				"username": "Lyricana",
-				"name": null,
-				"avatar_template": "/en/d4/user_avatar/us.forums.blizzard.com/lyricana/{size}/265_2.png",
-				"title": "Community Manager",
-				"primary_group_name": "community-manager",
-				"animated_avatar": null,
-				"post_count": 104
-			},
-			"topic": {
-				"id": 227822,
-				"title": "PC - Patch 2.3.1. Rollback",
-				"fancy_title": "PC - Patch 2.3.1. Rollback",
-				"slug": "pc-patch-231-rollback",
-				"posts_count": 6
 			}
 		}
 	]
