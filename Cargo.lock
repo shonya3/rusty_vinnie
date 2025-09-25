@@ -518,6 +518,7 @@ dependencies = [
  "chrono",
  "html-escape",
  "http 0.1.0",
+ "regex",
  "serde",
  "serde_json",
  "thiserror 1.0.64",

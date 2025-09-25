@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use regex::Regex;
 use serde::Deserialize;
 use thiserror::Error;
 
@@ -11,6 +12,8 @@ pub enum Error {
     Http(#[from] http::Error),
     #[error("json parse error: {0}")]
     Json(#[from] serde_json::Error),
+    #[error("regex error: {0}")]
+    Regex(#[from] regex::Error),
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -27,6 +30,12 @@ impl User {
 }
 
 #[derive(Debug, Clone)]
+pub enum PostKind {
+    News { post_image_url: Option<String> },
+    Other,
+}
+
+#[derive(Debug, Clone)]
 pub struct DiabloPost {
     pub title: String,
     pub id: u32,
@@ -34,7 +43,7 @@ pub struct DiabloPost {
     pub url: String,
     pub pub_date: DateTime<Utc>,
     pub user: User,
-    pub is_news: bool,
+    pub kind: PostKind,
 }
 
 pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
@@ -43,7 +52,7 @@ pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
     Ok(posts)
 }
 
-pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> {
+pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
     #[derive(Debug, Clone, Deserialize)]
     struct RawDiabloPost {
         #[serde(rename = "topic_title")]
@@ -64,16 +73,43 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> 
     }
 
     let posts = serde_json::from_str::<Response>(content)?.posts;
+    let re = Regex::new(r##"<a href=\"([^\"]+\.(?:png|jpg|jpeg|gif))\".*?>.*?</a>"##)?;
+
     let posts = posts
         .into_iter()
-        .map(|raw_post| DiabloPost {
-            title: raw_post.title,
-            id: raw_post.id,
-            description: html_escape::decode_html_entities(&raw_post.description).to_string(),
-            url: format!("{}{}", BASE_URL, raw_post.pathname),
-            pub_date: raw_post.pub_date,
-            is_news: raw_post.user.id == 1,
-            user: raw_post.user,
+        .map(|raw_post| {
+            let description = html_escape::decode_html_entities(&raw_post.description).to_string();
+            let (kind, description) = if raw_post.user.id == 1 {
+                if let Some(captures) = re.captures(&description) {
+                    let image_url = captures.get(1).map(|m| m.as_str().to_string());
+                    let description = re.replace(&description, "").to_string();
+                    (
+                        PostKind::News {
+                            post_image_url: image_url,
+                        },
+                        description,
+                    )
+                } else {
+                    (
+                        PostKind::News {
+                            post_image_url: None,
+                        },
+                        description,
+                    )
+                }
+            } else {
+                (PostKind::Other, description)
+            };
+
+            DiabloPost {
+                title: raw_post.title,
+                id: raw_post.id,
+                description,
+                url: format!("{}{}", BASE_URL, raw_post.pathname),
+                pub_date: raw_post.pub_date,
+                user: raw_post.user,
+                kind,
+            }
         })
         .collect();
 
@@ -111,12 +147,21 @@ mod tests {
 
         assert_eq!(
             first_post.description,
-            "<a href=\"https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png\">[Embody the Sector’s Finest with StarCraft x Diablo IV]</a> Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  <a href=\"https://news.blizzard.com/en-us/article/24224371\">View Full Article</a>"
+            " Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  <a href=\"https://news.blizzard.com/en-us/article/24224371\">View Full Article</a>"
         );
 
-        assert!(first_post.is_news);
+        match &first_post.kind {
+            PostKind::News { post_image_url } => {
+                assert_eq!(post_image_url.as_deref(), Some("https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png"));
+            }
+            _ => panic!("Expected PostKind::News"),
+        }
+
         assert_eq!(first_post.user.id, 1);
         assert_eq!(first_post.user.username, "BlizzardEntertainment");
-        assert_eq!(first_post.user.profile_url(), "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity");
+        assert_eq!(
+            first_post.user.profile_url(),
+            "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity"
+        );
     }
 }

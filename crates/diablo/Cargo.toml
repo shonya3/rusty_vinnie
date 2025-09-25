@@ -12,4 +12,4 @@ chrono = { version = "0.4", features = ["serde"] }
 http = { path = "../http" }
 thiserror = "1.0"
 html-escape = "0.2.13"
-
+regex = "1.10.5"
