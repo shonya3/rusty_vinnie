@@ -14,15 +14,27 @@ pub enum Error {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+pub struct User {
+    pub id: u32,
+    pub username: String,
+    pub avatar_template: String,
+}
+
+impl User {
+    pub fn profile_url(&self) -> String {
+        format!("{}/u/{}/activity", BASE_URL, self.username)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct DiabloPost {
-    #[serde(rename = "topic_title")]
     pub title: String,
     pub id: u32,
-    #[serde(rename = "excerpt")]
     pub description: String,
     pub url: String,
-    #[serde(rename = "created_at")]
     pub pub_date: DateTime<Utc>,
+    pub user: User,
+    pub is_news: bool,
 }
 
 pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
@@ -43,6 +55,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> 
         pub pathname: String,
         #[serde(rename = "created_at")]
         pub pub_date: DateTime<Utc>,
+        pub user: User,
     }
 
     #[derive(Debug, Clone, Deserialize)]
@@ -59,6 +72,8 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> 
             description: html_escape::decode_html_entities(&raw_post.description).to_string(),
             url: format!("{}{}", BASE_URL, raw_post.pathname),
             pub_date: raw_post.pub_date,
+            is_news: raw_post.user.id == 1,
+            user: raw_post.user,
         })
         .collect();
 
@@ -98,5 +113,10 @@ mod tests {
             first_post.description,
             "<a href=\"https://bnetcmsus-a.akamaihd.net/cms/blog_header/47/47LPZ5UXDG1X1758584759888.png\">[Embody the Sector’s Finest with StarCraft x Diablo IV]</a> Faster than a Zerg rush, StarCraft storms into Sanctuary for a limited time.  <a href=\"https://news.blizzard.com/en-us/article/24224371\">View Full Article</a>"
         );
+
+        assert!(first_post.is_news);
+        assert_eq!(first_post.user.id, 1);
+        assert_eq!(first_post.user.username, "BlizzardEntertainment");
+        assert_eq!(first_post.user.profile_url(), "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity");
     }
 }
