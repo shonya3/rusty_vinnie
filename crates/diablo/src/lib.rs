@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use thiserror::Error;
 
-const URL: &str = "https://us.forums.blizzard.com/en/d4/groups/blizzard-tracker/posts.json";
+const POSTS_URL: &str = "https://us.forums.blizzard.com/en/d4/groups/blizzard-tracker/posts.json";
 const BASE_URL: &str = "https://us.forums.blizzard.com/en/d4";
 
 #[derive(Debug, Error)]
@@ -25,25 +25,42 @@ pub struct DiabloPost {
     pub pub_date: DateTime<Utc>,
 }
 
-impl DiabloPost {
-    pub fn link(&self) -> String {
-        format!("{}{}", BASE_URL, self.url)
-    }
-}
-
 pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
-    let content = http::text(URL).await?;
+    let content = http::text(POSTS_URL).await?;
     let posts = parse_posts(&content)?;
     Ok(posts)
 }
 
 pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> {
     #[derive(Debug, Clone, Deserialize)]
+    struct RawDiabloPost {
+        #[serde(rename = "topic_title")]
+        pub title: String,
+        pub id: u32,
+        #[serde(rename = "excerpt")]
+        pub description: String,
+        #[serde(rename = "url")]
+        pub pathname: String,
+        #[serde(rename = "created_at")]
+        pub pub_date: DateTime<Utc>,
+    }
+
+    #[derive(Debug, Clone, Deserialize)]
     struct Response {
-        posts: Vec<DiabloPost>,
+        posts: Vec<RawDiabloPost>,
     }
 
     let posts = serde_json::from_str::<Response>(content)?.posts;
+    let posts = posts
+        .into_iter()
+        .map(|raw_post| DiabloPost {
+            title: raw_post.title,
+            id: raw_post.id,
+            description: raw_post.description,
+            url: format!("{}{}", BASE_URL, raw_post.pathname),
+            pub_date: raw_post.pub_date,
+        })
+        .collect();
 
     Ok(posts)
 }
@@ -68,7 +85,7 @@ mod tests {
         let first_post = &posts[0];
         assert_eq!(first_post.id, 1989634);
         assert_eq!(
-            first_post.link(),
+            first_post.url,
             "https://us.forums.blizzard.com/en/d4/t/are-chaos-items-bugged/231417/2"
         );
 

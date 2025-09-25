@@ -29,7 +29,7 @@ pub async fn watch_diablo_news(ctx: &SerenityContext) {
 pub fn create_summary_embed(post: &DiabloPost) -> CreateEmbed {
     let mut embed = CreateEmbed::new()
         .title(&post.title)
-        .url(post.link())
+        .url(&post.url)
         .description(&post.description)
         .field(
             "Posted date",
