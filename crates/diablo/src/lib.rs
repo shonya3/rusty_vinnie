@@ -1,66 +1,49 @@
 use chrono::{DateTime, Utc};
+use serde::Deserialize;
 use thiserror::Error;
 
-const URL: &str = "https://www.wowhead.com/diablo-4/blue-tracker?rss";
-
-#[derive(Debug, Error)]
-pub enum ItemParseError {
-    #[error("missing field: {0}")]
-    MissingField(String),
-    #[error("chrono parse error: {0}")]
-    Chrono(#[from] chrono::ParseError),
-}
+const URL: &str = "https://us.forums.blizzard.com/en/d4/groups/blizzard-tracker/posts.json";
+const BASE_URL: &str = "https://us.forums.blizzard.com/en/d4";
 
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("http error: {0}")]
     Http(#[from] http::Error),
-    #[error("rss parse error: {0}")]
-    Rss(#[from] rss::Error),
-    #[error("item parse error on item {1:?}: {0}")]
-    ItemParse(#[source] ItemParseError, Box<rss::Item>),
+    #[error("json parse error: {0}")]
+    Json(#[from] serde_json::Error),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DiabloPost {
+    #[serde(rename = "topic_title")]
     pub title: String,
-    pub link: String,
+    pub id: u32,
+    #[serde(rename = "excerpt")]
     pub description: String,
+    pub url: String,
+    #[serde(rename = "created_at")]
     pub pub_date: DateTime<Utc>,
+}
+
+impl DiabloPost {
+    pub fn link(&self) -> String {
+        format!("{}{}", BASE_URL, self.url)
+    }
 }
 
 pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
     let content = http::text(URL).await?;
-    parse_posts(&content)
+    let posts = parse_posts(&content)?;
+    Ok(posts)
 }
 
-fn parse_item(item: &rss::Item) -> Result<DiabloPost, ItemParseError> {
-    let title = item.title().unwrap_or_default().to_string();
-    let link = item
-        .link()
-        .ok_or_else(|| ItemParseError::MissingField("link".to_string()))?
-        .to_string();
-    let description = item.description().unwrap_or_default().to_string();
-    let pub_date = item
-        .pub_date()
-        .ok_or_else(|| ItemParseError::MissingField("pub_date".to_string()))?;
-    let pub_date = DateTime::parse_from_rfc2822(pub_date)?.with_timezone(&Utc);
+pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, serde_json::Error> {
+    #[derive(Debug, Clone, Deserialize)]
+    struct Response {
+        posts: Vec<DiabloPost>,
+    }
 
-    Ok(DiabloPost {
-        title,
-        link,
-        description,
-        pub_date,
-    })
-}
-
-pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
-    let channel = rss::Channel::read_from(content.as_bytes())?;
-    let posts = channel
-        .into_items()
-        .into_iter()
-        .map(|item| parse_item(&item).map_err(|e| Error::ItemParse(e, Box::new(item.clone()))))
-        .collect::<Result<Vec<_>, _>>()?;
+    let posts = serde_json::from_str::<Response>(content)?.posts;
 
     Ok(posts)
 }
@@ -68,7 +51,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::TimeZone;
+    use chrono::{TimeZone, Timelike};
 
     #[tokio::test]
     async fn test_fetch_posts() {
@@ -78,20 +61,20 @@ mod tests {
 
     #[test]
     fn test_parse_from_fixture() {
-        let content = include_str!("../tests/fixtures/diablo_rss.xml");
+        let content = include_str!("../tests/fixtures/posts.json");
         let posts = parse_posts(content).unwrap();
-        assert_eq!(posts.len(), 1);
+        assert_eq!(posts.len(), 20);
 
         let first_post = &posts[0];
-        assert_eq!(first_post.title, "A title");
+        assert_eq!(first_post.id, 1989634);
         assert_eq!(
-            first_post.link,
-            "https://www.wowhead.com/diablo-4/blue-tracker/topic/us/231178"
+            first_post.link(),
+            "https://us.forums.blizzard.com/en/d4/t/are-chaos-items-bugged/231417/2"
         );
 
         assert_eq!(
-            first_post.pub_date,
-            Utc.with_ymd_and_hms(2025, 9, 24, 0, 20, 43).unwrap()
+            first_post.pub_date.with_nanosecond(0).unwrap(),
+            Utc.with_ymd_and_hms(2025, 9, 25, 14, 45, 46).unwrap()
         );
     }
 }
