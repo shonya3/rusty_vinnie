@@ -109,14 +109,18 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
                 (PostKind::Other, description)
             };
 
+            let avatar_url = {
+                let avatar = &raw_post.user.avatar_template;
+                match avatar.starts_with("https") {
+                    true => avatar.clone(),
+                    false => format!("{}{}", WEBSITE_DOMAIN_URL, avatar.replace("{size}", "128")),
+                }
+            };
+
             let user = User {
                 id: raw_post.user.id,
                 username: raw_post.user.username,
-                avatar_url: format!(
-                    "{}{}",
-                    WEBSITE_DOMAIN_URL,
-                    raw_post.user.avatar_template.replace("{size}", "128")
-                ),
+                avatar_url,
             };
 
             DiabloPost {
