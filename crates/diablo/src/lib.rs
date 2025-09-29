@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use regex::Regex;
 use serde::Deserialize;
+use serde_repr::Serialize_repr;
 use thiserror::Error;
 
 const POSTS_URL: &str = "https://us.forums.blizzard.com/en/d4/groups/blizzard-tracker/posts.json";
@@ -36,6 +37,40 @@ pub enum PostKind {
     Other,
 }
 
+/// Represents "category_id" number field
+#[derive(Clone, Copy, Serialize_repr, Debug, PartialEq)]
+#[repr(u16)]
+pub enum PostCategory {
+    PcGeneralDiscussion = 5,
+    ConsoleDiscussion = 6,
+    ConsoleBugReport = 11,
+    Other = u16::MAX,
+}
+
+impl PostCategory {
+    pub fn is_console_related(&self) -> bool {
+        matches!(
+            self,
+            PostCategory::ConsoleDiscussion | PostCategory::ConsoleBugReport
+        )
+    }
+}
+
+impl<'de> Deserialize<'de> for PostCategory {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = u16::deserialize(deserializer)?;
+        Ok(match value {
+            5 => PostCategory::PcGeneralDiscussion,
+            6 => PostCategory::ConsoleDiscussion,
+            11 => PostCategory::ConsoleBugReport,
+            _ => PostCategory::Other,
+        })
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct DiabloPost {
     pub title: String,
@@ -45,6 +80,7 @@ pub struct DiabloPost {
     pub pub_date: DateTime<Utc>,
     pub user: User,
     pub kind: PostKind,
+    pub category: PostCategory,
 }
 
 pub async fn fetch_posts() -> Result<Vec<DiabloPost>, Error> {
@@ -73,6 +109,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
         #[serde(rename = "created_at")]
         pub pub_date: DateTime<Utc>,
         pub user: RawUser,
+        pub category_id: PostCategory,
     }
 
     #[derive(Debug, Clone, Deserialize)]
@@ -81,7 +118,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
     }
 
     let posts = serde_json::from_str::<Response>(content)?.posts;
-    let re = Regex::new(r##"<a href=\"([^\"]+\.(?:png|jpg|jpeg|gif))\".*?>.*?</a>"##)?;
+    let re = Regex::new(r##"<a href=\"([^\\"]+\.(?:png|jpg|jpeg|gif))\".*?>.*?</a>"##)?;
 
     let posts = posts
         .into_iter()
@@ -131,6 +168,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
                 pub_date: raw_post.pub_date,
                 user,
                 kind,
+                category: raw_post.category_id,
             }
         })
         .collect();
@@ -185,6 +223,7 @@ mod tests {
             first_post.user.profile_url(),
             "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity"
         );
+        assert_eq!(first_post.category, PostCategory::PcGeneralDiscussion);
         assert_eq!(first_post.user.avatar_url, "https://us.forums.blizzard.com/en/d4/plugins/discourse-blizzard-plugin/images/avatars/d4/default.png");
     }
 }

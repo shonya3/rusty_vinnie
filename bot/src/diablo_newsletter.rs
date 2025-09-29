@@ -17,6 +17,7 @@ pub async fn watch_diablo_news(ctx: &SerenityContext) {
             Ok(posts) => {
                 for post in posts.iter().filter(|post| {
                     interval::is_within_last_minutes(interval::INTERVAL_MINS, post.pub_date)
+                        && !post.category.is_console_related()
                 }) {
                     let message = CreateMessage::new().embed(create_summary_embed(post));
                     let _ = channel_id.send_message(ctx, message).await;
