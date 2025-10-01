@@ -33,7 +33,7 @@ pub fn create_summary_embed(post: &DiabloPost) -> CreateEmbed {
         .title(&post.title)
         .url(&post.url)
         .author(
-            CreateEmbedAuthor::new(&post.user.username)
+            CreateEmbedAuthor::new(&post.user.name)
                 .url(post.user.profile_url())
                 .icon_url(&post.user.avatar_url),
         )

@@ -21,13 +21,13 @@ pub enum Error {
 #[derive(Debug, Clone)]
 pub struct User {
     pub id: u32,
-    pub username: String,
+    pub name: String,
     pub avatar_url: String,
 }
 
 impl User {
     pub fn profile_url(&self) -> String {
-        format!("{}/u/{}/activity", BASE_URL, self.username)
+        format!("{}/u/{}/activity", BASE_URL, self.name)
     }
 }
 
@@ -93,7 +93,8 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
     #[derive(Debug, Clone, Deserialize)]
     struct RawUser {
         pub id: u32,
-        pub username: String,
+        #[serde(rename = "username")]
+        pub name: String,
         pub avatar_template: String,
     }
 
@@ -156,7 +157,7 @@ pub fn parse_posts(content: &str) -> Result<Vec<DiabloPost>, Error> {
 
             let user = User {
                 id: raw_post.user.id,
-                username: raw_post.user.username,
+                name: raw_post.user.name,
                 avatar_url,
             };
 
@@ -218,7 +219,7 @@ mod tests {
         }
 
         assert_eq!(first_post.user.id, 1);
-        assert_eq!(first_post.user.username, "BlizzardEntertainment");
+        assert_eq!(first_post.user.name, "BlizzardEntertainment");
         assert_eq!(
             first_post.user.profile_url(),
             "https://us.forums.blizzard.com/en/d4/u/BlizzardEntertainment/activity"
