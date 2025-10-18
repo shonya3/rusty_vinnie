@@ -18,6 +18,7 @@ mod status;
 #[allow(unused)]
 mod ea_live_updates;
 mod unused;
+mod newsletter;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
 pub const EMBED_DESCRIPTION_CUSTOM_MAX_CHARS: usize = 1000;
