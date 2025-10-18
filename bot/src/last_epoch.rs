@@ -1,39 +1,20 @@
-use crate::{interval, message::MessageWithThreadedDetails, Context, Error};
+use crate::{message::MessageWithThreadedDetails, newsletter::NewsItem, Context, Error};
 
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
 use poise::serenity_prelude::{
-    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter,
-    CreateMessage, Timestamp,
+    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
+    Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
 
-pub async fn watch_subforums(ctx: &SerenityContext, subforums: Vec<Subforum>) {
-    futures::future::join_all(
-        subforums
-            .into_iter()
-            .map(|subforum| watch_subforum(ctx, subforum)),
-    )
-    .await;
-}
+impl NewsItem for NewsThreadInfo {
+    async fn post_to_discord(&self, ctx: &SerenityContext, channel: crate::channel::AppChannel) {
+        create_message(self).send(ctx, channel.id()).await
+    }
 
-async fn watch_subforum(ctx: &SerenityContext, subforum: Subforum) {
-    let mut interval =
-        tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
-    let channel_id = ChannelId::new(1362313267879350363);
-
-    loop {
-        interval.tick().await;
-        match last_epoch_forum::fetch_subforum_threads_list(subforum).await {
-            Ok(threads) => {
-                for thread in threads.into_iter().filter(|thread| {
-                    interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.datetime)
-                }) {
-                    create_message(&thread).send(ctx, channel_id).await
-                }
-            }
-            Err(err) => eprintln!("{err:?}"),
-        }
+    fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {
+        self.datetime
     }
 }
 

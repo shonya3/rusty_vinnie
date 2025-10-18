@@ -1,5 +1,4 @@
-use crate::{channel::AppChannel, interval, message::MessageWithThreadedDetails};
-use chrono::FixedOffset;
+use crate::{channel::AppChannel, message::MessageWithThreadedDetails, newsletter::NewsItem};
 use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
@@ -7,44 +6,13 @@ use poise::serenity_prelude::{
 };
 use unicode_segmentation::UnicodeSegmentation;
 
-pub async fn watch_subforums(
-    ctx: &SerenityContext,
-    channel: AppChannel,
-    configs: Vec<(WebsiteLanguage, Subforum)>,
-    offset: Option<FixedOffset>,
-) {
-    futures::future::join_all(
-        configs
-            .into_iter()
-            .map(|(lang, subforum)| watch_subforum(ctx, channel, lang, subforum, offset)),
-    )
-    .await;
-}
+impl NewsItem for NewsThreadInfo {
+    async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel) {
+        create_message(self).await.send(ctx, channel.id()).await;
+    }
 
-async fn watch_subforum(
-    ctx: &SerenityContext,
-    channel: AppChannel,
-    lang: WebsiteLanguage,
-    subforum: Subforum,
-    time_offset: Option<FixedOffset>,
-) {
-    let mut interval =
-        tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
-    let channel_id = channel.id();
-
-    loop {
-        interval.tick().await;
-
-        match poe_forum::fetch_subforum_threads_list(lang, subforum, time_offset.as_ref()).await {
-            Ok(threads) => {
-                for thread in threads.into_iter().filter(|thread| {
-                    interval::is_within_last_minutes(interval::INTERVAL_MINS, thread.posted_date)
-                }) {
-                    create_message(&thread).await.send(ctx, channel_id).await;
-                }
-            }
-            Err(err) => eprintln!("{err:?}"),
-        }
+    fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {
+        self.posted_date
     }
 }
 

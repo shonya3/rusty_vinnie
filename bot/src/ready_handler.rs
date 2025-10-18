@@ -1,12 +1,12 @@
 use crate::{
     channel::AppChannel,
-    diablo_newsletter,
-    last_epoch::{self, Subforum as LastEpochSubforum},
-    poe_newsletter,
+    last_epoch::Subforum as LastEpochSubforum,
+    newsletter,
     status::{get_kroiya_status, watch_status},
     Data,
 };
 use chrono::FixedOffset;
+use futures::future::join_all;
 use poe_forum::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{self as serenity};
 
@@ -17,44 +17,83 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
 }
 
 async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
+    let diablo = newsletter::start_news_feed(ctx, AppChannel::Diablo, async || {
+        diablo::fetch_posts().await.map(|posts| {
+            posts
+                .into_iter()
+                .filter(|post| !post.category.is_console_related())
+                .collect()
+        })
+    });
+
+    let last_epoch = join_all(
+        [
+            LastEpochSubforum::Announcements,
+            LastEpochSubforum::DeveloperBlogs,
+            LastEpochSubforum::News,
+            LastEpochSubforum::PatchNotes,
+        ]
+        .into_iter()
+        .map(async |subforum: LastEpochSubforum| {
+            newsletter::start_news_feed(ctx, AppChannel::LastEpoch, async || {
+                last_epoch_forum::fetch_subforum_threads_list(subforum).await
+            })
+            .await;
+        }),
+    );
+
+    let poe1 = join_all(
+        [
+            (WebsiteLanguage::En, Subforum::News),
+            (WebsiteLanguage::Ru, Subforum::News),
+            (WebsiteLanguage::En, Subforum::PatchNotes),
+            (WebsiteLanguage::Ru, Subforum::PatchNotes),
+        ]
+        .into_iter()
+        .map(async |(lang, subforum)| {
+            newsletter::start_news_feed(ctx, AppChannel::Poe, async || {
+                poe_forum::fetch_subforum_threads_list(
+                    lang,
+                    subforum,
+                    Timezone::BritishSummer.offset().as_ref(),
+                )
+                .await
+            })
+            .await
+        }),
+    );
+
+    let poe2 = join_all(
+        [
+            (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
+            (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
+            (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
+            (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
+        ]
+        .into_iter()
+        .map(async |(lang, subforum)| {
+            newsletter::start_news_feed(ctx, AppChannel::Poe, async || {
+                poe_forum::fetch_subforum_threads_list(
+                    lang,
+                    subforum,
+                    Timezone::BritishSummer.offset().as_ref(),
+                )
+                .await
+            })
+            .await
+        }),
+    );
+
     tokio::join!(
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
             || AppChannel::General.say(ctx, ":rabbit: ушел"),
         ),
-        last_epoch::watch_subforums(
-            ctx,
-            vec![
-                LastEpochSubforum::Announcements,
-                LastEpochSubforum::DeveloperBlogs,
-                LastEpochSubforum::News,
-                LastEpochSubforum::PatchNotes,
-            ],
-        ),
-        poe_newsletter::watch_subforums(
-            ctx,
-            AppChannel::Poe,
-            vec![
-                (WebsiteLanguage::En, Subforum::News),
-                (WebsiteLanguage::Ru, Subforum::News),
-                (WebsiteLanguage::En, Subforum::PatchNotes),
-                (WebsiteLanguage::Ru, Subforum::PatchNotes),
-            ],
-            Timezone::BritishSummer.offset(),
-        ),
-        poe_newsletter::watch_subforums(
-            ctx,
-            AppChannel::Poe2,
-            vec![
-                (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
-                (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
-                (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
-                (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
-            ],
-            Timezone::BritishSummer.offset(),
-        ),
-        diablo_newsletter::watch_diablo_news(ctx),
+        last_epoch,
+        poe1,
+        poe2,
+        diablo,
     );
 }
 

@@ -1,30 +1,19 @@
-use crate::{channel::AppChannel, interval};
+use crate::{channel::AppChannel, newsletter::NewsItem};
+use chrono::{DateTime, Utc};
 use diablo::{DiabloPost, PostKind};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
     Timestamp,
 };
 
-pub async fn watch_diablo_news(ctx: &SerenityContext) {
-    let mut interval =
-        tokio::time::interval(interval::duration_from_mins(interval::INTERVAL_MINS as u64));
-    let channel_id = AppChannel::Diablo.id();
+impl NewsItem for DiabloPost {
+    async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel) {
+        let message = CreateMessage::new().embed(create_summary_embed(self));
+        let _ = channel.id().send_message(ctx, message).await;
+    }
 
-    loop {
-        interval.tick().await;
-
-        match diablo::fetch_posts().await {
-            Ok(posts) => {
-                for post in posts.iter().filter(|post| {
-                    interval::is_within_last_minutes(interval::INTERVAL_MINS, post.pub_date)
-                        && !post.category.is_console_related()
-                }) {
-                    let message = CreateMessage::new().embed(create_summary_embed(post));
-                    let _ = channel_id.send_message(ctx, message).await;
-                }
-            }
-            Err(err) => eprintln!("{err:?}"),
-        }
+    fn timestamp(&self) -> DateTime<Utc> {
+        self.pub_date
     }
 }
 
