@@ -117,6 +117,8 @@ pub enum TeasersForumThread {
     Poe2_02(Lang),
     Poe1_3_26Ru,
     Poe1_3_26En,
+    Poe1_3_27En,
+    Poe1_3_27Ru,
 }
 
 impl TeasersForumThread {
@@ -139,6 +141,12 @@ impl TeasersForumThread {
             TeasersForumThread::Poe1_3_26En => {
                 "https://www.pathofexile.com/forum/view-thread/3784648"
             }
+            TeasersForumThread::Poe1_3_27En => {
+                "https://www.pathofexile.com/forum/view-thread/3867910"
+            }
+            TeasersForumThread::Poe1_3_27Ru => {
+                "https://ru.pathofexile.com/forum/view-thread/3867911"
+            }
         }
     }
 
@@ -155,6 +163,8 @@ impl TeasersForumThread {
             },
             TeasersForumThread::Poe1_3_26Ru => "Тизеры Path of Exile: Секреты Атласа",
             TeasersForumThread::Poe1_3_26En => "Path of Exile: Secrets of the Atlas Teasers",
+            TeasersForumThread::Poe1_3_27En => "Path of Exile: Keepers of the Flame Teasers",
+            TeasersForumThread::Poe1_3_27Ru => "Тизеры Path of Exile: Хранители пламени",
         }
     }
 }
