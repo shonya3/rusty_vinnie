@@ -1,12 +1,12 @@
 use crate::{
     channel::AppChannel,
-    last_epoch::Subforum as LastEpochSubforum,
     newsletter,
     status::{get_kroiya_status, watch_status},
     Data,
 };
 use chrono::FixedOffset;
 use futures::future::join_all;
+use last_epoch_forum::Subforum as LastEpochSubforum;
 use poe_forum::{Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{self as serenity};
 

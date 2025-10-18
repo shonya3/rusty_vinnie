@@ -7,11 +7,8 @@ use std::{collections::HashSet, sync::Arc};
 mod channel;
 mod commands;
 mod interval;
-mod last_epoch;
 mod message;
 mod message_handler;
-mod poe_newsletter;
-mod diablo_newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
@@ -90,7 +87,7 @@ async fn main(
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![last_epoch::epoch_thread()],
+            commands: vec![newsletter::last_epoch::epoch_thread()],
             ..Default::default()
         })
         .build();
