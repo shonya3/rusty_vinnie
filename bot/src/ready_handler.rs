@@ -82,7 +82,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         ]
         .into_iter()
         .map(async |(lang, subforum)| {
-            newsletter::start_news_feed(ctx, AppChannel::Poe, async || {
+            newsletter::start_news_feed(ctx, AppChannel::Poe2, async || {
                 poe_forum::fetch_subforum_threads_list(
                     lang,
                     subforum,
