@@ -65,7 +65,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
                 poe_forum::fetch_subforum_threads_list(
                     lang,
                     subforum,
-                    Timezone::BritishSummer.offset().as_ref(),
+                    Timezone::BritishWinter.offset().as_ref(),
                 )
                 .await
             })
@@ -86,7 +86,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
                 poe_forum::fetch_subforum_threads_list(
                     lang,
                     subforum,
-                    Timezone::BritishSummer.offset().as_ref(),
+                    Timezone::BritishWinter.offset().as_ref(),
                 )
                 .await
             })
