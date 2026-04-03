@@ -8,7 +8,6 @@ use chrono::FixedOffset;
 use futures::future::join_all;
 use last_epoch_forum::Subforum as LastEpochSubforum;
 use poe_forum::{Subforum, WebsiteLanguage};
-use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
 
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
@@ -17,16 +16,7 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     set_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &serenity::Context, data: &Data) {
-    let teasers_3_27 = crate::poe_teasers::watch_teasers_threads(
-        ctx,
-        data,
-        &[
-            TeasersForumThread::Poe1_3_27Ru,
-            TeasersForumThread::Poe1_3_27En,
-        ],
-    );
-
+async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
     let diablo = newsletter::start_news_feed(ctx, AppChannel::Diablo, async || {
         diablo::fetch_posts().await.map(|posts| {
             posts
@@ -52,6 +42,8 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         }),
     );
 
+    let timezone_offset = Timezone::Moscow.offset();
+
     let poe1 = join_all(
         [
             (WebsiteLanguage::En, Subforum::News),
@@ -62,12 +54,8 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         .into_iter()
         .map(async |(lang, subforum)| {
             newsletter::start_news_feed(ctx, AppChannel::Poe, async || {
-                poe_forum::fetch_subforum_threads_list(
-                    lang,
-                    subforum,
-                    Timezone::BritishWinter.offset().as_ref(),
-                )
-                .await
+                poe_forum::fetch_subforum_threads_list(lang, subforum, timezone_offset.as_ref())
+                    .await
             })
             .await
         }),
@@ -83,19 +71,14 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         .into_iter()
         .map(async |(lang, subforum)| {
             newsletter::start_news_feed(ctx, AppChannel::Poe2, async || {
-                poe_forum::fetch_subforum_threads_list(
-                    lang,
-                    subforum,
-                    Timezone::BritishWinter.offset().as_ref(),
-                )
-                .await
+                poe_forum::fetch_subforum_threads_list(lang, subforum, timezone_offset.as_ref())
+                    .await
             })
             .await
         }),
     );
 
     tokio::join!(
-        teasers_3_27,
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
@@ -112,6 +95,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
 pub enum Timezone {
     BritishWinter,
     BritishSummer,
+    Moscow,
 }
 
 impl Timezone {
@@ -119,6 +103,7 @@ impl Timezone {
         match self {
             Timezone::BritishWinter => FixedOffset::east_opt(0),
             Timezone::BritishSummer => FixedOffset::east_opt(3600),
+            Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
         }
     }
 }

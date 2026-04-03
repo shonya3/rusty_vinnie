@@ -67,17 +67,15 @@ pub fn break_markup_into_day_sections(markup: &str) -> Vec<String> {
         .collect();
 
     let indices = s.match_indices("<h3>").map(|(i, _)| i).collect::<Vec<_>>();
-    let h3_sections = s
-        .match_indices("<h3>")
+
+    s.match_indices("<h3>")
         .enumerate()
         .map(|(index, (start, _))| {
             let end = indices.get(index + 1).copied().unwrap_or(s.len());
 
             s[start..end].to_owned()
         })
-        .collect::<Vec<_>>();
-
-    h3_sections
+        .collect::<Vec<_>>()
 }
 
 pub fn parse_day_section(input: &str, thread: LiveUpdatesThread) -> Vec<LiveUpdate> {
@@ -116,7 +114,7 @@ pub fn parse_day_section(input: &str, thread: LiveUpdatesThread) -> Vec<LiveUpda
 
 #[cfg(test)]
 mod tests {
-    use crate::{parse_day_section, LiveUpdatesThread};
+    use crate::{LiveUpdatesThread, parse_day_section};
 
     #[test]
     fn parse() {
