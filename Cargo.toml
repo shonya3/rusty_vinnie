@@ -2,7 +2,8 @@
 resolver = "2"
 members = [
     "bot",
-    "crates/*"
+    "crates/*",
+    "crates/poe_challenge_extractor"
 ]
 
 [workspace.package]
@@ -17,3 +18,4 @@ serde = { version = "1", features = ["derive"] }
 scraper = "0.23.1"
 reqwest = { version = "0.12.15", features = ["json", "rustls-tls"] }
 serde_json = "1.0.140"
+playwright = "0.0.20"

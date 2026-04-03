@@ -1,0 +1,12 @@
+[package]
+name = "poe_challenge_extractor"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+playwright.workspace = true
+tokio.workspace = true
+chrono.workspace = true
+
+[package.metadata.playwright]
+install-deps = true
