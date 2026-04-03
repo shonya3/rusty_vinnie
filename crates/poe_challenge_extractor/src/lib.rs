@@ -45,14 +45,10 @@ impl ChallengeExtractor {
             pages.first().unwrap().clone()
         };
 
-        let url = "https://www.pathofexile.com/account/view-profile/Frxtl-5064/challenges";
-        page.goto_builder(url)
-            .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
-            .goto()
-            .await
-            .unwrap();
-
-        Self { page }
+        let extractor = Self { page };
+        extractor.navigate().await.unwrap();
+        
+        extractor
     }
 
     /// Calculates remaining tiers to reach [`TARGET_TIERS`]
@@ -61,13 +57,24 @@ impl ChallengeExtractor {
     }
 
     /// Reloads the page.
-    pub async fn refresh(&self) {
-        self.page
-            .reload_builder()
+    pub async fn refresh(&self) -> Result<(), playwright::Error> {
+        self.page.reload_builder()
             .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
             .reload()
             .await
-            .unwrap();
+            .map_err(playwright::Error::from)
+            .map(|_| ())
+    }
+
+    /// Navigates to challenges page.
+    pub async fn navigate(&self) -> Result<(), playwright::Error> {
+        let url = "https://www.pathofexile.com/account/view-profile/Frxtl-5064/challenges";
+        self.page.goto_builder(url)
+            .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
+            .goto()
+            .await
+            .map_err(playwright::Error::from)
+            .map(|_| ())
     }
 
     /// Returns the raw HTML content of the page.
@@ -94,6 +101,10 @@ pub async fn run() {
         }
 
         tokio::time::sleep(Duration::from_secs(300)).await;
-        extractor.refresh().await;
+        
+        if extractor.refresh().await.is_err() {
+            println!("Page lost, reconnecting...");
+            extractor.navigate().await.ok();
+        }
     }
 }
