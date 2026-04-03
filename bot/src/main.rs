@@ -13,7 +13,7 @@ mod message;
 mod message_handler;
 mod newsletter;
 pub mod poe_teasers;
-mod presence;
+mod challenges;
 mod ready_handler;
 mod status;
 mod unused;

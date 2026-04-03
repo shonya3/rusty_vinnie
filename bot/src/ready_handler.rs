@@ -1,7 +1,7 @@
 use crate::{
+    challenges::{start_daily_summarizer, start_presence_updater},
     channel::AppChannel,
     newsletter,
-    presence::start_presence_updater,
     status::{get_kroiya_status, watch_status},
     Data,
 };
@@ -80,6 +80,7 @@ async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
     );
 
     let presence = start_presence_updater(ctx);
+    let challenge_summarizer = start_daily_summarizer(ctx);
 
     tokio::join!(
         watch_status(
@@ -92,6 +93,7 @@ async fn set_watchers(ctx: &serenity::Context, _data: &Data) {
         poe2,
         diablo,
         presence,
+        challenge_summarizer,
     );
 }
 
