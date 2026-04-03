@@ -4,3 +4,4 @@ Secrets.toml
 Secrets*.toml
 .env
 remaining_tiers.txt
+tiers_history.txt

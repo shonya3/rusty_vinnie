@@ -19,6 +19,7 @@ fn extract_current_tiers(content: &str) -> Option<u32> {
 
 const TARGET_TIERS: u32 = 8000;
 const OUTPUT_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\remaining_tiers.txt");
+const HISTORY_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\tiers_history.txt");
 
 /// Connects to Chrome via CDP and extracts challenge progress from PoE profile pages.
 pub struct ChallengeExtractor {
@@ -89,6 +90,12 @@ pub async fn run() {
     playwright.install_chromium().unwrap();
 
     let mut extractor = ChallengeExtractor::new(&playwright).await.unwrap();
+    
+    // Try to read previous remaining from file
+    let mut previous_remaining = std::fs::read_to_string(OUTPUT_FILE)
+        .ok()
+        .and_then(|c| c.trim().split_whitespace().last()?.parse().ok());
+    
     println!("Starting extraction loop...\n");
 
     loop {
@@ -99,6 +106,20 @@ pub async fn run() {
                     let line = format!("{}: {}", now, remaining);
                     println!("{}", line);
                     std::fs::write(OUTPUT_FILE, line).ok();
+                    
+                    // Append to history if changed
+                    if previous_remaining != Some(remaining) {
+                        let history_line = format!("{}: {}", now, remaining);
+                        if let Ok(mut file) = std::fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(HISTORY_FILE)
+                        {
+                            use std::io::Write;
+                            file.write_all(format!("{}\n", history_line).as_bytes()).ok();
+                        }
+                        previous_remaining = Some(remaining);
+                    }
                 }
             }
             Err(e) => {
