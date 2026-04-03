@@ -92,13 +92,33 @@ pub async fn run() {
     println!("Starting extraction loop...\n");
 
     loop {
-        let content = extractor.content().await.unwrap();
-
-        if let Some(remaining) = extractor.remaining(&content) {
-            let now = chrono::Local::now().format("%d.%m %H:%M");
-            let line = format!("{}: {}", now, remaining);
-            println!("{}", line);
-            std::fs::write(OUTPUT_FILE, line).ok();
+        match extractor.content().await {
+            Ok(content) => {
+                if let Some(remaining) = extractor.remaining(&content) {
+                    let now = chrono::Local::now().format("%d.%m %H:%M");
+                    let line = format!("{}: {}", now, remaining);
+                    println!("{}", line);
+                    std::fs::write(OUTPUT_FILE, line).ok();
+                }
+            }
+            Err(e) => {
+                println!("Failed to get content: {:?}", e);
+                println!("Reconnecting...");
+                extractor = ChallengeExtractor::new(&playwright).await.unwrap();
+                
+                // Fetch immediately after reconnect
+                match extractor.content().await {
+                    Ok(content) => {
+                        if let Some(remaining) = extractor.remaining(&content) {
+                            let now = chrono::Local::now().format("%d.%m %H:%M");
+                            let line = format!("{}: {}", now, remaining);
+                            println!("{}", line);
+                            std::fs::write(OUTPUT_FILE, line).ok();
+                        }
+                    }
+                    Err(e) => println!("Failed to reconnect: {:?}", e),
+                }
+            }
         }
 
         tokio::time::sleep(Duration::from_secs(300)).await;
