@@ -34,7 +34,8 @@ impl ChallengeExtractor {
             .connect_over_cdp()
             .await?;
 
-        let context = browser.contexts()?.first().unwrap();
+        let contexts = browser.contexts()?;
+        let context = contexts.first().unwrap();
         let pages = context.pages()?;
 
         let page = if pages.is_empty() {
