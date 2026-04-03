@@ -27,28 +27,26 @@ pub struct ChallengeExtractor {
 
 impl ChallengeExtractor {
     /// Creates a new extractor, connects to Chrome via CDP and navigates to challenges page.
-    pub async fn new(playwright: &Playwright) -> Self {
+    pub async fn new(playwright: &Playwright) -> Result<Self, playwright::Error> {
         let browser = playwright
             .chromium()
             .connect_over_cdp_builder("http://localhost:9222")
             .connect_over_cdp()
-            .await
-            .unwrap();
+            .await?;
 
-        let contexts = browser.contexts().unwrap();
-        let context = contexts.first().unwrap();
-        let pages = context.pages().unwrap();
+        let context = browser.contexts()?.first().unwrap();
+        let pages = context.pages()?;
 
         let page = if pages.is_empty() {
-            context.new_page().await.unwrap()
+            context.new_page().await?
         } else {
-            pages.first().unwrap().clone()
+            pages.first().unwrap().to_owned()
         };
 
         let extractor = Self { page };
-        extractor.navigate().await.unwrap();
-        
-        extractor
+        extractor.navigate().await?;
+
+        Ok(extractor)
     }
 
     /// Calculates remaining tiers to reach [`TARGET_TIERS`]
@@ -58,7 +56,8 @@ impl ChallengeExtractor {
 
     /// Reloads the page.
     pub async fn refresh(&self) -> Result<(), playwright::Error> {
-        self.page.reload_builder()
+        self.page
+            .reload_builder()
             .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
             .reload()
             .await
@@ -69,7 +68,8 @@ impl ChallengeExtractor {
     /// Navigates to challenges page.
     pub async fn navigate(&self) -> Result<(), playwright::Error> {
         let url = "https://www.pathofexile.com/account/view-profile/Frxtl-5064/challenges";
-        self.page.goto_builder(url)
+        self.page
+            .goto_builder(url)
             .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
             .goto()
             .await
@@ -87,7 +87,7 @@ pub async fn run() {
     let playwright = Playwright::initialize().await.unwrap();
     playwright.install_chromium().unwrap();
 
-    let extractor = ChallengeExtractor::new(&playwright).await;
+    let mut extractor = ChallengeExtractor::new(&playwright).await.unwrap();
     println!("Starting extraction loop...\n");
 
     loop {
@@ -101,10 +101,12 @@ pub async fn run() {
         }
 
         tokio::time::sleep(Duration::from_secs(300)).await;
-        
+
         if extractor.refresh().await.is_err() {
             println!("Page lost, reconnecting...");
-            extractor.navigate().await.ok();
+            if extractor.navigate().await.is_err() {
+                extractor = ChallengeExtractor::new(&playwright).await.unwrap();
+            }
         }
     }
 }
