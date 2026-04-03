@@ -96,6 +96,10 @@ pub async fn run() {
         .ok()
         .and_then(|c| c.trim().split_whitespace().last()?.parse().ok());
     
+    if let Some(prev) = previous_remaining {
+        println!("Loaded previous remaining: {}", prev);
+    }
+    
     println!("Starting extraction loop...\n");
 
     loop {
