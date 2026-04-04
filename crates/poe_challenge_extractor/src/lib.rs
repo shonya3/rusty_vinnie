@@ -1,6 +1,5 @@
+use playwright::{Playwright, api::Page};
 use std::time::Duration;
-
-use playwright::Playwright;
 
 fn extract_current_tiers(content: &str) -> Option<u32> {
     if let Some(start) = content.find("Tyrannical Tiers") {
@@ -22,33 +21,13 @@ const OUTPUT_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\remaini
 const HISTORY_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\tiers_history.txt");
 
 /// Connects to Chrome via CDP and extracts challenge progress from PoE profile pages.
-pub struct ChallengeExtractor {
-    page: playwright::api::Page,
+pub struct ChallengeExtractor<'a> {
+    page: &'a playwright::api::Page,
 }
 
-impl ChallengeExtractor {
-    /// Creates a new extractor, connects to Chrome via CDP and navigates to challenges page.
-    pub async fn new(playwright: &Playwright) -> Result<Self, playwright::Error> {
-        let browser = playwright
-            .chromium()
-            .connect_over_cdp_builder("http://localhost:9222")
-            .connect_over_cdp()
-            .await?;
-
-        let contexts = browser.contexts()?;
-        let context = contexts.first().unwrap();
-        let pages = context.pages()?;
-
-        let page = if pages.is_empty() {
-            context.new_page().await?
-        } else {
-            pages.first().unwrap().to_owned()
-        };
-
-        let extractor = Self { page };
-        extractor.navigate().await?;
-
-        Ok(extractor)
+impl<'a> ChallengeExtractor<'a> {
+    pub fn new(page: &'a Page) -> Self {
+        Self { page }
     }
 
     /// Calculates remaining tiers to reach [`TARGET_TIERS`]
@@ -85,74 +64,73 @@ impl ChallengeExtractor {
     }
 }
 
-pub async fn run() {
-    let playwright = Playwright::initialize().await.unwrap();
-    playwright.install_chromium().unwrap();
+async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
+    let playwright = Playwright::initialize().await?;
+    playwright.install_chromium()?;
 
-    let mut extractor = ChallengeExtractor::new(&playwright).await.unwrap();
-    
-    // Try to read previous remaining from file
-    let mut previous_remaining = std::fs::read_to_string(OUTPUT_FILE)
+    let browser = playwright
+        .chromium()
+        .connect_over_cdp_builder("http://localhost:9222")
+        .connect_over_cdp()
+        .await?;
+
+    let contexts = browser.contexts()?;
+    let context = contexts.first().ok_or("No browser context")?;
+    let pages = context.pages()?;
+
+    let page = if pages.is_empty() {
+        context.new_page().await?
+    } else {
+        pages.first().unwrap().to_owned()
+    };
+
+    let extractor = ChallengeExtractor::new(&page);
+    extractor.navigate().await?;
+
+    // Read previous from file
+    let mut previous_remaining: Option<u32> = std::fs::read_to_string(OUTPUT_FILE)
         .ok()
-        .and_then(|c| c.trim().split_whitespace().last()?.parse().ok());
-    
+        .and_then(|c| c.split_whitespace().last()?.parse().ok());
+
     if let Some(prev) = previous_remaining {
         println!("Loaded previous remaining: {}", prev);
     }
-    
+
     println!("Starting extraction loop...\n");
 
     loop {
-        match extractor.content().await {
-            Ok(content) => {
-                if let Some(remaining) = extractor.remaining(&content) {
-                    let now = chrono::Local::now().format("%d.%m %H:%M");
-                    let line = format!("{}: {}", now, remaining);
-                    println!("{}", line);
-                    std::fs::write(OUTPUT_FILE, line).ok();
-                    
-                    // Append to history if changed
-                    if previous_remaining != Some(remaining) {
-                        let history_line = format!("{}: {}", now, remaining);
-                        if let Ok(mut file) = std::fs::OpenOptions::new()
-                            .create(true)
-                            .append(true)
-                            .open(HISTORY_FILE)
-                        {
-                            use std::io::Write;
-                            file.write_all(format!("{}\n", history_line).as_bytes()).ok();
-                        }
-                        previous_remaining = Some(remaining);
-                    }
+        let content = extractor.content().await?;
+        if let Some(remaining) = extractor.remaining(&content) {
+            let now = chrono::Local::now().format("%d.%m %H:%M");
+            let line = format!("{}: {}", now, remaining);
+            println!("{}", line);
+            std::fs::write(OUTPUT_FILE, line).ok();
+
+            if previous_remaining != Some(remaining) {
+                let history_line = format!("{}: {}", now, remaining);
+                if let Ok(mut file) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(HISTORY_FILE)
+                {
+                    use std::io::Write;
+                    file.write_all(format!("{}\n", history_line).as_bytes())
+                        .ok();
                 }
-            }
-            Err(e) => {
-                println!("Failed to get content: {:?}", e);
-                println!("Reconnecting...");
-                extractor = ChallengeExtractor::new(&playwright).await.unwrap();
-                
-                // Fetch immediately after reconnect
-                match extractor.content().await {
-                    Ok(content) => {
-                        if let Some(remaining) = extractor.remaining(&content) {
-                            let now = chrono::Local::now().format("%d.%m %H:%M");
-                            let line = format!("{}: {}", now, remaining);
-                            println!("{}", line);
-                            std::fs::write(OUTPUT_FILE, line).ok();
-                        }
-                    }
-                    Err(e) => println!("Failed to reconnect: {:?}", e),
-                }
+                previous_remaining = Some(remaining);
             }
         }
 
         tokio::time::sleep(Duration::from_secs(300)).await;
+        extractor.refresh().await?;
+    }
+}
 
-        if extractor.refresh().await.is_err() {
-            println!("Page lost, reconnecting...");
-            if extractor.navigate().await.is_err() {
-                extractor = ChallengeExtractor::new(&playwright).await.unwrap();
-            }
+pub async fn run() {
+    loop {
+        if let Err(e) = connect_and_extract().await {
+            println!("\nConnection lost: {}. Reconnecting in 5 seconds...\n", e);
         }
+        tokio::time::sleep(Duration::from_secs(5)).await;
     }
 }

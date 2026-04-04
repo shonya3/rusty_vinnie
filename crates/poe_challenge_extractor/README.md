@@ -6,7 +6,7 @@ Extracts Tyrannical Tiers challenge progress from Path of Exile profile.
 
 1. Open Chrome with debug port:
 ```powershell
-Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "--remote-debugging-port=9222","--user-data-dir=`"$env:LOCALAPPDATA\Google\Chrome\User Data`""
+powershell -Command "Start-Process 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9222','--user-data-dir=$env:LOCALAPPDATA\Google\Chrome\User Data'"
 ```
 
 2. Run the extractor:
