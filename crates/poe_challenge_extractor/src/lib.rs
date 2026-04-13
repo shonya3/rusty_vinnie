@@ -107,15 +107,14 @@ async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
             std::fs::write(OUTPUT_FILE, line).ok();
 
             if previous_remaining != Some(remaining) {
-                let history_line = format!("{}: {}", now, remaining);
+                let history_line = format!("{}: {}\n", now, remaining);
                 if let Ok(mut file) = std::fs::OpenOptions::new()
                     .create(true)
                     .append(true)
                     .open(HISTORY_FILE)
                 {
                     use std::io::Write;
-                    file.write_all(format!("{}\n", history_line).as_bytes())
-                        .ok();
+                    file.write_all(history_line.as_bytes()).ok();
                 }
                 previous_remaining = Some(remaining);
             }
