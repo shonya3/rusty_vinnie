@@ -26,7 +26,7 @@ diablo = { path = "../crates/diablo" }
 http = { path = "../crates/http" }
 unicode-segmentation = "1.12.0"
 url = "2.5.4"
-libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["remote", "tls"] }
+libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["remote", "tls"], branch = "main" }
 
 [dev-dependencies]
-libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["core"] }
+libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["core"], branch = "main" }

@@ -3,7 +3,6 @@ resolver = "2"
 members = [
     "bot",
     "crates/*",
-    "crates/poe_challenge_extractor"
 ]
 
 [workspace.package]

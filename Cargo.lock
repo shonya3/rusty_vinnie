@@ -322,6 +322,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cmake"
+version = "0.1.54"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7caa3f9de89ddbe2c607f4101924c5abec803763ae9534e4f4d7d8f84aa81f0"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1590,8 +1599,8 @@ dependencies = [
 
 [[package]]
 name = "libsql"
-version = "0.9.8"
-source = "git+https://github.com/tursodatabase/libsql#41eae61b6fcd45829f2231d133725484bcc4f1ae"
+version = "0.9.30"
+source = "git+https://github.com/tursodatabase/libsql?branch=main#e4beacaa266fba930b637515e2082b42c2d6a817"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -1606,6 +1615,7 @@ dependencies = [
  "libsql-hrana",
  "libsql-sqlite3-parser",
  "libsql-sys",
+ "parking_lot",
  "serde",
  "serde_json",
  "thiserror 1.0.64",
@@ -1617,18 +1627,19 @@ dependencies = [
 
 [[package]]
 name = "libsql-ffi"
-version = "0.9.8"
-source = "git+https://github.com/tursodatabase/libsql#41eae61b6fcd45829f2231d133725484bcc4f1ae"
+version = "0.9.30"
+source = "git+https://github.com/tursodatabase/libsql?branch=main#e4beacaa266fba930b637515e2082b42c2d6a817"
 dependencies = [
  "bindgen",
  "cc",
+ "cmake",
  "glob",
 ]
 
 [[package]]
 name = "libsql-hrana"
-version = "0.9.8"
-source = "git+https://github.com/tursodatabase/libsql#41eae61b6fcd45829f2231d133725484bcc4f1ae"
+version = "0.9.30"
+source = "git+https://github.com/tursodatabase/libsql?branch=main#e4beacaa266fba930b637515e2082b42c2d6a817"
 dependencies = [
  "base64 0.21.7",
  "bytes",
@@ -1639,7 +1650,7 @@ dependencies = [
 [[package]]
 name = "libsql-sqlite3-parser"
 version = "0.13.0"
-source = "git+https://github.com/tursodatabase/libsql#41eae61b6fcd45829f2231d133725484bcc4f1ae"
+source = "git+https://github.com/tursodatabase/libsql?branch=main#e4beacaa266fba930b637515e2082b42c2d6a817"
 dependencies = [
  "bitflags 2.6.0",
  "cc",
@@ -1655,8 +1666,8 @@ dependencies = [
 
 [[package]]
 name = "libsql-sys"
-version = "0.9.8"
-source = "git+https://github.com/tursodatabase/libsql#41eae61b6fcd45829f2231d133725484bcc4f1ae"
+version = "0.9.30"
+source = "git+https://github.com/tursodatabase/libsql?branch=main#e4beacaa266fba930b637515e2082b42c2d6a817"
 dependencies = [
  "bytes",
  "libsql-ffi",
