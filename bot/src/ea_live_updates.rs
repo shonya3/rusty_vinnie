@@ -97,8 +97,8 @@ async fn send_live_updates(
     });
 
     let embeds = map
-        .iter()
-        .filter_map(|(_, updates)| {
+        .values()
+        .filter_map(|updates| {
             let thread = updates.first().map(|u| u.thread)?;
             Some(
                 CreateEmbed::new()

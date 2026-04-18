@@ -7,13 +7,13 @@ const TIERS_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\remaining_ti
 
 pub fn read_remaining_tiers() -> Option<u32> {
     let content = std::fs::read_to_string(TIERS_FILE).ok()?;
-    let num = content.trim().split_whitespace().last()?;
+    let num = content.split_whitespace().last()?;
     num.parse().ok()
 }
 
 pub fn read_remaining_tiers_with_time() -> Option<(String, u32)> {
     let content = std::fs::read_to_string(TIERS_FILE).ok()?;
-    let parts: Vec<&str> = content.trim().split_whitespace().collect();
+    let parts: Vec<&str> = content.split_whitespace().collect();
     if parts.len() >= 2 {
         let time = parts[0].to_string();
         let remaining = parts.last()?.parse().ok()?;
