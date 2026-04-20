@@ -29,6 +29,12 @@ impl TierEntry {
             .with_timezone(&FixedOffset::east_opt(3 * 3600).unwrap());
         moscow.format("%d.%m %H:%M").to_string()
     }
+
+    pub fn hours_since(&self) -> i64 {
+        let now = Utc::now();
+        let diff = now.signed_duration_since(self.datetime);
+        diff.num_hours()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

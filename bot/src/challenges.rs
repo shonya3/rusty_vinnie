@@ -31,11 +31,21 @@ pub async fn start_daily_summarizer(ctx: &poise::serenity_prelude::Context) {
 
         if now.hour() == 22 && now.minute() == 0 {
             if let Some(entry) = get_last_entry() {
-                let message = format!(
-                    "Daily summary: <@407169521988665345> {} remaining tiers ({})",
-                    entry.remaining,
-                    entry.datetime_moscow()
-                );
+                let hours_stale = entry.hours_since();
+                let message = if hours_stale >= 24 {
+                    format!(
+                        "Daily summary: <@407169521988665345> {} tiers remaining ({} - no maps completed for {} hours)",
+                        entry.remaining,
+                        entry.datetime_moscow(),
+                        hours_stale
+                    )
+                } else {
+                    format!(
+                        "Daily summary: <@407169521988665345> {} tiers remaining ({})",
+                        entry.remaining,
+                        entry.datetime_moscow()
+                    )
+                };
                 AppChannel::Poe.say(ctx, &message).await;
             }
         }
