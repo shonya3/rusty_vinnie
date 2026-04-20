@@ -3,7 +3,14 @@ use playwright::{Playwright, api::Page};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-#[derive(Serialize, Deserialize)]
+pub fn load_history() -> TiersHistory {
+    std::fs::read_to_string(paths::tiers_history())
+        .ok()
+        .and_then(|c| serde_json::from_str(&c).ok())
+        .unwrap_or_default()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TierEntry {
     pub datetime: DateTime<Utc>,
     pub remaining: u32,
@@ -11,14 +18,20 @@ pub struct TierEntry {
 
 impl std::fmt::Display for TierEntry {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let moscow = self
-            .datetime
-            .with_timezone(&FixedOffset::east_opt(3 * 3600).unwrap());
-        write!(f, "{}: {}", moscow.format("%d.%m %H:%M"), self.remaining)
+        write!(f, "{}: {}", self.datetime_moscow(), self.remaining)
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+impl TierEntry {
+    pub fn datetime_moscow(&self) -> String {
+        let moscow = self
+            .datetime
+            .with_timezone(&FixedOffset::east_opt(3 * 3600).unwrap());
+        moscow.format("%d.%m %H:%M").to_string()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TiersHistory {
     pub entries: Vec<TierEntry>,
 }
@@ -30,13 +43,6 @@ impl std::fmt::Display for TiersHistory {
         }
         Ok(())
     }
-}
-
-pub fn load_history() -> TiersHistory {
-    std::fs::read_to_string(paths::tiers_history())
-        .ok()
-        .and_then(|c| serde_json::from_str(&c).ok())
-        .unwrap_or_default()
 }
 
 mod paths {
@@ -190,7 +196,7 @@ mod tests {
 
     #[test]
     fn test_tiers_history_display() {
-let json = r#"{
+        let json = r#"{
             "entries": [
                 {"datetime": "2025-04-11T15:37:00Z", "remaining": 1326},
                 {"datetime": "2025-04-12T10:17:00Z", "remaining": 1262},
