@@ -1,7 +1,45 @@
+use chrono::{DateTime, FixedOffset, Utc};
 use playwright::{Playwright, api::Page};
+use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-pub mod paths {
+#[derive(Serialize, Deserialize)]
+pub struct TierEntry {
+    pub datetime: DateTime<Utc>,
+    pub remaining: u32,
+}
+
+impl std::fmt::Display for TierEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let moscow = self
+            .datetime
+            .with_timezone(&FixedOffset::east_opt(3 * 3600).unwrap());
+        write!(f, "{}: {}", moscow.format("%d.%m %H:%M"), self.remaining)
+    }
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct TiersHistory {
+    pub entries: Vec<TierEntry>,
+}
+
+impl std::fmt::Display for TiersHistory {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for entry in &self.entries {
+            writeln!(f, "{}", entry)?;
+        }
+        Ok(())
+    }
+}
+
+pub fn load_history() -> TiersHistory {
+    std::fs::read_to_string(paths::tiers_history())
+        .ok()
+        .and_then(|c| serde_json::from_str(&c).ok())
+        .unwrap_or_default()
+}
+
+mod paths {
     use std::path::PathBuf;
 
     pub fn workspace_root() -> PathBuf {
@@ -13,12 +51,8 @@ pub mod paths {
             .to_path_buf()
     }
 
-    pub fn remaining_tiers() -> PathBuf {
-        workspace_root().join("remaining_tiers.txt")
-    }
-
     pub fn tiers_history() -> PathBuf {
-        workspace_root().join("tiers_history")
+        workspace_root().join("tiers_history.json")
     }
 }
 
@@ -106,10 +140,9 @@ async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
     let extractor = ChallengeExtractor::new(&page);
     extractor.navigate().await?;
 
-    // Read previous from file
-    let mut previous_remaining: Option<u32> = std::fs::read_to_string(paths::remaining_tiers())
-        .ok()
-        .and_then(|c| c.split_whitespace().last()?.parse().ok());
+    let mut tiers_history = load_history();
+
+    let mut previous_remaining = tiers_history.entries.last().map(|e| e.remaining);
 
     if let Some(prev) = previous_remaining {
         println!("Loaded previous remaining: {}", prev);
@@ -120,21 +153,19 @@ async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         let content = extractor.content().await?;
         if let Some(remaining) = extractor.remaining(&content) {
-            let now = chrono::Local::now().format("%d.%m %H:%M");
-            let line = format!("{}: {}", now, remaining);
-            println!("{}", line);
-            std::fs::write(paths::remaining_tiers(), line).ok();
+            let entry = TierEntry {
+                datetime: Utc::now(),
+                remaining,
+            };
+            println!("{}", entry);
 
             if previous_remaining != Some(remaining) {
-                let history_line = format!("{}: {}\n", now, remaining);
-                if let Ok(mut file) = std::fs::OpenOptions::new()
-                    .create(true)
-                    .append(true)
-                    .open(paths::tiers_history())
-                {
-                    use std::io::Write;
-                    file.write_all(history_line.as_bytes()).ok();
-                }
+                tiers_history.entries.push(entry);
+                std::fs::write(
+                    paths::tiers_history(),
+                    serde_json::to_string_pretty(&tiers_history).unwrap(),
+                )
+                .ok();
                 previous_remaining = Some(remaining);
             }
         }
@@ -150,5 +181,29 @@ pub async fn run() {
             println!("\nConnection lost: {}. Reconnecting in 5 seconds...\n", e);
         }
         tokio::time::sleep(Duration::from_secs(5)).await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tiers_history_display() {
+let json = r#"{
+            "entries": [
+                {"datetime": "2025-04-11T15:37:00Z", "remaining": 1326},
+                {"datetime": "2025-04-12T10:17:00Z", "remaining": 1262},
+                {"datetime": "2025-04-12T17:45:00Z", "remaining": 1246},
+                {"datetime": "2025-04-13T04:09:00Z", "remaining": 1230},
+                {"datetime": "2025-04-13T18:55:00Z", "remaining": 1214}
+            ]
+        }"#;
+
+        let history: TiersHistory = serde_json::from_str(json).unwrap();
+
+        let expected = "11.04 18:37: 1326\n12.04 13:17: 1262\n12.04 20:45: 1246\n13.04 07:09: 1230\n13.04 21:55: 1214\n";
+
+        assert_eq!(expected, history.to_string());
     }
 }
