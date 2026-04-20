@@ -3,16 +3,16 @@ use std::time::Duration;
 use crate::channel::AppChannel;
 use chrono::Timelike;
 
-const TIERS_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\remaining_tiers.txt");
-
 pub fn read_remaining_tiers() -> Option<u32> {
-    let content = std::fs::read_to_string(TIERS_FILE).ok()?;
+    let content =
+        std::fs::read_to_string(poe_challenge_extractor::paths::remaining_tiers()).ok()?;
     let num = content.split_whitespace().last()?;
     num.parse().ok()
 }
 
 pub fn read_remaining_tiers_with_time() -> Option<(String, u32)> {
-    let content = std::fs::read_to_string(TIERS_FILE).ok()?;
+    let content =
+        std::fs::read_to_string(poe_challenge_extractor::paths::remaining_tiers()).ok()?;
     let parts: Vec<&str> = content.split_whitespace().collect();
     if parts.len() >= 2 {
         let time = parts[0].to_string();

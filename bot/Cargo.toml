@@ -18,6 +18,7 @@ shuttle-persist = "0.51.0"
 serde_json.workspace = true
 futures = "0.3.31"
 
+poe_challenge_extractor = { path = "../crates/poe_challenge_extractor" }
 poe_forum = {path = "../crates/poe_forum"}
 last_epoch_forum = { path = "../crates/last_epoch_forum" }
 poe_teasers = { path = "../crates/poe_teasers" }

@@ -2769,6 +2769,7 @@ dependencies = [
  "http 0.1.0",
  "last_epoch_forum",
  "libsql",
+ "poe_challenge_extractor",
  "poe_forum",
  "poe_teasers",
  "poise",

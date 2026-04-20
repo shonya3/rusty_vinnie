@@ -1,6 +1,29 @@
 use playwright::{Playwright, api::Page};
 use std::time::Duration;
 
+pub mod paths {
+    use std::path::PathBuf;
+
+    pub fn workspace_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .to_path_buf()
+    }
+
+    pub fn remaining_tiers() -> PathBuf {
+        workspace_root().join("remaining_tiers.txt")
+    }
+
+    pub fn tiers_history() -> PathBuf {
+        workspace_root().join("tiers_history")
+    }
+}
+
+const TARGET_TIERS: u32 = 8000;
+
 fn extract_current_tiers(content: &str) -> Option<u32> {
     if let Some(start) = content.find("Tyrannical Tiers") {
         let chunk = &content[start..start + 200.min(content.len() - start)];
@@ -15,10 +38,6 @@ fn extract_current_tiers(content: &str) -> Option<u32> {
     }
     None
 }
-
-const TARGET_TIERS: u32 = 8000;
-const OUTPUT_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\remaining_tiers.txt");
-const HISTORY_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "\\..\\..\\tiers_history.txt");
 
 /// Connects to Chrome via CDP and extracts challenge progress from PoE profile pages.
 pub struct ChallengeExtractor<'a> {
@@ -88,7 +107,7 @@ async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
     extractor.navigate().await?;
 
     // Read previous from file
-    let mut previous_remaining: Option<u32> = std::fs::read_to_string(OUTPUT_FILE)
+    let mut previous_remaining: Option<u32> = std::fs::read_to_string(paths::remaining_tiers())
         .ok()
         .and_then(|c| c.split_whitespace().last()?.parse().ok());
 
@@ -104,14 +123,14 @@ async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
             let now = chrono::Local::now().format("%d.%m %H:%M");
             let line = format!("{}: {}", now, remaining);
             println!("{}", line);
-            std::fs::write(OUTPUT_FILE, line).ok();
+            std::fs::write(paths::remaining_tiers(), line).ok();
 
             if previous_remaining != Some(remaining) {
                 let history_line = format!("{}: {}\n", now, remaining);
                 if let Ok(mut file) = std::fs::OpenOptions::new()
                     .create(true)
                     .append(true)
-                    .open(HISTORY_FILE)
+                    .open(paths::tiers_history())
                 {
                     use std::io::Write;
                     file.write_all(history_line.as_bytes()).ok();
