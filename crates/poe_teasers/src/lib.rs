@@ -1,5 +1,5 @@
 use error::Error;
-use scraper::{selectable::Selectable, ElementRef, Html, Selector};
+use scraper::{ElementRef, Html, Selector, selectable::Selectable};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
@@ -112,9 +112,10 @@ fn next_sibling_element<'a>(element: &'a ElementRef) -> Option<ElementRef<'a>> {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum TeasersForumThread {
+    Poe2_05(Lang),
+    Poe2_02(Lang),
     Poe2(Lang),
     Poe1_3_25Russian,
-    Poe2_02(Lang),
     Poe1_3_26Ru,
     Poe1_3_26En,
     Poe1_3_27En,
@@ -124,6 +125,14 @@ pub enum TeasersForumThread {
 impl TeasersForumThread {
     pub fn url(&self) -> &'static str {
         match self {
+            TeasersForumThread::Poe2_05(lang) => match lang {
+                Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3929743",
+                Lang::En => "https://www.pathofexile.com/forum/view-thread/3929742",
+            },
+            TeasersForumThread::Poe2_02(lang) => match lang {
+                Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3726161",
+                Lang::En => "https://www.pathofexile.com/forum/view-thread/3726160",
+            },
             &TeasersForumThread::Poe2(lang) => match lang {
                 Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3584454",
                 Lang::En => "https://www.pathofexile.com/forum/view-thread/3584453",
@@ -131,10 +140,6 @@ impl TeasersForumThread {
             TeasersForumThread::Poe1_3_25Russian => {
                 "https://ru.pathofexile.com/forum/view-thread/3530604/page/1"
             }
-            TeasersForumThread::Poe2_02(lang) => match lang {
-                Lang::Ru => "https://ru.pathofexile.com/forum/view-thread/3726161",
-                Lang::En => "https://www.pathofexile.com/forum/view-thread/3726160",
-            },
             TeasersForumThread::Poe1_3_26Ru => {
                 "https://ru.pathofexile.com/forum/view-thread/3784649"
             }
@@ -152,15 +157,19 @@ impl TeasersForumThread {
 
     pub fn title(&self) -> &'static str {
         match self {
+            TeasersForumThread::Poe2_05(lang) => match lang {
+                Lang::Ru => "Тизеры Path of Exile 2: Возвращение Древних",
+                Lang::En => "Path of Exile 2: Return of the Ancients Teasers",
+            },
+            TeasersForumThread::Poe2_02(lang) => match lang {
+                Lang::Ru => "Тизеры Path of Exile 2 0.2.0",
+                Lang::En => "Path of Exile 2 - 0.2.0 Teasers",
+            },
             TeasersForumThread::Poe2(lang) => match lang {
                 Lang::Ru => "Тизеры Path of Exile 2",
                 Lang::En => "Path of Exile 2 Teasers",
             },
             TeasersForumThread::Poe1_3_25Russian => "Тизеры Path of Exile: Поселенцы Калгуура",
-            TeasersForumThread::Poe2_02(lang) => match lang {
-                Lang::Ru => "Тизеры Path of Exile 2 0.2.0",
-                Lang::En => "Path of Exile 2 - 0.2.0 Teasers",
-            },
             TeasersForumThread::Poe1_3_26Ru => "Тизеры Path of Exile: Секреты Атласа",
             TeasersForumThread::Poe1_3_26En => "Path of Exile: Secrets of the Atlas Teasers",
             TeasersForumThread::Poe1_3_27En => "Path of Exile: Keepers of the Flame Teasers",
@@ -190,9 +199,10 @@ mod tests {
         println!("{}", h2.html());
 
         let next = super::next_sibling_element(&h2).unwrap();
-        assert!(next
-            .html()
-            .starts_with("<div class=\"spoiler spoilerVisible\">"));
+        assert!(
+            next.html()
+                .starts_with("<div class=\"spoiler spoilerVisible\">")
+        );
         println!("{}", next.html());
     }
 }
