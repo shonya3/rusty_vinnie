@@ -10,12 +10,7 @@ dotenv = "0.15.0"
 poise = {git = "https://github.com/serenity-rs/poise.git", branch = "current"}
 rand = "0.9.1"
 tokio = { workspace = true }
-reqwest.workspace = true
 chrono = { workspace = true }
-shuttle-runtime = "0.56.0"
-shuttle-serenity = "0.56.0"
-shuttle-persist = "0.51.0"
-serde_json.workspace = true
 futures = "0.3.31"
 
 poe_challenge_extractor = { path = "../crates/poe_challenge_extractor" }
@@ -26,7 +21,6 @@ ea_live_updates = { path = "../crates/ea_live_updates" }
 diablo = { path = "../crates/diablo" }
 http = { path = "../crates/http" }
 unicode-segmentation = "1.12.0"
-url = "2.5.4"
 libsql = { git = "https://github.com/tursodatabase/libsql", default-features = false, features = ["remote", "tls"], branch = "main" }
 
 [dev-dependencies]
