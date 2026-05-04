@@ -9,9 +9,10 @@ pub async fn watch_teasers_threads(
     ctx: &SerenityContext,
     data: &Data,
     forum_threads: &[TeasersForumThread],
+    channel: AppChannel,
 ) {
     let mut interval = tokio::time::interval(Duration::from_secs(360));
-    let channel_id = AppChannel::Poe.id();
+    let channel_id = channel.id();
     loop {
         interval.tick().await;
         for forum_thread in forum_threads {

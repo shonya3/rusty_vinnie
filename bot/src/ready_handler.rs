@@ -26,6 +26,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
             TeasersForumThread::Poe2_05(poe_teasers::Lang::En),
             TeasersForumThread::Poe2_05(poe_teasers::Lang::Ru),
         ],
+        AppChannel::Poe2,
     );
 
     let diablo = newsletter::start_news_feed(ctx, AppChannel::Diablo, async || {
