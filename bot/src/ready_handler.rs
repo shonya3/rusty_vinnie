@@ -1,8 +1,9 @@
 use crate::{
-    challenges::{start_daily_summarizer, start_presence_updater},
+    challenges::start_daily_summarizer,
     channel::AppChannel,
     newsletter,
     status::{get_kroiya_status, watch_status},
+    stream_announcer,
     Data,
 };
 use chrono::FixedOffset;
@@ -90,8 +91,8 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         }),
     );
 
-    let presence = start_presence_updater(ctx);
     let challenge_summarizer = start_daily_summarizer(ctx);
+    let stream_announcer = stream_announcer::start_announcer(ctx.clone(), AppChannel::Poe2);
 
     tokio::join!(
         watch_status(
@@ -104,8 +105,8 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         poe1,
         poe2,
         diablo,
-        presence,
         challenge_summarizer,
+        stream_announcer,
     );
 }
 

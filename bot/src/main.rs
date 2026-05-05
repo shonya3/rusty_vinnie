@@ -16,6 +16,7 @@ pub mod poe_teasers;
 mod challenges;
 mod ready_handler;
 mod status;
+mod stream_announcer;
 mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;

@@ -8,6 +8,7 @@ fn get_last_entry() -> Option<TierEntry> {
     load_history().entries.last().cloned()
 }
 
+#[allow(unused)]
 pub async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
     let mut interval = tokio::time::interval(Duration::from_secs(60));
     loop {
