@@ -26,7 +26,7 @@ impl AppChannel {
             AppChannel::Poe => ChannelId::new(356013349496029184),
             AppChannel::Poe2 => ChannelId::new(1399352084515520654),
             AppChannel::LastEpoch => ChannelId::new(1362313267879350363),
-            AppChannel::Dev => ChannelId::new(841929108829372460),
+            AppChannel::Dev => ChannelId::new(842131980538871878),
             AppChannel::Diablo => ChannelId::new(1420445617976774657),
         }
     }

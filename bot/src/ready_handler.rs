@@ -3,7 +3,7 @@ use crate::{
     channel::AppChannel,
     newsletter,
     status::{get_kroiya_status, watch_status},
-    stream_announcer,
+    stream_announcer::{self, Offset},
     Data,
 };
 use chrono::FixedOffset;
@@ -92,7 +92,30 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
     );
 
     let challenge_summarizer = start_daily_summarizer(ctx);
-    let stream_announcer = stream_announcer::start_announcer(ctx.clone(), AppChannel::Poe2);
+    let stream_announcer = join_all(
+        [
+            Offset::Hours(48),
+            Offset::Hours(24),
+            Offset::Hours(12),
+            Offset::Hours(6),
+            Offset::Hours(3),
+            Offset::Hours(2),
+            Offset::Hours(1),
+            Offset::Minutes(45),
+            Offset::Minutes(30),
+            Offset::Minutes(15),
+            Offset::Minutes(5),
+        ]
+        .into_iter()
+        .filter(|o| o.is_upcoming())
+        .map(|offset| async move {
+            stream_announcer::schedule(offset, move || async move {
+                let msg = format!("⏰ Stream starts in {}!", offset.label());
+                AppChannel::Poe2.say(&ctx, &msg).await;
+            })
+            .await;
+        }),
+    );
 
     tokio::join!(
         watch_status(
