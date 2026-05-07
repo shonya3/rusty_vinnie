@@ -119,7 +119,10 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
             Offset::Minutes(45),
             Offset::Minutes(30),
             Offset::Minutes(15),
+            Offset::Minutes(10),
             Offset::Minutes(5),
+            Offset::Minutes(2),
+            Offset::Minutes(1),
         ]
         .into_iter()
         .filter(|o| o.is_upcoming())
