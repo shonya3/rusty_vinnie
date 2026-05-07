@@ -108,6 +108,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
             Offset::Hours(48),
             Offset::Hours(24),
             Offset::Hours(12),
+            Offset::Hours(10),
             Offset::Hours(8),
             Offset::Hours(6),
             Offset::Hours(5),
