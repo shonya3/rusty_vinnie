@@ -39,17 +39,17 @@ impl Offset {
     pub fn is_upcoming(&self) -> bool {
         self.time() > Utc::now()
     }
-}
 
-pub async fn schedule<F, Fut>(offset: Offset, f: F)
-where
-    F: FnOnce() -> Fut,
-    Fut: std::future::Future<Output = ()>,
-{
-    let time = offset.time();
-    let delay = time.signed_duration_since(Utc::now());
-    tokio::time::sleep(Duration::from_secs(delay.num_seconds() as u64)).await;
-    f().await;
+    pub async fn schedule<F, Fut>(&self, f: F)
+    where
+        F: FnOnce() -> Fut,
+        Fut: std::future::Future<Output = ()>,
+    {
+        let time = self.time();
+        let delay = time.signed_duration_since(Utc::now());
+        tokio::time::sleep(Duration::from_secs(delay.num_seconds() as u64)).await;
+        f().await;
+    }
 }
 
 pub fn update_presence(ctx: &poise::serenity_prelude::Context) {

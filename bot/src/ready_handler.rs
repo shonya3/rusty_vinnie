@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::{
     challenges::start_daily_summarizer,
     channel::AppChannel,
@@ -92,7 +94,14 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
     );
 
     let challenge_summarizer = start_daily_summarizer(ctx);
-    let presence_updater = start_presence_updater(ctx);
+
+    let presence_updater = async move {
+        let mut interval = tokio::time::interval(Duration::from_mins(1));
+        loop {
+            interval.tick().await;
+            stream_announcer::update_presence(ctx);
+        }
+    };
 
     let stream_announcer = join_all(
         [
@@ -111,15 +120,18 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         .into_iter()
         .filter(|o| o.is_upcoming())
         .map(|offset| async move {
-            stream_announcer::schedule(offset, move || async move {
-                let msg = format!("⏰ Stream starts in {}!", offset.label());
-                AppChannel::Poe2.say(&ctx, &msg).await;
-            })
-            .await;
+            offset
+                .schedule(move || async move {
+                    let msg = format!("⏰ Stream starts in {}!", offset.label());
+                    AppChannel::Poe2.say(&ctx, &msg).await;
+                })
+                .await;
         }),
     );
 
     tokio::join!(
+        stream_announcer,
+        presence_updater,
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
@@ -131,8 +143,6 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         poe2,
         diablo,
         challenge_summarizer,
-        stream_announcer,
-        presence_updater,
     );
 }
 
@@ -150,14 +160,5 @@ impl Timezone {
             Timezone::BritishSummer => FixedOffset::east_opt(3600),
             Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
         }
-    }
-}
-
-async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
-    use std::time::Duration;
-    let mut interval = tokio::time::interval(Duration::from_mins(1));
-    loop {
-        interval.tick().await;
-        stream_announcer::update_presence(ctx);
     }
 }
