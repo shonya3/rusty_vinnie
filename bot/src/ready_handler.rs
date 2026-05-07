@@ -92,6 +92,8 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
     );
 
     let challenge_summarizer = start_daily_summarizer(ctx);
+    let presence_updater = start_presence_updater(ctx);
+
     let stream_announcer = join_all(
         [
             Offset::Hours(48),
@@ -130,6 +132,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         diablo,
         challenge_summarizer,
         stream_announcer,
+        presence_updater,
     );
 }
 
@@ -147,5 +150,14 @@ impl Timezone {
             Timezone::BritishSummer => FixedOffset::east_opt(3600),
             Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
         }
+    }
+}
+
+async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
+    use std::time::Duration;
+    let mut interval = tokio::time::interval(Duration::from_mins(1));
+    loop {
+        interval.tick().await;
+        stream_announcer::update_presence(ctx);
     }
 }

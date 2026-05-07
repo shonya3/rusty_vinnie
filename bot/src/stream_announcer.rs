@@ -51,3 +51,20 @@ where
     tokio::time::sleep(Duration::from_secs(delay.num_seconds() as u64)).await;
     f().await;
 }
+
+pub fn update_presence(ctx: &poise::serenity_prelude::Context) {
+    let now = Utc::now();
+    let remaining = STREAM_DATETIME.signed_duration_since(now);
+    if remaining.num_seconds() > 0 {
+        let days = remaining.num_days();
+        let hours = remaining.num_hours() % 24;
+        let mins = remaining.num_minutes() % 60;
+        let status = if days > 0 {
+            format!("{}d {}h {}m", days, hours, mins)
+        } else {
+            format!("{}h {}m", hours, mins)
+        };
+        let activity = poise::serenity_prelude::ActivityData::watching(status);
+        ctx.set_activity(Some(activity));
+    }
+}
