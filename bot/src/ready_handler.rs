@@ -14,6 +14,7 @@ use last_epoch_forum::Subforum as LastEpochSubforum;
 use poe_forum::{Subforum, WebsiteLanguage};
 use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
+use rand::seq::IndexedRandom;
 
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
@@ -103,6 +104,15 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         }
     };
 
+    let e = || {
+        [
+            "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "🐭",
+            "🤓", "😎", "🦀",
+        ]
+        .choose(&mut rand::rng())
+        .unwrap()
+    };
+
     let stream_announcer = join_all(
         [
             Offset::Hours(48),
@@ -129,7 +139,9 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         .map(|offset| async move {
             offset
                 .schedule(move || async move {
-                    let msg = format!("⏰ Stream starts in {}!", offset.label());
+                    let e1 = format!("{}{}{}", e(), e(), e());
+                    let e2 = format!("{}{}{}", e(), e(), e());
+                    let msg = format!("{e1} Stream starts in {} {e2}", offset.label());
                     AppChannel::Poe2.say(&ctx, &msg).await;
                 })
                 .await;
