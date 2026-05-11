@@ -1,10 +1,38 @@
-use crate::{channel::AppChannel, message::MessageWithThreadedDetails, newsletter::NewsItem};
+use crate::{
+    channel::AppChannel,
+    message::MessageWithThreadedDetails,
+    newsletter::{NewsItem, Newsletter},
+};
 use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
     Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
     Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
+
+pub struct PoeNewsletter {
+    pub subforums: Vec<(WebsiteLanguage, Subforum)>,
+}
+
+impl PoeNewsletter {
+    pub fn new(subforums: Vec<(WebsiteLanguage, Subforum)>) -> Self {
+        Self { subforums }
+    }
+}
+
+impl Newsletter for PoeNewsletter {
+    type Item = NewsThreadInfo;
+    type Error = reqwest::Error;
+
+    async fn fetch(&self) -> Result<Vec<Self::Item>, Self::Error> {
+        let mut all = Vec::new();
+        for (lang, subforum) in &self.subforums {
+            let items = poe_forum::fetch_subforum_threads_list(*lang, *subforum, None).await?;
+            all.extend(items);
+        }
+        Ok(all)
+    }
+}
 
 impl NewsItem for NewsThreadInfo {
     async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel) {
