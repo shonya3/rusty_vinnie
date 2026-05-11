@@ -3,7 +3,7 @@ use std::time::Duration;
 use crate::{
     challenges::start_daily_summarizer,
     channel::AppChannel,
-    newsletter,
+    newsletter::{self, Newsletter, PoeNewsletter},
     status::{get_kroiya_status, watch_status},
     stream_announcer::{self, Offset},
     Data,
@@ -77,22 +77,13 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         }),
     );
 
-    let poe2 = join_all(
-        [
-            (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
-            (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
-            (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
-            (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
-        ]
-        .into_iter()
-        .map(async |(lang, subforum)| {
-            newsletter::start_news_feed(ctx, AppChannel::Poe2, async || {
-                poe_forum::fetch_subforum_threads_list(lang, subforum, timezone_offset.as_ref())
-                    .await
-            })
-            .await
-        }),
-    );
+    let poe2_newsletter = PoeNewsletter::new(vec![
+        (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
+        (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
+        (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
+        (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
+    ]);
+    let poe2 = poe2_newsletter.start(ctx, AppChannel::Poe2);
 
     let challenge_summarizer = start_daily_summarizer(ctx);
 
