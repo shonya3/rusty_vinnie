@@ -4,6 +4,7 @@ use futures::lock::Mutex;
 use poise::serenity_prelude::{self as serenity};
 use std::{collections::HashSet, sync::Arc};
 
+mod challenges;
 mod channel;
 mod commands;
 #[allow(unused)]
@@ -13,7 +14,6 @@ mod message;
 mod message_handler;
 mod newsletter;
 pub mod poe_teasers;
-mod challenges;
 mod ready_handler;
 mod status;
 mod stream_announcer;
@@ -49,6 +49,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 pub struct Data {
     pub db: Arc<DbClient>,
     pub published_live_updates: Arc<Mutex<HashSet<LiveUpdate>>>,
+    pub newsletters: Arc<newsletters::AppNewsletters>,
 }
 
 #[tokio::main]
@@ -84,6 +85,7 @@ async fn main() {
                 Ok(Data {
                     db: Arc::new(db),
                     published_live_updates: Default::default(),
+                    newsletters: Arc::new(newsletters::AppNewsletters::new())
                 })
             })
         })
@@ -100,4 +102,67 @@ async fn main() {
         .framework(framework)
         .await;
     client.unwrap().start().await.unwrap();
+}
+
+pub mod newsletters {
+    use last_epoch_forum::Subforum as LastEpochSubforum;
+    use poe_forum::{Subforum, WebsiteLanguage};
+
+    use crate::{
+        interval::Timezone,
+        newsletter::{
+            diablo::DiabloNewsletter, last_epoch::LastEpochNewsletter, poe::PoeNewsletter,
+        },
+    };
+
+    pub struct AppNewsletters {
+        pub poe1: PoeNewsletter,
+        pub poe2: PoeNewsletter,
+        pub last_epoch: LastEpochNewsletter,
+        pub diablo: DiabloNewsletter,
+    }
+
+    impl Default for AppNewsletters {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+    impl AppNewsletters {
+        pub fn new() -> Self {
+            let poe1 = PoeNewsletter::new(
+                vec![
+                    (WebsiteLanguage::En, Subforum::News),
+                    (WebsiteLanguage::Ru, Subforum::News),
+                    (WebsiteLanguage::En, Subforum::PatchNotes),
+                    (WebsiteLanguage::Ru, Subforum::PatchNotes),
+                ],
+                Timezone::Moscow,
+            );
+
+            let poe2 = PoeNewsletter::new(
+                vec![
+                    (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
+                    (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
+                    (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
+                    (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
+                ],
+                Timezone::Moscow,
+            );
+
+            let last_epoch = LastEpochNewsletter::new(vec![
+                LastEpochSubforum::Announcements,
+                LastEpochSubforum::DeveloperBlogs,
+                LastEpochSubforum::News,
+                LastEpochSubforum::PatchNotes,
+            ]);
+
+            Self {
+                poe1,
+                poe2,
+                last_epoch,
+                diablo: DiabloNewsletter,
+            }
+        }
+    }
 }

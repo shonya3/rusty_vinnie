@@ -1,25 +1,21 @@
 use std::time::Duration;
 
 use crate::{
-    challenges::start_daily_summarizer,
+    challenges,
     channel::AppChannel,
-    interval::Timezone,
-    newsletter::{
-        diablo::DiabloNewsletter, last_epoch::LastEpochNewsletter, poe::PoeNewsletter, Newsletter,
-    },
+    newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
     stream_announcer::{self, Offset},
     Data,
 };
 use futures::future::join_all;
-use last_epoch_forum::Subforum as LastEpochSubforum;
-use poe_forum::{Subforum, WebsiteLanguage};
 use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
 use rand::seq::IndexedRandom;
 
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
+
     set_watchers(ctx, data).await;
 }
 
@@ -34,49 +30,25 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         AppChannel::Poe2,
     );
 
-    let diablo_newsletter = DiabloNewsletter;
-    let diablo = diablo_newsletter.start(ctx, AppChannel::Diablo);
-
-    let last_epoch_newsletter = LastEpochNewsletter::new(vec![
-        LastEpochSubforum::Announcements,
-        LastEpochSubforum::DeveloperBlogs,
-        LastEpochSubforum::News,
-        LastEpochSubforum::PatchNotes,
-    ]);
-    let last_epoch = last_epoch_newsletter.start(ctx, AppChannel::LastEpoch);
-
-    let poe1_newsletter = PoeNewsletter::new(
-        vec![
-            (WebsiteLanguage::En, Subforum::News),
-            (WebsiteLanguage::Ru, Subforum::News),
-            (WebsiteLanguage::En, Subforum::PatchNotes),
-            (WebsiteLanguage::Ru, Subforum::PatchNotes),
-        ],
-        Timezone::Moscow,
+    tokio::join!(
+        watch_status(
+            || get_kroiya_status(ctx),
+            || AppChannel::General.say(ctx, ":rabbit: пришел"),
+            || AppChannel::General.say(ctx, ":rabbit: ушел"),
+        ),
+        teasers,
+        data.newsletters.poe1.start(ctx, AppChannel::Poe),
+        data.newsletters.poe2.start(ctx, AppChannel::Poe2),
+        data.newsletters
+            .last_epoch
+            .start(ctx, AppChannel::LastEpoch),
+        data.newsletters.diablo.start(ctx, AppChannel::Diablo),
+        challenges::start_daily_summarizer(ctx),
     );
-    let poe1 = poe1_newsletter.start(ctx, AppChannel::Poe);
+}
 
-    let poe2_newsletter = PoeNewsletter::new(
-        vec![
-            (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
-            (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
-            (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
-            (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
-        ],
-        Timezone::Moscow,
-    );
-    let poe2 = poe2_newsletter.start(ctx, AppChannel::Poe2);
-
-    let challenge_summarizer = start_daily_summarizer(ctx);
-
-    let presence_updater = async move {
-        let mut interval = tokio::time::interval(Duration::from_mins(1));
-        loop {
-            interval.tick().await;
-            stream_announcer::update_presence(ctx);
-        }
-    };
-
+#[allow(unused)]
+fn countdown(ctx: &serenity::Context) {
     let e = || {
         [
             "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "🐭",
@@ -120,20 +92,15 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
                 .await;
         }),
     );
+}
 
-    tokio::join!(
-        stream_announcer,
-        presence_updater,
-        watch_status(
-            || get_kroiya_status(ctx),
-            || AppChannel::General.say(ctx, ":rabbit: пришел"),
-            || AppChannel::General.say(ctx, ":rabbit: ушел"),
-        ),
-        teasers,
-        last_epoch,
-        poe1,
-        poe2,
-        diablo,
-        challenge_summarizer,
-    );
+#[allow(unused)]
+fn precence(ctx: &serenity::Context) {
+    let presence_updater = async move {
+        let mut interval = tokio::time::interval(Duration::from_mins(1));
+        loop {
+            interval.tick().await;
+            stream_announcer::update_presence(ctx);
+        }
+    };
 }
