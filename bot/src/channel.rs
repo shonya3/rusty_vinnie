@@ -4,7 +4,7 @@ use poise::serenity_prelude::{CacheHttp, ChannelId};
 #[derive(Debug, Clone, Copy)]
 pub enum AppChannel {
     General,
-    Poe,
+    Poe1,
     Poe2,
     LastEpoch,
     Dev,
@@ -23,7 +23,7 @@ impl AppChannel {
     pub fn id(&self) -> ChannelId {
         match self {
             AppChannel::General => ChannelId::new(356012941083934722),
-            AppChannel::Poe => ChannelId::new(356013349496029184),
+            AppChannel::Poe1 => ChannelId::new(356013349496029184),
             AppChannel::Poe2 => ChannelId::new(1399352084515520654),
             AppChannel::LastEpoch => ChannelId::new(1362313267879350363),
             AppChannel::Dev => ChannelId::new(842131980538871878),

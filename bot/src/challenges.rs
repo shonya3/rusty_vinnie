@@ -47,7 +47,7 @@ pub async fn start_daily_summarizer(ctx: &poise::serenity_prelude::Context) {
                         entry.datetime_moscow()
                     )
                 };
-                AppChannel::Poe.say(ctx, &message).await;
+                AppChannel::Poe1.say(ctx, &message).await;
             }
         }
 

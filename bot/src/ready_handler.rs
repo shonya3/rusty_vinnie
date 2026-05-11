@@ -44,7 +44,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
             || AppChannel::General.say(ctx, ":rabbit: ушел"),
         ),
         teasers,
-        data.newsletters.poe1.start(ctx, AppChannel::Poe),
+        data.newsletters.poe1.start(ctx, AppChannel::Poe1),
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
