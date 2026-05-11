@@ -31,7 +31,60 @@ pub async fn start_news_feed<T, Fut, F, E>(
 pub trait Newsletter {
     type Item: NewsItem;
     type Error: Error;
-    async fn fetch(&self) -> Result<Vec<Self::Item>, Self::Error>;
+
+    /// Implement this to define the actual fetch logic for your newsletter.
+    /// This method is called by [`fetch`](Self::fetch) which handles retries.
+    async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error>;
+
+    /// Fetches with automatic retry (up to 3 attempts with 2s delay between).
+    async fn fetch(&self) -> Result<Vec<Self::Item>, Self::Error> {
+        let name = std::any::type_name::<Self>();
+        let mut attempt = 0;
+
+        loop {
+            attempt += 1;
+            match self.fetch_impl().await {
+                Ok(items) => return Ok(items),
+                Err(err) => {
+                    eprintln!("{name} fetch attempt {attempt} failed: {err:?}");
+                    if attempt == 3 {
+                        return Err(err);
+                    }
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                }
+            }
+        }
+    }
+
+    async fn fetch_fresh(
+        &self,
+        stale_time: std::time::Duration,
+    ) -> Result<Vec<Self::Item>, Self::Error> {
+        let items = self.fetch().await?;
+        let items = items
+            .into_iter()
+            .filter(|i| {
+                interval::is_within_last_minutes((stale_time.as_secs() / 60) as i64, i.timestamp())
+            })
+            .collect();
+        Ok(items)
+    }
+
+    #[allow(unused)]
+    async fn send_fresh(
+        &self,
+        stale_time: std::time::Duration,
+        ctx: &SerenityContext,
+        channel: AppChannel,
+    ) -> Result<(), Self::Error> {
+        let items = self.fetch_fresh(stale_time).await?;
+
+        for item in items {
+            item.post_to_discord(ctx, channel).await;
+        }
+
+        Ok(())
+    }
 
     async fn start(&self, ctx: &SerenityContext, channel: AppChannel) {
         let name = std::any::type_name::<Self>();
@@ -48,21 +101,6 @@ pub trait Newsletter {
                 Err(err) => eprintln!("{name} error: {err:?}"),
             }
         }
-    }
-
-    #[allow(unused)]
-    async fn fetch_fresh(
-        &self,
-        stale_time: std::time::Duration,
-    ) -> Result<Vec<Self::Item>, Self::Error> {
-        let vec = self.fetch().await?;
-        let vec = vec
-            .into_iter()
-            .filter(|i| {
-                interval::is_within_last_minutes((stale_time.as_secs() / 60) as i64, i.timestamp())
-            })
-            .collect();
-        Ok(vec)
     }
 }
 

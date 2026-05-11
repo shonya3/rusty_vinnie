@@ -24,7 +24,7 @@ impl Newsletter for PoeNewsletter {
     type Item = NewsThreadInfo;
     type Error = reqwest::Error;
 
-    async fn fetch(&self) -> Result<Vec<Self::Item>, Self::Error> {
+    async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error> {
         let mut all = Vec::new();
         for (lang, subforum) in &self.subforums {
             let items = poe_forum::fetch_subforum_threads_list(*lang, *subforum, None).await?;
