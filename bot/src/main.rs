@@ -118,7 +118,7 @@ pub mod newsletters {
     pub struct AppNewsletters {
         pub poe1: PoeNewsletter,
         pub poe2: PoeNewsletter,
-        pub last_epoch: LastEpochNewsletter,
+        pub epoch: LastEpochNewsletter,
         pub diablo: DiabloNewsletter,
     }
 
@@ -150,7 +150,7 @@ pub mod newsletters {
                 Timezone::Moscow,
             );
 
-            let last_epoch = LastEpochNewsletter::new(vec![
+            let epoch = LastEpochNewsletter::new(vec![
                 LastEpochSubforum::Announcements,
                 LastEpochSubforum::DeveloperBlogs,
                 LastEpochSubforum::News,
@@ -160,7 +160,7 @@ pub mod newsletters {
             Self {
                 poe1,
                 poe2,
-                last_epoch,
+                epoch,
                 diablo: DiabloNewsletter,
             }
         }

@@ -46,9 +46,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         teasers,
         data.newsletters.poe1.start(ctx, AppChannel::Poe),
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
-        data.newsletters
-            .last_epoch
-            .start(ctx, AppChannel::LastEpoch),
+        data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
         challenges::start_daily_summarizer(ctx),
     );
