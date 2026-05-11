@@ -1,5 +1,6 @@
 use crate::{
     channel::AppChannel,
+    interval::Timezone,
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
 };
@@ -12,11 +13,12 @@ use unicode_segmentation::UnicodeSegmentation;
 
 pub struct PoeNewsletter {
     pub subforums: Vec<(WebsiteLanguage, Subforum)>,
+    pub timezone: Timezone,
 }
 
 impl PoeNewsletter {
-    pub fn new(subforums: Vec<(WebsiteLanguage, Subforum)>) -> Self {
-        Self { subforums }
+    pub fn new(subforums: Vec<(WebsiteLanguage, Subforum)>, timezone: Timezone) -> Self {
+        Self { subforums, timezone }
     }
 }
 
@@ -27,7 +29,12 @@ impl Newsletter for PoeNewsletter {
     async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error> {
         let mut all = Vec::new();
         for (lang, subforum) in &self.subforums {
-            let items = poe_forum::fetch_subforum_threads_list(*lang, *subforum, None).await?;
+            let items = poe_forum::fetch_subforum_threads_list(
+                *lang,
+                *subforum,
+                self.timezone.offset().as_ref(),
+            )
+            .await?;
             all.extend(items);
         }
         Ok(all)

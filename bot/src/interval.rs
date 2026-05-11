@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration as ChronoDuration, Utc};
+use chrono::{DateTime, Duration as ChronoDuration, FixedOffset, Utc};
 use std::{future::Future, time::Duration};
 use tokio::time::Interval;
 
@@ -20,6 +20,7 @@ pub fn is_fresh(timestamp: DateTime<Utc>) -> bool {
     is_within_last_minutes(INTERVAL_MINS, timestamp)
 }
 
+#[allow(unused)]
 /// Set interval with default [`INTERVAL_MINS`]
 pub async fn set_interval<F, Fut>(f: F)
 where
@@ -32,5 +33,22 @@ where
         interval.tick().await;
 
         f().await;
+    }
+}
+
+#[allow(unused)]
+pub enum Timezone {
+    BritishWinter,
+    BritishSummer,
+    Moscow,
+}
+
+impl Timezone {
+    pub fn offset(&self) -> Option<FixedOffset> {
+        match self {
+            Timezone::BritishWinter => FixedOffset::east_opt(0),
+            Timezone::BritishSummer => FixedOffset::east_opt(3600),
+            Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
+        }
     }
 }

@@ -3,12 +3,14 @@ use std::time::Duration;
 use crate::{
     challenges::start_daily_summarizer,
     channel::AppChannel,
-    newsletter::{self, Newsletter, PoeNewsletter},
+    interval::Timezone,
+    newsletter::{
+        diablo::DiabloNewsletter, last_epoch::LastEpochNewsletter, poe::PoeNewsletter, Newsletter,
+    },
     status::{get_kroiya_status, watch_status},
     stream_announcer::{self, Offset},
     Data,
 };
-use chrono::FixedOffset;
 use futures::future::join_all;
 use last_epoch_forum::Subforum as LastEpochSubforum;
 use poe_forum::{Subforum, WebsiteLanguage};
@@ -18,7 +20,6 @@ use rand::seq::IndexedRandom;
 
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
-
     set_watchers(ctx, data).await;
 }
 
@@ -33,56 +34,37 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         AppChannel::Poe2,
     );
 
-    let diablo = newsletter::start_news_feed(ctx, AppChannel::Diablo, async || {
-        diablo::fetch_posts().await.map(|posts| {
-            posts
-                .into_iter()
-                .filter(|post| !post.category.is_console_related())
-                .collect()
-        })
-    });
+    let diablo_newsletter = DiabloNewsletter;
+    let diablo = diablo_newsletter.start(ctx, AppChannel::Diablo);
 
-    let last_epoch = join_all(
-        [
-            LastEpochSubforum::Announcements,
-            LastEpochSubforum::DeveloperBlogs,
-            LastEpochSubforum::News,
-            LastEpochSubforum::PatchNotes,
-        ]
-        .into_iter()
-        .map(async |subforum: LastEpochSubforum| {
-            newsletter::start_news_feed(ctx, AppChannel::LastEpoch, async || {
-                last_epoch_forum::fetch_subforum_threads_list(subforum).await
-            })
-            .await;
-        }),
-    );
+    let last_epoch_newsletter = LastEpochNewsletter::new(vec![
+        LastEpochSubforum::Announcements,
+        LastEpochSubforum::DeveloperBlogs,
+        LastEpochSubforum::News,
+        LastEpochSubforum::PatchNotes,
+    ]);
+    let last_epoch = last_epoch_newsletter.start(ctx, AppChannel::LastEpoch);
 
-    let timezone_offset = Timezone::Moscow.offset();
-
-    let poe1 = join_all(
-        [
+    let poe1_newsletter = PoeNewsletter::new(
+        vec![
             (WebsiteLanguage::En, Subforum::News),
             (WebsiteLanguage::Ru, Subforum::News),
             (WebsiteLanguage::En, Subforum::PatchNotes),
             (WebsiteLanguage::Ru, Subforum::PatchNotes),
-        ]
-        .into_iter()
-        .map(async |(lang, subforum)| {
-            newsletter::start_news_feed(ctx, AppChannel::Poe, async || {
-                poe_forum::fetch_subforum_threads_list(lang, subforum, timezone_offset.as_ref())
-                    .await
-            })
-            .await
-        }),
+        ],
+        Timezone::Moscow,
     );
+    let poe1 = poe1_newsletter.start(ctx, AppChannel::Poe);
 
-    let poe2_newsletter = PoeNewsletter::new(vec![
-        (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
-        (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
-        (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
-        (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
-    ]);
+    let poe2_newsletter = PoeNewsletter::new(
+        vec![
+            (WebsiteLanguage::En, Subforum::EarlyAccessPatchNotesEn),
+            (WebsiteLanguage::Ru, Subforum::EarlyAccessPatchNotesRu),
+            (WebsiteLanguage::En, Subforum::EarlyAccessAnnouncementsEn),
+            (WebsiteLanguage::Ru, Subforum::EarlyAccessAnnouncementsRu),
+        ],
+        Timezone::Moscow,
+    );
     let poe2 = poe2_newsletter.start(ctx, AppChannel::Poe2);
 
     let challenge_summarizer = start_daily_summarizer(ctx);
@@ -154,21 +136,4 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         diablo,
         challenge_summarizer,
     );
-}
-
-#[allow(dead_code)]
-pub enum Timezone {
-    BritishWinter,
-    BritishSummer,
-    Moscow,
-}
-
-impl Timezone {
-    pub fn offset(&self) -> Option<FixedOffset> {
-        match self {
-            Timezone::BritishWinter => FixedOffset::east_opt(0),
-            Timezone::BritishSummer => FixedOffset::east_opt(3600),
-            Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
-        }
-    }
 }

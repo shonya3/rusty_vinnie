@@ -1,4 +1,4 @@
-use crate::{message::MessageWithThreadedDetails, newsletter::NewsItem, Context, Error};
+use crate::{message::MessageWithThreadedDetails, newsletter::{NewsItem, Newsletter}, Context, Error};
 
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
@@ -7,6 +7,30 @@ use poise::serenity_prelude::{
     Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
+
+pub struct LastEpochNewsletter {
+    pub subforums: Vec<Subforum>,
+}
+
+impl LastEpochNewsletter {
+    pub fn new(subforums: Vec<Subforum>) -> Self {
+        Self { subforums }
+    }
+}
+
+impl Newsletter for LastEpochNewsletter {
+    type Item = NewsThreadInfo;
+    type Error = reqwest::Error;
+
+    async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error> {
+        let mut all = Vec::new();
+        for subforum in &self.subforums {
+            let items = last_epoch_forum::fetch_subforum_threads_list(*subforum).await?;
+            all.extend(items);
+        }
+        Ok(all)
+    }
+}
 
 impl NewsItem for NewsThreadInfo {
     async fn post_to_discord(&self, ctx: &SerenityContext, channel: crate::channel::AppChannel) {
