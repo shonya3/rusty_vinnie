@@ -2588,6 +2588,7 @@ dependencies = [
  "poe_teasers",
  "poise",
  "rand 0.9.1",
+ "reqwest 0.12.15",
  "tokio",
  "unicode-segmentation",
 ]
