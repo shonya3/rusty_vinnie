@@ -1,3 +1,5 @@
+use poise::CreateReply;
+
 use crate::{channel::AppChannel, newsletter::Newsletter, Context};
 use std::time::Duration;
 
@@ -83,6 +85,9 @@ pub async fn post_news(
     ctx: Context<'_>,
     #[description = "Number of minutes to look back"] mins: u64,
 ) -> Result<(), CommandError> {
+    ctx.defer_ephemeral().await?;
+    ctx.reply(format!("Starting to post news for the last {mins} mins"))
+        .await?;
     let n = &ctx.data().newsletters;
     let context = ctx.serenity_context();
     let stale_time = Duration::from_mins(mins);
@@ -100,6 +105,9 @@ pub async fn post_news(
     poe2?;
     epoch?;
     diablo?;
+
+    ctx.send(CreateReply::default().content("Done!").ephemeral(true))
+        .await?;
 
     Ok(())
 }
