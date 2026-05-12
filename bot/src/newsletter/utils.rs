@@ -10,8 +10,8 @@ pub trait Newsletter {
     type Item: NewsItem;
     type Error: Error;
 
-    /// Implement this to define the actual fetch logic for your newsletter.
-    /// This method is called by [`fetch`](Self::fetch) which handles retries.
+    /// Fetches newsletter data from the source.
+    /// Called automatically by [`fetch`](Self::fetch) with retry handling.
     async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error>;
 
     /// Fetches with automatic retry (up to 3 attempts with 2s delay between).
