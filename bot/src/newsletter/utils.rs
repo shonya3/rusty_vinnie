@@ -1,9 +1,6 @@
-use crate::{
-    channel::AppChannel,
-    interval::{self},
-};
+use crate::interval::{self};
 use chrono::{DateTime, Utc};
-use poise::serenity_prelude::Context as SerenityContext;
+use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
 use std::error::Error;
 
 pub trait Newsletter {
@@ -49,31 +46,39 @@ pub trait Newsletter {
     }
 
     #[allow(unused)]
-    async fn send_fresh(
+    async fn send_fresh<C>(
         &self,
         stale_time: std::time::Duration,
         ctx: &SerenityContext,
-        channel: AppChannel,
-    ) -> Result<(), Self::Error> {
+        channel: C,
+    ) -> Result<(), Self::Error>
+    where
+        C: Into<ChannelId>,
+    {
         let items = self.fetch_fresh(stale_time).await?;
+        let channel_id = channel.into();
 
         for item in items {
-            item.post_to_discord(ctx, channel).await;
+            item.post_to_discord(ctx, channel_id).await;
         }
 
         Ok(())
     }
 
-    async fn start(&self, ctx: &SerenityContext, channel: AppChannel) {
+    async fn start<C>(&self, ctx: &SerenityContext, channel: C)
+    where
+        C: Into<ChannelId>,
+    {
         let name = std::any::type_name::<Self>();
         let mut interval = interval::interval();
+        let channel_id = channel.into();
         loop {
             interval.tick().await;
             match self.fetch().await {
                 Ok(items) => {
                     let items = items.into_iter().filter(|item| item.is_fresh());
                     for item in items {
-                        item.post_to_discord(ctx, channel).await;
+                        item.post_to_discord(ctx, channel_id).await;
                     }
                 }
                 Err(err) => eprintln!("{name} error: {err:?}"),
@@ -83,7 +88,9 @@ pub trait Newsletter {
 }
 
 pub trait NewsItem {
-    async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel);
+    async fn post_to_discord<C>(&self, ctx: &SerenityContext, channel: C)
+    where
+        C: Into<ChannelId>;
 
     fn timestamp(&self) -> DateTime<Utc>;
 

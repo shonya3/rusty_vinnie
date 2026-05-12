@@ -1,4 +1,8 @@
-use crate::{message::MessageWithThreadedDetails, newsletter::{NewsItem, Newsletter}, Context, Error};
+use crate::{
+    message::MessageWithThreadedDetails,
+    newsletter::{NewsItem, Newsletter},
+    Context, Error,
+};
 
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
@@ -33,8 +37,11 @@ impl Newsletter for LastEpochNewsletter {
 }
 
 impl NewsItem for NewsThreadInfo {
-    async fn post_to_discord(&self, ctx: &SerenityContext, channel: crate::channel::AppChannel) {
-        create_message(self).send(ctx, channel.id()).await
+    async fn post_to_discord<C>(&self, ctx: &SerenityContext, channel: C)
+    where
+        C: Into<poise::serenity_prelude::ChannelId>,
+    {
+        create_message(self).send(ctx, channel.into()).await
     }
 
     fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {

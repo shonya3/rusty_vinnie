@@ -31,3 +31,9 @@ impl AppChannel {
         }
     }
 }
+
+impl From<AppChannel> for ChannelId {
+    fn from(val: AppChannel) -> Self {
+        val.id()
+    }
+}

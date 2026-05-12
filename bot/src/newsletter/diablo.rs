@@ -1,4 +1,4 @@
-use crate::{channel::AppChannel, newsletter::{NewsItem, Newsletter}};
+use crate::newsletter::{NewsItem, Newsletter};
 use chrono::{DateTime, Utc};
 use diablo::{DiabloPost, PostKind};
 use poise::serenity_prelude::{
@@ -14,14 +14,20 @@ impl Newsletter for DiabloNewsletter {
 
     async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error> {
         let posts = diablo::fetch_posts().await?;
-        Ok(posts.into_iter().filter(|post| !post.category.is_console_related()).collect())
+        Ok(posts
+            .into_iter()
+            .filter(|post| !post.category.is_console_related())
+            .collect())
     }
 }
 
 impl NewsItem for DiabloPost {
-    async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel) {
+    async fn post_to_discord<C>(&self, ctx: &SerenityContext, channel: C)
+    where
+        C: Into<poise::serenity_prelude::ChannelId>,
+    {
         let message = CreateMessage::new().embed(create_summary_embed(self));
-        let _ = channel.id().send_message(ctx, message).await;
+        let _ = channel.into().send_message(ctx, message).await;
     }
 
     fn timestamp(&self) -> DateTime<Utc> {

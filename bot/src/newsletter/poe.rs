@@ -1,5 +1,4 @@
 use crate::{
-    channel::AppChannel,
     interval::Timezone,
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
@@ -18,7 +17,10 @@ pub struct PoeNewsletter {
 
 impl PoeNewsletter {
     pub fn new(subforums: Vec<(WebsiteLanguage, Subforum)>, timezone: Timezone) -> Self {
-        Self { subforums, timezone }
+        Self {
+            subforums,
+            timezone,
+        }
     }
 }
 
@@ -42,10 +44,12 @@ impl Newsletter for PoeNewsletter {
 }
 
 impl NewsItem for NewsThreadInfo {
-    async fn post_to_discord(&self, ctx: &SerenityContext, channel: AppChannel) {
-        create_message(self).await.send(ctx, channel.id()).await;
+    async fn post_to_discord<C>(&self, ctx: &SerenityContext, channel: C)
+    where
+        C: Into<poise::serenity_prelude::ChannelId>,
+    {
+        create_message(self).await.send(ctx, channel.into()).await;
     }
-
     fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {
         self.posted_date
     }
