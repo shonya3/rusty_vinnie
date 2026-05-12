@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use crate::{
-    challenges,
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
@@ -48,7 +47,6 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
-        challenges::start_daily_summarizer(ctx),
     );
 }
 

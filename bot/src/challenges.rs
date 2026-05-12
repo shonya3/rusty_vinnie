@@ -24,6 +24,7 @@ pub async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
     }
 }
 
+#[allow(unused)]
 pub async fn start_daily_summarizer(ctx: &poise::serenity_prelude::Context) {
     use tokio::time::sleep;
 
