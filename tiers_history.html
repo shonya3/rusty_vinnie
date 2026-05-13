@@ -187,7 +187,7 @@ ctx.clearRect(0, 0, W, H);
 ctx.strokeStyle = '#e8e8ed';
 ctx.lineWidth = 1;
 yLabels.forEach((v, i) => {
-  const y = pad.top + (chartH / yLabels.length) * i;
+  const y = pad.top + (chartH / (yLabels.length - 1)) * i;
   ctx.beginPath();
   ctx.moveTo(pad.left, y);
   ctx.lineTo(W - pad.right, y);
