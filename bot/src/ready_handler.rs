@@ -15,8 +15,9 @@ use rand::seq::IndexedRandom;
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
 
-    println!("\nWatchers will start in 10 seconds");
-    for i in (1..=10).rev() {
+    let timer = 60;
+    println!("\nWatchers will start in {timer} seconds");
+    for i in (1..=timer).rev() {
         println!("{i}...");
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
