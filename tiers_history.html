@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiers History</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f7;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    margin: 0;
+  }
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    max-width: 720px;
+    width: 100%;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 0.25rem;
+    color: #1d1d1f;
+  }
+  .subtitle {
+    color: #86868b;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+  .stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #f5f5f7;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    flex: 1;
+    min-width: 100px;
+  }
+  .stat-card .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6e6e73;
+  }
+  .stat-card .value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-top: 2px;
+  }
+  canvas {
+    width: 100%;
+    height: 260px;
+    display: block;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead th {
+    background: #f5f5f7;
+    color: #6e6e73;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #d2d2d7;
+  }
+  thead th:last-child {
+    text-align: right;
+  }
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e8e8ed;
+    font-size: 0.9rem;
+    color: #1d1d1f;
+  }
+  tbody td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:hover {
+    background: #f5f5f7;
+  }
+  .completed {
+    color: #86868b;
+    font-size: 0.8rem;
+  }
+  .total-row td {
+    font-weight: 600;
+    border-top: 2px solid #1d1d1f;
+    border-bottom: none;
+    padding-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Tiers History</h1>
+  <div class="subtitle">Challenge tiers remaining over time</div>
+
+  <div class="stats" id="stats"></div>
+  <canvas id="chart"></canvas>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Remaining</th>
+        <th>Completed</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+const data = {"entries":[{"datetime":"2026-04-03T17:10:00Z","remaining":2062},{"datetime":"2026-04-04T03:50:00Z","remaining":2046},{"datetime":"2026-04-04T08:44:00Z","remaining":2030},{"datetime":"2026-04-04T08:49:00Z","remaining":2014},{"datetime":"2026-04-04T09:36:00Z","remaining":1998},{"datetime":"2026-04-04T09:51:00Z","remaining":1966},{"datetime":"2026-04-04T09:56:00Z","remaining":1950},{"datetime":"2026-04-04T15:39:00Z","remaining":1934},{"datetime":"2026-04-04T15:49:00Z","remaining":1918},{"datetime":"2026-04-04T15:54:00Z","remaining":1902},{"datetime":"2026-04-04T16:04:00Z","remaining":1886},{"datetime":"2026-04-04T16:09:00Z","remaining":1870},{"datetime":"2026-04-04T16:20:00Z","remaining":1838},{"datetime":"2026-04-04T16:35:00Z","remaining":1806},{"datetime":"2026-04-04T21:26:00Z","remaining":1774},{"datetime":"2026-04-04T21:36:00Z","remaining":1758},{"datetime":"2026-04-05T10:40:00Z","remaining":1742},{"datetime":"2026-04-05T11:00:00Z","remaining":1726},{"datetime":"2026-04-05T14:31:00Z","remaining":1710},{"datetime":"2026-04-05T14:36:00Z","remaining":1694},{"datetime":"2026-04-05T18:30:00Z","remaining":1662},{"datetime":"2026-04-05T21:26:00Z","remaining":1646},{"datetime":"2026-04-06T09:11:00Z","remaining":1630},{"datetime":"2026-04-06T19:53:00Z","remaining":1614},{"datetime":"2026-04-07T15:13:00Z","remaining":1598},{"datetime":"2026-04-07T17:28:00Z","remaining":1582},{"datetime":"2026-04-07T17:58:00Z","remaining":1566},{"datetime":"2026-04-07T18:08:00Z","remaining":1550},{"datetime":"2026-04-07T22:05:00Z","remaining":1534},{"datetime":"2026-04-10T11:03:00Z","remaining":1470},{"datetime":"2026-04-10T11:18:00Z","remaining":1454},{"datetime":"2026-04-10T17:15:00Z","remaining":1438},{"datetime":"2026-04-10T17:35:00Z","remaining":1422},{"datetime":"2026-04-10T17:45:00Z","remaining":1406},{"datetime":"2026-04-10T17:50:00Z","remaining":1390},{"datetime":"2026-04-11T08:30:00Z","remaining":1374},{"datetime":"2026-04-11T08:35:00Z","remaining":1342},{"datetime":"2026-04-11T15:37:00Z","remaining":1326},{"datetime":"2026-04-12T10:17:00Z","remaining":1262},{"datetime":"2026-04-12T17:45:00Z","remaining":1246},{"datetime":"2026-04-13T04:09:00Z","remaining":1230},{"datetime":"2026-04-13T18:55:00Z","remaining":1214}]};
+
+const entries = data.entries;
+const days = Math.ceil((new Date(entries[entries.length-1].datetime) - new Date(entries[0].datetime)) / 86400000);
+
+// per-day stats
+const dayMap = {};
+entries.forEach(e => {
+  const key = e.datetime.slice(0, 10);
+  if (!dayMap[key]) dayMap[key] = { first: e.remaining, last: e.remaining };
+  else dayMap[key].last = e.remaining;
+});
+const dayKeys = Object.keys(dayMap).sort();
+let totalPerDay = 0;
+dayKeys.forEach(k => { totalPerDay += dayMap[k].first - dayMap[k].last; });
+const avgPerDay = totalPerDay / dayKeys.length;
+const totalCompleted = entries[0].remaining - entries[entries.length-1].remaining;
+
+document.getElementById('stats').innerHTML = `
+  <div class="stat-card"><div class="label">Total completed</div><div class="value">${totalCompleted}</div></div>
+  <div class="stat-card"><div class="label">Avg per day</div><div class="value">${avgPerDay.toFixed(1)}</div></div>
+  <div class="stat-card"><div class="label">Days active</div><div class="value">${dayKeys.length}</div></div>
+  <div class="stat-card"><div class="label">Total entries</div><div class="value">${entries.length}</div></div>
+`;
+
+// chart
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+const rect = canvas.parentElement.getBoundingClientRect();
+const dpr = window.devicePixelRatio || 1;
+canvas.width = (rect.width - 48) * dpr;
+canvas.height = 260 * dpr;
+ctx.scale(dpr, dpr);
+const W = canvas.width / dpr;
+const H = canvas.height / dpr;
+
+const pad = { top: 20, right: 16, bottom: 36, left: 48 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const vals = entries.map(e => e.remaining);
+const minVal = Math.min(...vals);
+const maxVal = Math.max(...vals);
+const range = maxVal - minVal || 1;
+
+const yAxis = count => {
+  const step = range / count;
+  const labels = [];
+  for (let i = 0; i <= count; i++) labels.push(Math.round(maxVal - step * i));
+  return labels;
+};
+const yLabels = yAxis(4);
+
+ctx.clearRect(0, 0, W, H);
+
+// grid lines
+ctx.strokeStyle = '#e8e8ed';
+ctx.lineWidth = 1;
+yLabels.forEach((v, i) => {
+  const y = pad.top + (chartH / yLabels.length) * i;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, y);
+  ctx.lineTo(W - pad.right, y);
+  ctx.stroke();
+  ctx.fillStyle = '#86868b';
+  ctx.font = '11px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(v, pad.left - 8, y);
+});
+
+// x labels
+const labelEvery = Math.max(1, Math.floor(entries.length / 8));
+entries.forEach((e, i) => {
+  if (i % labelEvery !== 0 && i !== entries.length - 1) return;
+  const x = pad.left + (i / (entries.length - 1)) * chartW;
+  const dt = new Date(e.datetime);
+  ctx.fillStyle = '#86868b';
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }), x, H - pad.bottom + 8);
+});
+
+// area fill
+ctx.beginPath();
+vals.forEach((v, i) => {
+  const x = pad.left + (i / (entries.length - 1)) * chartW;
+  const y = pad.top + ((maxVal - v) / range) * chartH;
+  i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+});
+ctx.lineTo(pad.left + chartW, pad.top + chartH);
+ctx.lineTo(pad.left, pad.top + chartH);
+ctx.closePath();
+ctx.fillStyle = 'rgba(0, 122, 255, 0.08)';
+ctx.fill();
+
+// line
+ctx.beginPath();
+vals.forEach((v, i) => {
+  const x = pad.left + (i / (entries.length - 1)) * chartW;
+  const y = pad.top + ((maxVal - v) / range) * chartH;
+  i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+});
+ctx.strokeStyle = '#007aff';
+ctx.lineWidth = 2;
+ctx.lineJoin = 'round';
+ctx.stroke();
+
+// dots
+vals.forEach((v, i) => {
+  const x = pad.left + (i / (entries.length - 1)) * chartW;
+  const y = pad.top + ((maxVal - v) / range) * chartH;
+  ctx.beginPath();
+  ctx.arc(x, y, 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#007aff';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+});
+
+// table
+const tbody = document.getElementById('tbody');
+
+const tr = document.createElement('tr');
+tr.className = 'total-row';
+tr.innerHTML = `
+  <td colspan="2">Total completed</td>
+  <td>${entries[entries.length-1].remaining}</td>
+  <td>${totalCompleted}</td>
+`;
+tbody.appendChild(tr);
+
+const reversed = [...entries].reverse();
+reversed.forEach((e, i) => {
+  const dt = new Date(e.datetime);
+  const dateStr = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  const timeStr = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const completed = i < reversed.length - 1 ? reversed[i + 1].remaining - e.remaining : 0;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${dateStr}</td>
+    <td>${timeStr}</td>
+    <td>${e.remaining}</td>
+    <td class="completed">${completed > 0 ? completed : '\u2014'}</td>
+  `;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
