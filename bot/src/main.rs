@@ -44,7 +44,7 @@ async fn event_handler(
 // Types used by all command functions
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 #[allow(unused)]
-pub type Context<'a> = poise::Context<'a, Data, Error>;
+pub type PoiseContext<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {

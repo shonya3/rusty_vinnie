@@ -1,7 +1,7 @@
 use crate::{
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
-    Context, Error,
+    Error, PoiseContext,
 };
 
 use last_epoch_forum::NewsThreadInfo;
@@ -101,7 +101,7 @@ pub fn subforum_title(subforum: Subforum) -> String {
 /// Fetch a specific thread from the Last Epoch forums
 #[poise::command(slash_command)]
 pub async fn epoch_thread(
-    ctx: Context<'_>,
+    ctx: PoiseContext<'_>,
     #[description = "Select a subforum"] subforum: SubforumSlash,
     #[description = "Nth thread to fetch"]
     #[min = 1]

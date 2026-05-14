@@ -4,7 +4,7 @@ use crate::{
     channel::AppChannel,
     newsletter::{NewsItem, Newsletter},
     time::fmt,
-    Context,
+    PoiseContext,
 };
 
 use std::time::Duration;
@@ -14,7 +14,7 @@ pub type CommandError = Box<dyn std::error::Error + Send + Sync>;
 /// Fetch fresh news from a specific newsletter
 #[poise::command(slash_command)]
 pub async fn fresh_news(
-    ctx: Context<'_>,
+    ctx: PoiseContext<'_>,
     #[description = "Number of minutes to look back"] mins: u64,
     #[description = "Which newsletter: poe1, poe2, epoch, diablo"]
     newsletter_choice: NewsletterChoice,
@@ -88,7 +88,7 @@ pub enum NewsletterChoice {
 /// Post latest news from all newsletters
 #[poise::command(slash_command)]
 pub async fn post_news(
-    ctx: Context<'_>,
+    ctx: PoiseContext<'_>,
     #[description = "Number of minutes to look back"] mins: u64,
 ) -> Result<(), CommandError> {
     ctx.defer_ephemeral().await?;
@@ -127,7 +127,7 @@ pub async fn post_news(
 
 /// Posts news and returns aggregated feedback message.
 async fn post_news_per_newsletter<N, C>(
-    ctx: Context<'_>,
+    ctx: PoiseContext<'_>,
     stale_time: Duration,
     newsletter: &N,
     channel: C,
