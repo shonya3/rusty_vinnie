@@ -97,7 +97,7 @@ pub async fn post_news(
     let epoch = n
         .epoch
         .send_fresh(stale_time, context, AppChannel::LastEpoch);
-    let diablo = n.epoch.send_fresh(stale_time, context, AppChannel::Diablo);
+    let diablo = n.diablo.send_fresh(stale_time, context, AppChannel::Diablo);
 
     let (poe1, poe2, epoch, diablo) = tokio::join!(poe1, poe2, epoch, diablo);
 
