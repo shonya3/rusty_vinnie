@@ -1,7 +1,7 @@
 use crate::{
-    interval::Timezone,
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
+    time::Timezone,
 };
 use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
@@ -52,6 +52,10 @@ impl NewsItem for NewsThreadInfo {
     }
     fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {
         self.posted_date
+    }
+
+    fn title(&self) -> String {
+        self.title.clone()
     }
 }
 

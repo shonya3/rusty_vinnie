@@ -94,6 +94,8 @@ pub trait NewsItem {
 
     fn timestamp(&self) -> DateTime<Utc>;
 
+    fn title(&self) -> String;
+
     fn is_fresh(&self) -> bool {
         interval::is_fresh(self.timestamp())
     }

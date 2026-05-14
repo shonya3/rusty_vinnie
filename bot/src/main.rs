@@ -4,6 +4,7 @@ use futures::lock::Mutex;
 use poise::serenity_prelude::{self as serenity};
 use std::{collections::HashSet, sync::Arc};
 
+mod announcer;
 mod challenges;
 mod channel;
 mod commands;
@@ -16,7 +17,7 @@ mod newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
-mod announcer;
+pub mod time;
 mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
@@ -93,8 +94,10 @@ async fn main() {
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
             },
-            commands: vec![newsletter::last_epoch::epoch_thread(), 
-            commands::fresh_news(), commands::post_news(),
+            commands: vec![
+              newsletter::last_epoch::epoch_thread(),
+              commands::fresh_news(),
+              commands::post_news(),
             ],
             ..Default::default()
         })
@@ -111,10 +114,10 @@ pub mod newsletters {
     use poe_forum::{Subforum, WebsiteLanguage};
 
     use crate::{
-        interval::Timezone,
         newsletter::{
             diablo::DiabloNewsletter, last_epoch::LastEpochNewsletter, poe::PoeNewsletter,
         },
+        time::Timezone,
     };
 
     pub struct AppNewsletters {

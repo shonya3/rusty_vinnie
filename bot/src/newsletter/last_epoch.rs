@@ -47,6 +47,10 @@ impl NewsItem for NewsThreadInfo {
     fn timestamp(&self) -> chrono::DateTime<chrono::Utc> {
         self.datetime
     }
+
+    fn title(&self) -> String {
+        self.title.clone()
+    }
 }
 
 pub fn create_message(thread: &NewsThreadInfo) -> MessageWithThreadedDetails {

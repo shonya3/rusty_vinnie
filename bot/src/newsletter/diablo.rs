@@ -33,6 +33,10 @@ impl NewsItem for DiabloPost {
     fn timestamp(&self) -> DateTime<Utc> {
         self.pub_date
     }
+
+    fn title(&self) -> String {
+        self.title.clone()
+    }
 }
 
 pub fn create_summary_embed(post: &DiabloPost) -> CreateEmbed {

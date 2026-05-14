@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration as ChronoDuration, FixedOffset, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 use std::{future::Future, time::Duration};
 use tokio::time::Interval;
 
@@ -9,7 +9,7 @@ pub fn duration_from_mins(mins: u64) -> Duration {
 }
 
 pub fn is_within_last_minutes(minutes: i64, timestamp: DateTime<Utc>) -> bool {
-    timestamp >= Utc::now() - ChronoDuration::minutes(minutes)
+    timestamp >= Utc::now() - TimeDelta::minutes(minutes)
 }
 
 pub fn interval() -> Interval {
@@ -33,22 +33,5 @@ where
         interval.tick().await;
 
         f().await;
-    }
-}
-
-#[allow(unused)]
-pub enum Timezone {
-    BritishWinter,
-    BritishSummer,
-    Moscow,
-}
-
-impl Timezone {
-    pub fn offset(&self) -> Option<FixedOffset> {
-        match self {
-            Timezone::BritishWinter => FixedOffset::east_opt(0),
-            Timezone::BritishSummer => FixedOffset::east_opt(3600),
-            Timezone::Moscow => FixedOffset::east_opt(3600 * 3),
-        }
     }
 }

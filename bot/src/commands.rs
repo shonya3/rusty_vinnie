@@ -1,6 +1,12 @@
-use poise::CreateReply;
+use poise::{serenity_prelude::ChannelId, CreateReply};
 
-use crate::{channel::AppChannel, newsletter::Newsletter, Context};
+use crate::{
+    channel::AppChannel,
+    newsletter::{NewsItem, Newsletter},
+    time::fmt,
+    Context,
+};
+
 use std::time::Duration;
 
 pub type CommandError = Box<dyn std::error::Error + Send + Sync>;
@@ -89,25 +95,69 @@ pub async fn post_news(
     ctx.reply(format!("Starting to post news for the last {mins} mins"))
         .await?;
     let n = &ctx.data().newsletters;
-    let context = ctx.serenity_context();
     let stale_time = Duration::from_mins(mins);
 
-    let poe1 = n.poe1.send_fresh(stale_time, context, AppChannel::Poe1);
-    let poe2 = n.poe2.send_fresh(stale_time, context, AppChannel::Poe2);
-    let epoch = n
-        .epoch
-        .send_fresh(stale_time, context, AppChannel::LastEpoch);
-    let diablo = n.diablo.send_fresh(stale_time, context, AppChannel::Diablo);
+    let p1 = post_news_per_newsletter(ctx, stale_time, &n.poe1, AppChannel::Dev);
+    let p2 = post_news_per_newsletter(ctx, stale_time, &n.poe2, AppChannel::Dev);
+    let e = post_news_per_newsletter(ctx, stale_time, &n.epoch, AppChannel::Dev);
+    let d = post_news_per_newsletter(ctx, stale_time, &n.diablo, AppChannel::Dev);
 
-    let (poe1, poe2, epoch, diablo) = tokio::join!(poe1, poe2, epoch, diablo);
+    let (poe1_msg, poe2_msg, epoch_msg, diablo_msg) = tokio::join!(p1, p2, e, d);
 
-    poe1?;
-    poe2?;
-    epoch?;
-    diablo?;
+    let mut msg = String::new();
+    if !poe1_msg.is_empty() {
+        msg += &format!("**Path of Exile 1**:\n{poe1_msg}");
+    }
+    if !poe2_msg.is_empty() {
+        msg += &format!("\n\n**Path of Exile 2**:\n{poe2_msg}")
+    }
+    if !epoch_msg.is_empty() {
+        msg += &format!("\n\n**Last Epoch**:\n{epoch_msg}")
+    }
+    if !diablo_msg.is_empty() {
+        msg += &format!("\n\n**Diablo**:\n{diablo_msg}")
+    }
 
-    ctx.send(CreateReply::default().content("Done!").ephemeral(true))
-        .await?;
+    println!("{msg}");
+
+    ctx.send(CreateReply::default().content(msg)).await?;
 
     Ok(())
+}
+
+/// Posts news and returns aggregated feedback message.
+async fn post_news_per_newsletter<N, C>(
+    ctx: Context<'_>,
+    stale_time: Duration,
+    newsletter: &N,
+    channel: C,
+) -> String
+where
+    N: Newsletter,
+    C: Into<ChannelId>,
+{
+    let items = match newsletter.fetch_fresh(stale_time).await {
+        Ok(mut items) => {
+            items.sort_by_key(|i| i.timestamp());
+            items
+        }
+        Err(err) => {
+            return format!("Could not fetch fresh items. {err:?}");
+        }
+    };
+
+    let mut messages: Vec<String> = Vec::new();
+    let channel_id = channel.into();
+    for item in items {
+        item.post_to_discord(ctx.serenity_context(), channel_id)
+            .await;
+
+        messages.push(format!(
+            "\t{}: {}",
+            fmt(item.timestamp(), true),
+            item.title(),
+        ));
+    }
+
+    messages.join("\n")
 }
