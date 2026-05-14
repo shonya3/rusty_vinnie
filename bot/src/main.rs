@@ -16,7 +16,7 @@ mod newsletter;
 pub mod poe_teasers;
 mod ready_handler;
 mod status;
-mod stream_announcer;
+mod announcer;
 mod unused;
 
 pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;

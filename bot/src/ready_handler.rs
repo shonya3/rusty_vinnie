@@ -1,23 +1,34 @@
 use std::time::Duration;
 
 use crate::{
+    announcer::{self, Offset},
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
-    stream_announcer::{self, Offset},
     Data,
 };
+
+use chrono::{DateTime, NaiveDate, Utc};
 use futures::future::join_all;
 use poe_teasers::TeasersForumThread;
 use poise::serenity_prelude::{self as serenity};
 use rand::seq::IndexedRandom;
 
+// May 29th, 20:00 UTC
+const LEAGUE_START: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+    NaiveDate::from_ymd_opt(2026, 5, 29)
+        .unwrap()
+        .and_hms_opt(20, 0, 0)
+        .unwrap(),
+    Utc,
+);
+
 pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     println!("Bot is ready");
 
-    let timer = 60;
-    println!("\nWatchers will start in {timer} seconds");
-    for i in (1..=timer).rev() {
+    let secs = 60;
+    println!("\nWatchers will start in {secs} seconds");
+    for i in (1..=secs).rev() {
         println!("{i}...");
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
@@ -37,6 +48,14 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         AppChannel::Poe2,
     );
 
+    let presence_updater = async move {
+        let mut interval = tokio::time::interval(Duration::from_mins(1));
+        loop {
+            interval.tick().await;
+            announcer::update_presence(ctx, LEAGUE_START);
+        }
+    };
+
     tokio::join!(
         watch_status(
             || get_kroiya_status(ctx),
@@ -48,11 +67,12 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
+        league_start_announcer(ctx),
+        presence_updater
     );
 }
 
-#[allow(unused)]
-fn countdown(ctx: &serenity::Context) {
+async fn league_start_announcer(ctx: &serenity::Context) {
     let e = || {
         [
             "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "🐭",
@@ -62,49 +82,38 @@ fn countdown(ctx: &serenity::Context) {
         .unwrap()
     };
 
-    let stream_announcer = join_all(
-        [
-            Offset::Hours(48),
-            Offset::Hours(24),
-            Offset::Hours(12),
-            Offset::Hours(10),
-            Offset::Hours(8),
-            Offset::Hours(6),
-            Offset::Hours(5),
-            Offset::Hours(4),
-            Offset::Hours(3),
-            Offset::Hours(2),
-            Offset::Hours(1),
-            Offset::Minutes(45),
-            Offset::Minutes(30),
-            Offset::Minutes(15),
-            Offset::Minutes(10),
-            Offset::Minutes(5),
-            Offset::Minutes(2),
-            Offset::Minutes(1),
-        ]
-        .into_iter()
-        .filter(|o| o.is_upcoming())
-        .map(|offset| async move {
-            offset
-                .schedule(move || async move {
-                    let e1 = format!("{}{}{}", e(), e(), e());
-                    let e2 = format!("{}{}{}", e(), e(), e());
-                    let msg = format!("{e1} Stream starts in {} {e2}", offset.label());
-                    AppChannel::Poe2.say(&ctx, &msg).await;
-                })
-                .await;
-        }),
-    );
-}
-
-#[allow(unused)]
-fn precence(ctx: &serenity::Context) {
-    let presence_updater = async move {
-        let mut interval = tokio::time::interval(Duration::from_mins(1));
-        loop {
-            interval.tick().await;
-            stream_announcer::update_presence(ctx);
-        }
-    };
+    join_all(
+        (1..20)
+            .map(|d| Offset::Days(d as i64))
+            .chain([
+                Offset::Hours(12),
+                Offset::Hours(10),
+                Offset::Hours(8),
+                Offset::Hours(6),
+                Offset::Hours(5),
+                Offset::Hours(4),
+                Offset::Hours(3),
+                Offset::Hours(2),
+                Offset::Hours(1),
+                Offset::Minutes(45),
+                Offset::Minutes(30),
+                Offset::Minutes(15),
+                Offset::Minutes(10),
+                Offset::Minutes(5),
+                Offset::Minutes(2),
+                Offset::Minutes(1),
+            ])
+            .filter(|o| o.is_upcoming(LEAGUE_START))
+            .map(move |offset| async move {
+                offset
+                    .schedule(LEAGUE_START, move || async move {
+                        let e1 = format!("{}{}{}", e(), e(), e());
+                        let e2 = format!("{}{}{}", e(), e(), e());
+                        let msg = format!("{e1} League starts in {}! {e2}", offset.label());
+                        AppChannel::Poe2.say(ctx, &msg).await;
+                    })
+                    .await;
+            }),
+    )
+    .await;
 }

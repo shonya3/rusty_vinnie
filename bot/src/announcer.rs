@@ -1,16 +1,10 @@
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, Utc};
 use std::time::Duration;
 
-pub const STREAM_DATETIME: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
-    NaiveDate::from_ymd_opt(2026, 5, 7)
-        .unwrap()
-        .and_hms_opt(20, 0, 0)
-        .unwrap(),
-    Utc,
-);
-
+#[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub enum Offset {
+    Days(i64),
     Hours(i64),
     Minutes(i64),
 }
@@ -18,6 +12,7 @@ pub enum Offset {
 impl Offset {
     pub fn as_minutes(&self) -> i64 {
         match self {
+            Offset::Days(d) => d * 1440,
             Offset::Hours(h) => h * 60,
             Offset::Minutes(m) => *m,
         }
@@ -25,36 +20,37 @@ impl Offset {
 
     pub fn label(&self) -> String {
         match self {
+            Offset::Days(d) => format!("{d}d"),
             Offset::Hours(h) => format!("{h}h"),
             Offset::Minutes(m) => format!("{m}min"),
         }
     }
 
     /// Returns scheduled time for this offset
-    pub fn time(&self) -> DateTime<Utc> {
-        STREAM_DATETIME - chrono::Duration::minutes(self.as_minutes())
+    pub fn time(&self, target: DateTime<Utc>) -> DateTime<Utc> {
+        target - chrono::TimeDelta::minutes(self.as_minutes())
     }
 
     /// Returns true if announcement time is still in the future
-    pub fn is_upcoming(&self) -> bool {
-        self.time() > Utc::now()
+    pub fn is_upcoming(&self, target: DateTime<Utc>) -> bool {
+        self.time(target) > Utc::now()
     }
 
-    pub async fn schedule<F, Fut>(&self, f: F)
+    pub async fn schedule<F, Fut>(&self, target: DateTime<Utc>, f: F)
     where
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = ()>,
     {
-        let time = self.time();
+        let time = self.time(target);
         let delay = time.signed_duration_since(Utc::now());
         tokio::time::sleep(Duration::from_secs(delay.num_seconds() as u64)).await;
         f().await;
     }
 }
 
-pub fn update_presence(ctx: &poise::serenity_prelude::Context) {
+pub fn update_presence(ctx: &poise::serenity_prelude::Context, target: DateTime<Utc>) {
     let now = Utc::now();
-    let remaining = STREAM_DATETIME.signed_duration_since(now);
+    let remaining = target.signed_duration_since(now);
     if remaining.num_seconds() > 0 {
         let days = remaining.num_days();
         let hours = remaining.num_hours() % 24;
