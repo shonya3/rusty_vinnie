@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::channel::AppChannel;
+use crate::{channel::AppChannel, SerenityContext};
 use chrono::Timelike;
 use poe_challenge_extractor::{load_history, TierEntry};
 
@@ -9,7 +9,7 @@ fn get_last_entry() -> Option<TierEntry> {
 }
 
 #[allow(unused)]
-pub async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
+pub async fn start_presence_updater(ctx: &SerenityContext) {
     let mut interval = tokio::time::interval(Duration::from_secs(60));
     loop {
         interval.tick().await;
@@ -25,7 +25,7 @@ pub async fn start_presence_updater(ctx: &poise::serenity_prelude::Context) {
 }
 
 #[allow(unused)]
-pub async fn start_daily_summarizer(ctx: &poise::serenity_prelude::Context) {
+pub async fn start_daily_summarizer(ctx: &SerenityContext) {
     use tokio::time::sleep;
 
     loop {

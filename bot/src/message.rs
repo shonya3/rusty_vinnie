@@ -1,6 +1,5 @@
-use poise::serenity_prelude::{
-    ChannelId, Context as SerenityContext, CreateEmbed, CreateMessage, CreateThread,
-};
+use crate::SerenityContext;
+use poise::serenity_prelude::{ChannelId, CreateEmbed, CreateMessage, CreateThread};
 
 pub struct MessageWithThreadedDetails {
     pub message: CreateMessage,

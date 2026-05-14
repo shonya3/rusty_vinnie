@@ -1,4 +1,5 @@
-use poise::serenity_prelude::{Context as SerenityContext, GuildId, UserId};
+use crate::SerenityContext;
+use poise::serenity_prelude::{GuildId, UserId};
 use std::{future::Future, time::Duration};
 
 pub async fn watch_status<On, Off, Fut>(

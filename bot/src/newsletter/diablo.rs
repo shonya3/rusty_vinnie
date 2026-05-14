@@ -1,9 +1,11 @@
-use crate::newsletter::{NewsItem, Newsletter};
+use crate::{
+    newsletter::{NewsItem, Newsletter},
+    SerenityContext,
+};
 use chrono::{DateTime, Utc};
 use diablo::{DiabloPost, PostKind};
 use poise::serenity_prelude::{
-    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
-    Timestamp,
+    CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
 };
 
 pub struct DiabloNewsletter;

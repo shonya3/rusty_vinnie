@@ -2,11 +2,11 @@ use crate::{
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
     time::Timezone,
+    SerenityContext,
 };
 use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
 use poise::serenity_prelude::{
-    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
-    Timestamp,
+    CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
 

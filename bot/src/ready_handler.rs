@@ -5,13 +5,12 @@ use crate::{
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
-    Data,
+    Data, SerenityContext,
 };
 
 use chrono::{DateTime, NaiveDate, Utc};
 use futures::future::join_all;
 use poe_teasers::TeasersForumThread;
-use poise::serenity_prelude::{self as serenity};
 use rand::seq::IndexedRandom;
 
 // May 29th, 20:00 UTC
@@ -23,7 +22,7 @@ const LEAGUE_START: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
     Utc,
 );
 
-pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
+pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
     println!("Bot is ready");
 
     let secs = 60;
@@ -37,7 +36,7 @@ pub async fn handle_ready(ctx: &serenity::Context, data: &Data) {
     set_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &serenity::Context, data: &Data) {
+async fn set_watchers(ctx: &SerenityContext, data: &Data) {
     let teasers = crate::poe_teasers::watch_teasers_threads(
         ctx,
         data,
@@ -72,7 +71,7 @@ async fn set_watchers(ctx: &serenity::Context, data: &Data) {
     );
 }
 
-async fn league_start_announcer(ctx: &serenity::Context) {
+async fn league_start_announcer(ctx: &SerenityContext) {
     let e = || {
         [
             "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "🐭",

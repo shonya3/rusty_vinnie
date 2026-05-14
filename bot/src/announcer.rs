@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use std::time::Duration;
 
+use crate::SerenityContext;
+
 #[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub enum Offset {
@@ -48,7 +50,7 @@ impl Offset {
     }
 }
 
-pub fn update_presence(ctx: &poise::serenity_prelude::Context, target: DateTime<Utc>) {
+pub fn update_presence(ctx: &SerenityContext, target: DateTime<Utc>) {
     let now = Utc::now();
     let remaining = target.signed_duration_since(now);
     if remaining.num_seconds() > 0 {

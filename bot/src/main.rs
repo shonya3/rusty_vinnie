@@ -24,9 +24,14 @@ pub const EMBED_DESCRIPTION_MAX_CHARS: usize = 4096;
 pub const EMBED_DESCRIPTION_CUSTOM_MAX_CHARS: usize = 1000;
 
 pub type DbClient = libsql::Database;
+pub type SerenityContext = poise::serenity_prelude::Context;
+
+// Types used by all command functions
+pub type Error = Box<dyn std::error::Error + Send + Sync>;
+pub type PoiseContext<'a> = poise::Context<'a, Data, Error>;
 
 async fn event_handler(
-    ctx: &serenity::Context,
+    ctx: &SerenityContext,
     event: &serenity::FullEvent,
     _framework: poise::FrameworkContext<'_, Data, Error>,
     data: &Data,
@@ -40,11 +45,6 @@ async fn event_handler(
     }
     Ok(())
 }
-
-// Types used by all command functions
-pub type Error = Box<dyn std::error::Error + Send + Sync>;
-#[allow(unused)]
-pub type PoiseContext<'a> = poise::Context<'a, Data, Error>;
 
 // Custom user data passed to all command functions
 pub struct Data {

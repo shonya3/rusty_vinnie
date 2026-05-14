@@ -1,8 +1,6 @@
-use crate::{channel::AppChannel, Data};
+use crate::{channel::AppChannel, Data, SerenityContext};
 use poe_teasers::{Teaser, TeasersForumThread};
-use poise::serenity_prelude::{
-    ChannelId, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
-};
+use poise::serenity_prelude::{ChannelId, CreateEmbed, CreateEmbedAuthor, CreateMessage};
 use std::time::Duration;
 
 pub async fn watch_teasers_threads(

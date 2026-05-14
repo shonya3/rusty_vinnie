@@ -1,6 +1,9 @@
-use crate::interval::{self};
+use crate::{
+    interval::{self},
+    SerenityContext,
+};
 use chrono::{DateTime, Utc};
-use poise::serenity_prelude::{ChannelId, Context as SerenityContext};
+use poise::serenity_prelude::ChannelId;
 use std::error::Error;
 
 pub trait Newsletter {

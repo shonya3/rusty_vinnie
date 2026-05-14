@@ -1,11 +1,9 @@
 use std::{collections::HashMap, time::Duration};
 
 use ea_live_updates::{LiveUpdate, LiveUpdatesThread};
-use poise::serenity_prelude::{
-    ChannelId, Colour, Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateMessage,
-};
+use poise::serenity_prelude::{ChannelId, Colour, CreateEmbed, CreateEmbedAuthor, CreateMessage};
 
-use crate::Data;
+use crate::{Data, SerenityContext};
 
 pub async fn spin_ea_live_updates_loop(
     ctx: &SerenityContext,

@@ -1,14 +1,12 @@
 use crate::{
     message::MessageWithThreadedDetails,
     newsletter::{NewsItem, Newsletter},
-    Error, PoiseContext,
+    Error, PoiseContext, SerenityContext,
 };
-
 use last_epoch_forum::NewsThreadInfo;
 pub use last_epoch_forum::Subforum;
 use poise::serenity_prelude::{
-    Context as SerenityContext, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage,
-    Timestamp,
+    CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
 };
 use unicode_segmentation::UnicodeSegmentation;
 

@@ -1,12 +1,10 @@
-use poise::{serenity_prelude::ChannelId, CreateReply};
-
 use crate::{
     channel::AppChannel,
     newsletter::{NewsItem, Newsletter},
     time::fmt,
     PoiseContext,
 };
-
+use poise::{serenity_prelude::ChannelId, CreateReply};
 use std::time::Duration;
 
 pub type CommandError = Box<dyn std::error::Error + Send + Sync>;
