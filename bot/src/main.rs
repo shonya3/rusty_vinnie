@@ -156,7 +156,6 @@ pub mod newsletters {
             );
 
             let epoch = LastEpochNewsletter::new(vec![
-                LastEpochSubforum::Announcements,
                 LastEpochSubforum::DeveloperBlogs,
                 LastEpochSubforum::News,
                 LastEpochSubforum::PatchNotes,

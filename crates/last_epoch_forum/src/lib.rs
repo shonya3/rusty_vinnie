@@ -24,7 +24,6 @@ pub struct NewsThreadInfo {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum Subforum {
-    Announcements,
     News,
     DeveloperBlogs,
     PatchNotes,
@@ -33,7 +32,6 @@ pub enum Subforum {
 impl std::fmt::Display for Subforum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            Subforum::Announcements => "announcements",
             Subforum::News => "news",
             Subforum::DeveloperBlogs => "developer-blogs",
             Subforum::PatchNotes => "patch-notes",

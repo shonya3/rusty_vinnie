@@ -87,7 +87,6 @@ pub fn create_summary_embed(thread: &NewsThreadInfo) -> CreateEmbed {
 
 pub fn subforum_title(subforum: Subforum) -> String {
     let (subforum_name, emoji) = match subforum {
-        Subforum::Announcements => ("Announcements", "📢"),
         Subforum::News => ("News", "📰"),
         Subforum::DeveloperBlogs => ("Developer Blogs", "👨‍💻"),
         Subforum::PatchNotes => ("Patch Notes", "✏️"),
@@ -128,8 +127,6 @@ pub async fn epoch_thread(
 
 #[derive(poise::ChoiceParameter)]
 enum SubforumSlash {
-    #[name = "announcements"]
-    Announcements,
     #[name = "news"]
     News,
     #[name = "developer_blogs"]
@@ -141,7 +138,6 @@ enum SubforumSlash {
 impl From<SubforumSlash> for Subforum {
     fn from(value: SubforumSlash) -> Self {
         match value {
-            SubforumSlash::Announcements => Subforum::Announcements,
             SubforumSlash::News => Subforum::News,
             SubforumSlash::DeveloperBlogs => Subforum::DeveloperBlogs,
             SubforumSlash::PatchNotes => Subforum::PatchNotes,
