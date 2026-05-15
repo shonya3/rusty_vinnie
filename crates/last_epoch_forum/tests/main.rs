@@ -4,9 +4,8 @@ use scraper::Html;
 
 #[tokio::test]
 async fn prepares_threads_info_based_on_markup() {
-    let html = std::fs::read_to_string("./tests/fixtures/announcements.html").unwrap();
-    let threads =
-        last_epoch_forum::html::prepare_threads_info(&html, Subforum::Announcements).await;
+    let html = std::fs::read_to_string("./tests/fixtures/news.html").unwrap();
+    let threads = last_epoch_forum::html::prepare_threads_info(&html, Subforum::News).await;
 
     assert_eq!(3, threads.len());
 
@@ -55,7 +54,7 @@ async fn prepares_threads_info_based_on_markup() {
 
 #[tokio::test]
 async fn fetches() {
-    let result = last_epoch_forum::fetch_subforum_threads_list(Subforum::Announcements).await;
+    let result = last_epoch_forum::fetch_subforum_threads_list(Subforum::News).await;
 
     assert!(result.is_ok());
 }
