@@ -95,10 +95,10 @@ pub async fn post_news(
     let n = &ctx.data().newsletters;
     let stale_time = Duration::from_mins(mins);
 
-    let p1 = post_news_per_newsletter(ctx, stale_time, &n.poe1, AppChannel::Dev);
-    let p2 = post_news_per_newsletter(ctx, stale_time, &n.poe2, AppChannel::Dev);
-    let e = post_news_per_newsletter(ctx, stale_time, &n.epoch, AppChannel::Dev);
-    let d = post_news_per_newsletter(ctx, stale_time, &n.diablo, AppChannel::Dev);
+    let p1 = post_news_per_newsletter(ctx, stale_time, &n.poe1, AppChannel::Poe1);
+    let p2 = post_news_per_newsletter(ctx, stale_time, &n.poe2, AppChannel::Poe2);
+    let e = post_news_per_newsletter(ctx, stale_time, &n.epoch, AppChannel::LastEpoch);
+    let d = post_news_per_newsletter(ctx, stale_time, &n.diablo, AppChannel::Diablo);
 
     let (poe1_msg, poe2_msg, epoch_msg, diablo_msg) = tokio::join!(p1, p2, e, d);
 
