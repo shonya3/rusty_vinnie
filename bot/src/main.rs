@@ -10,6 +10,7 @@ mod channel;
 mod commands;
 #[allow(unused)]
 mod ea_live_updates;
+pub mod emoji;
 mod interval;
 mod message;
 mod message_handler;
