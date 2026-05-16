@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::{
     announcer::{self, Offset},
     channel::AppChannel,
@@ -8,11 +6,11 @@ use crate::{
     status::{get_kroiya_status, watch_status},
     Data, SerenityContext,
 };
-
 use chrono::{DateTime, NaiveDate, Utc};
 use futures::future::join_all;
 use poe_teasers::TeasersForumThread;
-use rand::seq::IndexedRandom;
+use rand::Rng;
+use std::time::Duration;
 
 // May 29th, 20:00 UTC
 const LEAGUE_START: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
@@ -73,15 +71,24 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn league_start_announcer(ctx: &SerenityContext) {
-    let emojis: Vec<String> = [
-        "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "😎", "🐺",
-    ]
-    .into_iter()
-    .map(|s| s.to_string())
-    .chain(Emoji::all().into_iter().map(|e| e.to_string()))
-    .collect();
+    fn generate_emojis() -> (String, String) {
+        let mut emojis: Vec<String> = [
+            "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "😎",
+            "🐺",
+        ]
+        .into_iter()
+        .map(|s| s.to_string())
+        .chain(Emoji::all().into_iter().map(|e| e.to_string()))
+        .collect();
 
-    let e = || emojis.choose(&mut rand::rng()).unwrap();
+        let mut rng = rand::rng();
+        let mut pick = || emojis.swap_remove(rng.random_range(0..emojis.len()));
+
+        (
+            format!("{}{}{}", pick(), pick(), pick()),
+            format!("{}{}{}", pick(), pick(), pick()),
+        )
+    }
 
     join_all(
         (1..20)
@@ -108,8 +115,7 @@ async fn league_start_announcer(ctx: &SerenityContext) {
             .map(move |offset| async move {
                 offset
                     .schedule(LEAGUE_START, move || async move {
-                        let e1 = format!("{}{}{}", e(), e(), e());
-                        let e2 = format!("{}{}{}", e(), e(), e());
+                        let (e1, e2) = generate_emojis();
                         let msg = format!("{e1} League starts in {}! {e2}", offset.label());
                         AppChannel::Poe2.say(ctx, &msg).await;
                     })

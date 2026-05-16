@@ -151,6 +151,6 @@ impl Custom {
 
 impl Display for Custom {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, ":{}:{}", self.name(), self.id())
+        write!(f, "<:{}:{}>", self.name(), self.id())
     }
 }
