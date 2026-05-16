@@ -34,6 +34,20 @@ impl Emoji {
             Emoji::Eggplant => Unicode::Eggplant.reaction(),
         }
     }
+
+    pub fn all() -> [Emoji; 7] {
+        [
+            // Custom
+            Emoji::Jaba,
+            Emoji::Nivazmojna,
+            Emoji::Zdruste,
+            Emoji::RustHappy,
+            // Unicode
+            Emoji::Utrechka,
+            Emoji::Crab,
+            Emoji::Eggplant,
+        ]
+    }
 }
 
 impl Display for Emoji {

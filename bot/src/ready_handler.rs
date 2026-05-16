@@ -3,6 +3,7 @@ use std::time::Duration;
 use crate::{
     announcer::{self, Offset},
     channel::AppChannel,
+    emoji::Emoji,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
     Data, SerenityContext,
@@ -72,14 +73,15 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn league_start_announcer(ctx: &SerenityContext) {
-    let e = || {
-        [
-            "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "🐭",
-            "🤓", "😎", "🦀",
-        ]
-        .choose(&mut rand::rng())
-        .unwrap()
-    };
+    let emojis: Vec<String> = [
+        "⏰", "🚨", "🐸", "🔥", "🎮", "✨", "🎉", "🚀", "🌟", "🔴", "💥", "⚡", "🌈", "😎", "🐺",
+    ]
+    .into_iter()
+    .map(|s| s.to_string())
+    .chain(Emoji::all().into_iter().map(|e| e.to_string()))
+    .collect();
+
+    let e = || emojis.choose(&mut rand::rng()).unwrap();
 
     join_all(
         (1..20)
