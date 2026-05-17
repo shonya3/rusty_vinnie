@@ -116,6 +116,10 @@ pub async fn post_news(
         msg += &format!("\n\n**Diablo**:\n{diablo_msg}")
     }
 
+    if msg.is_empty() {
+        msg = format!("No news for the last {mins} mins.");
+    }
+
     println!("{msg}");
 
     ctx.send(CreateReply::default().content(msg)).await?;
