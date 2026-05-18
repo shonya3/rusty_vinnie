@@ -89,7 +89,7 @@ pub async fn post_news(
     ctx: PoiseContext<'_>,
     #[description = "Number of minutes to look back"] mins: u64,
 ) -> Result<(), CommandError> {
-    ctx.defer_ephemeral().await?;
+    ctx.defer().await?;
     ctx.reply(format!("Starting to post news for the last {mins} mins"))
         .await?;
     let n = &ctx.data().newsletters;
