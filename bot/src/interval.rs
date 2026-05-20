@@ -4,16 +4,12 @@ use tokio::time::Interval;
 
 pub const INTERVAL_MINS: i64 = 10;
 
-pub fn duration_from_mins(mins: u64) -> Duration {
-    Duration::from_secs(60 * mins)
-}
-
 pub fn is_within_last_minutes(minutes: i64, timestamp: DateTime<Utc>) -> bool {
     timestamp >= Utc::now() - TimeDelta::minutes(minutes)
 }
 
 pub fn interval() -> Interval {
-    tokio::time::interval(duration_from_mins(INTERVAL_MINS as u64))
+    tokio::time::interval(Duration::from_mins(INTERVAL_MINS as u64))
 }
 
 pub fn is_fresh(timestamp: DateTime<Utc>) -> bool {
