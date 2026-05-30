@@ -50,6 +50,7 @@ impl Offset {
     }
 }
 
+#[allow(unused)]
 pub fn update_presence(ctx: &SerenityContext, target: DateTime<Utc>) {
     let now = Utc::now();
     let remaining = target.signed_duration_since(now);

@@ -1,5 +1,5 @@
 use crate::{
-    announcer::{self, Offset},
+    announcer::Offset,
     channel::AppChannel,
     emoji::Emoji,
     newsletter::Newsletter,
@@ -46,13 +46,13 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         AppChannel::Poe2,
     );
 
-    let presence_updater = async move {
-        let mut interval = tokio::time::interval(Duration::from_mins(1));
-        loop {
-            interval.tick().await;
-            announcer::update_presence(ctx, LEAGUE_START);
-        }
-    };
+    // let presence_updater = async move {
+    //     let mut interval = tokio::time::interval(Duration::from_mins(1));
+    //     loop {
+    //         interval.tick().await;
+    //         announcer::update_presence(ctx, LEAGUE_START);
+    //     }
+    // };
 
     tokio::join!(
         watch_status(
@@ -65,11 +65,11 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
-        league_start_announcer(ctx),
-        presence_updater
+        // presence_updater
     );
 }
 
+#[allow(unused)]
 async fn league_start_announcer(ctx: &SerenityContext) {
     fn generate_emojis() -> (String, String) {
         let mut emojis: Vec<String> = [
@@ -91,9 +91,14 @@ async fn league_start_announcer(ctx: &SerenityContext) {
     }
 
     join_all(
-        (1..20)
+        (2..20)
             .map(|d| Offset::Days(d as i64))
             .chain([
+                Offset::Hours(30),
+                Offset::Hours(27),
+                Offset::Hours(24),
+                Offset::Hours(20),
+                Offset::Hours(16),
                 Offset::Hours(12),
                 Offset::Hours(10),
                 Offset::Hours(8),
