@@ -96,12 +96,6 @@ mod html {
         lang: WebsiteLanguage,
         time_offset: Option<&FixedOffset>,
     ) -> Option<NewsThreadInfo> {
-        // Some(NewsThreadInfo::new(
-        //     get_thread_url(tr, lang)?,
-        //     get_posted_date(tr, lang, time_offset)?,
-        //     get_thread_title(tr)?,
-        // ))
-
         Some(NewsThreadInfo {
             url: get_thread_url(tr, lang)?,
             posted_date: get_posted_date(tr, lang, time_offset)?,
