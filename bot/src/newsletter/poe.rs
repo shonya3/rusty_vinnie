@@ -4,7 +4,7 @@ use crate::{
     time::Timezone,
     SerenityContext,
 };
-use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, WebsiteLanguage};
+use poe_forum::{post::PostDetails, NewsThreadInfo, Subforum, ThreadSource, WebsiteLanguage};
 use poise::serenity_prelude::{
     CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
 };
@@ -30,13 +30,23 @@ impl Newsletter for PoeNewsletter {
 
     async fn fetch_impl(&self) -> Result<Vec<Self::Item>, Self::Error> {
         let mut all = Vec::new();
+        let source = ThreadSource::Forum {
+            time_offset: self.timezone.offset(),
+        };
+        // TODO: switch to API when ready
+        // let source = if std::env::var("POE_DEV").is_ok() {
+        //     ThreadSource::Api {
+        //         base_url: "http://localhost:3000".into(),
+        //         time_offset: chrono::FixedOffset::east_opt(10800),
+        //     }
+        // } else {
+        //     ThreadSource::Api {
+        //         base_url: "https://poe-patch-notes.shonya3.workers.dev".into(),
+        //         time_offset: None,
+        //     }
+        // };
         for (lang, subforum) in &self.subforums {
-            let items = poe_forum::fetch_subforum_threads_list(
-                *lang,
-                *subforum,
-                self.timezone.offset().as_ref(),
-            )
-            .await?;
+            let items = poe_forum::fetch_subforum_threads_list(*lang, *subforum, &source).await?;
             all.extend(items);
         }
         Ok(all)
@@ -76,9 +86,16 @@ pub fn create_summary_embed(
     thread: &NewsThreadInfo,
     post_details: Option<&PostDetails>,
 ) -> CreateEmbed {
+    let site_url = thread
+        .url
+        .rsplit('/')
+        .next()
+        .map(|id| format!("https://poe-patch-notes.shonya3.workers.dev/thread/{id}"))
+        .unwrap_or_else(|| thread.url.clone());
+
     let mut embed = CreateEmbed::new()
         .title(&thread.title)
-        .url(&thread.url)
+        .url(&site_url)
         .field(
             "Posted date",
             format!("<t:{}>", thread.posted_date.timestamp()),
