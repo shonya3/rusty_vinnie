@@ -5,22 +5,84 @@ pub use post::get_post_details;
 
 pub mod post;
 
+/// Where to fetch forum thread data from.
+#[derive(Debug, Clone)]
+pub enum ThreadSource {
+    /// Scrape the official Path of Exile forum HTML directly.
+    ///
+    /// `time_offset` is used to adjust forum-local timestamps to UTC.
+    Forum { time_offset: Option<FixedOffset> },
+    /// Fetch pre-parsed thread list from a PoE Forum Reader API endpoint
+    /// (e.g. a Cloudflare Worker running the TanStack Start app).
+    ///
+    /// The API returns ISO strings that represent wall-clock timestamps
+    /// from the forum. If the API was deployed in a different timezone
+    /// than the consumer, `time_offset` can shift the timestamps back
+    /// to true UTC. Pass `None` when the API already returns correct UTC.
+    Api { base_url: String, time_offset: Option<FixedOffset> },
+}
+
 pub async fn fetch_subforum_threads_list(
     lang: WebsiteLanguage,
     subforum: Subforum,
-    time_offset: Option<&FixedOffset>,
+    source: &ThreadSource,
 ) -> Result<Vec<NewsThreadInfo>, reqwest::Error> {
-    let url = match lang {
-        WebsiteLanguage::Ru => {
-            format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
+    match source {
+        ThreadSource::Forum { time_offset } => {
+            let url = match lang {
+                WebsiteLanguage::Ru => {
+                    format!("https://ru.pathofexile.com/forum/view-forum/{subforum}")
+                }
+                WebsiteLanguage::En => {
+                    format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
+                }
+            };
+            let html = http::text(&url).await?;
+            Ok(html::parse(&html, subforum, lang, time_offset.as_ref()))
         }
-        WebsiteLanguage::En => {
-            format!("https://www.pathofexile.com/forum/view-forum/{subforum}")
+        ThreadSource::Api { base_url, time_offset } => {
+            let api_url = format!(
+                "{}/api/threads?subforum={}&lang={}",
+                base_url.trim_end_matches('/'),
+                subforum,
+                match lang {
+                    WebsiteLanguage::En => "en",
+                    WebsiteLanguage::Ru => "ru",
+                },
+            );
+            #[derive(Deserialize)]
+            struct ApiThread {
+                url: String,
+                #[serde(rename = "postedDateISO")]
+                posted_date: DateTime<Utc>,
+                title: String,
+                author: Option<String>,
+            }
+            #[derive(Deserialize)]
+            struct ApiResponse {
+                threads: Vec<ApiThread>,
+            }
+            let resp: ApiResponse = reqwest::get(&api_url).await?.json().await?;
+            Ok(resp
+                .threads
+                .into_iter()
+                .map(|t| NewsThreadInfo {
+                    url: t.url,
+                    posted_date: match time_offset {
+                        Some(offset) => {
+                            t.posted_date
+                                - chrono::Duration::seconds(offset.local_minus_utc() as i64)
+                        }
+                        None => t.posted_date,
+                    },
+                    title: t.title,
+                    author: t.author,
+                    lang,
+                    subforum,
+                })
+                .collect())
         }
-    };
-
-    let html = http::text(&url).await?;
-    Ok(html::parse(&html, subforum, lang, time_offset))
+    }
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
