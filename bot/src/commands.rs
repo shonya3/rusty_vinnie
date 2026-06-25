@@ -85,20 +85,27 @@ pub enum NewsletterChoice {
 
 /// Post latest news from all newsletters
 #[poise::command(slash_command)]
-pub async fn post_news(
+pub async fn news(
     ctx: PoiseContext<'_>,
     #[description = "Number of minutes to look back"] mins: u64,
+    #[description = "Should all news items be posted in channels"] post: bool,
 ) -> Result<(), CommandError> {
     ctx.defer().await?;
-    ctx.reply(format!("Starting to post news for the last {mins} mins"))
-        .await?;
+    ctx.reply(format!(
+        "Starting to collect {}news for the last {mins} mins",
+        match post {
+            true => "and post ",
+            false => "",
+        }
+    ))
+    .await?;
     let n = &ctx.data().newsletters;
     let stale_time = Duration::from_mins(mins);
 
-    let p1 = post_news_per_newsletter(ctx, stale_time, &n.poe1, AppChannel::Poe1);
-    let p2 = post_news_per_newsletter(ctx, stale_time, &n.poe2, AppChannel::Poe2);
-    let e = post_news_per_newsletter(ctx, stale_time, &n.epoch, AppChannel::LastEpoch);
-    let d = post_news_per_newsletter(ctx, stale_time, &n.diablo, AppChannel::Diablo);
+    let p1 = news_per_newsletter(ctx, stale_time, &n.poe1, AppChannel::Poe1, post);
+    let p2 = news_per_newsletter(ctx, stale_time, &n.poe2, AppChannel::Poe2, post);
+    let e = news_per_newsletter(ctx, stale_time, &n.epoch, AppChannel::LastEpoch, post);
+    let d = news_per_newsletter(ctx, stale_time, &n.diablo, AppChannel::Diablo, post);
 
     let (poe1_msg, poe2_msg, epoch_msg, diablo_msg) = tokio::join!(p1, p2, e, d);
 
@@ -127,12 +134,13 @@ pub async fn post_news(
     Ok(())
 }
 
-/// Posts news and returns aggregated feedback message.
-async fn post_news_per_newsletter<N, C>(
+/// Returns aggregated message about posts and posts each one if post param is true.
+async fn news_per_newsletter<N, C>(
     ctx: PoiseContext<'_>,
     stale_time: Duration,
     newsletter: &N,
     channel: C,
+    post: bool,
 ) -> String
 where
     N: Newsletter,
@@ -151,8 +159,10 @@ where
     let mut messages: Vec<String> = Vec::new();
     let channel_id = channel.into();
     for item in items {
-        item.post_to_discord(ctx.serenity_context(), channel_id)
-            .await;
+        if post {
+            item.post_to_discord(ctx.serenity_context(), channel_id)
+                .await;
+        }
 
         messages.push(format!(
             "\t{}: {}",

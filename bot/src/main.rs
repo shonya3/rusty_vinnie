@@ -98,7 +98,7 @@ async fn main() {
             commands: vec![
               newsletter::last_epoch::epoch_thread(),
               commands::fresh_news(),
-              commands::post_news(),
+              commands::news(),
             ],
             ..Default::default()
         })
