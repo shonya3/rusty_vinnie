@@ -5,7 +5,6 @@ use crate::{
     status::{get_kroiya_status, watch_status},
     Data, SerenityContext,
 };
-use poe_teasers::TeasersForumThread;
 use std::time::Duration;
 
 pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
@@ -23,16 +22,6 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn set_watchers(ctx: &SerenityContext, data: &Data) {
-    let teasers = crate::poe_teasers::watch_teasers_threads(
-        ctx,
-        data,
-        &[
-            TeasersForumThread::Poe2_05(poe_teasers::Lang::En),
-            TeasersForumThread::Poe2_05(poe_teasers::Lang::Ru),
-        ],
-        AppChannel::Poe2,
-    );
-
     const STREAM_DATE: chrono::DateTime<chrono::Utc> =
         chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
             chrono::NaiveDate::from_ymd_opt(2026, 7, 16)
@@ -48,7 +37,6 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
             || AppChannel::General.say(ctx, ":rabbit: ушел"),
         ),
-        teasers,
         data.newsletters.poe1.start(ctx, AppChannel::Poe1),
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),

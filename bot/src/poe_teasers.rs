@@ -1,3 +1,17 @@
+///
+/// Usage:
+/// ```
+/// use poe_teasers::TeasersForumThread;
+/// let teasers = crate::poe_teasers::watch_teasers_threads(
+///  ctx,
+///  data,
+///  &[
+///   TeasersForumThread::Poe2_05(poe_teasers::Lang::En),
+///   TeasersForumThread::Poe2_05(poe_teasers::Lang::Ru),
+///  ],
+/// AppChannel::Poe2,```
+///
+///
 use crate::{channel::AppChannel, Data, SerenityContext};
 use poe_teasers::{Teaser, TeasersForumThread};
 use poise::serenity_prelude::{ChannelId, CreateEmbed, CreateEmbedAuthor, CreateMessage};
