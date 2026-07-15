@@ -1,4 +1,5 @@
 use crate::{
+    announce,
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
@@ -32,6 +33,15 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         AppChannel::Poe2,
     );
 
+    const STREAM_DATE: chrono::DateTime<chrono::Utc> =
+        chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
+            chrono::NaiveDate::from_ymd_opt(2026, 7, 16)
+                .unwrap()
+                .and_hms_opt(20, 0, 0)
+                .unwrap(),
+            chrono::Utc,
+        );
+
     tokio::join!(
         watch_status(
             || get_kroiya_status(ctx),
@@ -43,5 +53,20 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
+        announce::start_presence_updater(ctx, STREAM_DATE),
+        futures::future::join_all(
+            announce::event_offsets()
+                .chain(std::iter::once(announce::Offset::Hours(29)))
+                .filter(|o| o.is_upcoming(STREAM_DATE))
+                .map(move |offset| async move {
+                    offset
+                        .schedule(STREAM_DATE, move || async move {
+                            let (e1, e2) = announce::generate_emojis();
+                            let msg = format!("{e1} Stream starts in {}! {e2}", offset.label());
+                            AppChannel::Poe1.say(ctx, &msg).await;
+                        })
+                        .await;
+                }),
+        ),
     );
 }

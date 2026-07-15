@@ -4,7 +4,7 @@ use futures::lock::Mutex;
 use poise::serenity_prelude::{self as serenity};
 use std::{collections::HashSet, sync::Arc};
 
-mod announcer;
+mod announce;
 mod challenges;
 mod channel;
 mod commands;
