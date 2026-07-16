@@ -1,4 +1,4 @@
-use crate::{emoji::Emoji, SerenityContext};
+use crate::{channel::AppChannel, emoji::Emoji, SerenityContext};
 use chrono::{DateTime, Utc};
 use rand::Rng;
 use std::time::Duration;
@@ -124,4 +124,87 @@ pub fn generate_emojis() -> (String, String) {
 pub fn with_emojis(s: &str) -> String {
     let (e1, e2) = generate_emojis();
     format!("{e1}{s}{e2}")
+}
+
+pub type Announcement = (AppChannel, Box<dyn Fn(Offset) -> String + Send>);
+
+#[allow(unused)]
+pub struct Announcer {
+    /// Target date.
+    date: chrono::DateTime<chrono::Utc>,
+    offsets: Option<Vec<Offset>>,
+    announcement: Option<Announcement>,
+    presence: bool,
+}
+
+impl Announcer {
+    pub fn new(date: chrono::DateTime<chrono::Utc>) -> Self {
+        Self {
+            date,
+            offsets: None,
+            announcement: None,
+            presence: false,
+        }
+    }
+
+    pub async fn start(self, ctx: &SerenityContext) {
+        let date = self.date;
+        let offsets = self.offsets;
+        let announcement = self.announcement;
+        let presence = self.presence;
+
+        if !presence && announcement.is_none() {
+            return;
+        }
+
+        let schedule = async {
+            if let Some((channel, format)) = announcement {
+                let offsets = offsets.unwrap_or_else(|| event_offsets().collect());
+                futures::future::join_all(offsets.into_iter().filter(|o| o.is_upcoming(date)).map(
+                    move |offset| {
+                        let msg = format(offset);
+                        async move {
+                            offset
+                                .schedule(date, move || async move {
+                                    channel.say(ctx, &msg).await;
+                                })
+                                .await;
+                        }
+                    },
+                ))
+                .await;
+            }
+        };
+        let presence_task = async {
+            if presence {
+                start_presence_updater(ctx, date).await;
+            }
+        };
+        tokio::join!(schedule, presence_task);
+    }
+
+    #[allow(unused)]
+    pub fn with_announcement(
+        self,
+        channel: AppChannel,
+        format: impl Fn(Offset) -> String + Send + 'static,
+    ) -> Self {
+        Self {
+            announcement: Some((channel, Box::new(format))),
+            ..self
+        }
+    }
+
+    #[allow(unused)]
+    pub fn offsets(self, offsets: impl Iterator<Item = Offset>) -> Self {
+        Self {
+            offsets: Some(offsets.collect()),
+            ..self
+        }
+    }
+
+    #[allow(unused)]
+    pub fn presence(self, presence: bool) -> Self {
+        Self { presence, ..self }
+    }
 }

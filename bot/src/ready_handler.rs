@@ -1,5 +1,7 @@
+use chrono::{DateTime, NaiveDate, Utc};
+
 use crate::{
-    announce,
+    announce::{self, Announcer},
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
@@ -22,16 +24,34 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn set_watchers(ctx: &SerenityContext, data: &Data) {
-    const STREAM_DATE: chrono::DateTime<chrono::Utc> =
-        chrono::DateTime::<chrono::Utc>::from_naive_utc_and_offset(
-            chrono::NaiveDate::from_ymd_opt(2026, 7, 16)
-                .unwrap()
-                .and_hms_opt(20, 0, 0)
-                .unwrap(),
-            chrono::Utc,
-        );
+    let stream = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 7, 16)
+            .unwrap()
+            .and_hms_opt(20, 0, 0)
+            .unwrap(),
+        Utc,
+    ))
+    .with_announcement(AppChannel::Poe1, |offset| {
+        announce::with_emojis(&format!(" Stream starts in {}! ", offset.label()))
+    })
+    .start(ctx);
+
+    let league = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 7, 24)
+            .unwrap()
+            .and_hms_opt(20, 0, 0)
+            .unwrap(),
+        Utc,
+    ))
+    .with_announcement(AppChannel::Poe1, |offset| {
+        announce::with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
+    })
+    .presence(true)
+    .start(ctx);
 
     tokio::join!(
+        stream,
+        league,
         watch_status(
             || get_kroiya_status(ctx),
             || AppChannel::General.say(ctx, ":rabbit: пришел"),
@@ -41,26 +61,5 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),
         data.newsletters.epoch.start(ctx, AppChannel::LastEpoch),
         data.newsletters.diablo.start(ctx, AppChannel::Diablo),
-        announce::start_presence_updater(ctx, STREAM_DATE),
-        futures::future::join_all(
-            announce::event_offsets()
-                .chain(std::iter::once(announce::Offset::Hours(29)))
-                .filter(|o| o.is_upcoming(STREAM_DATE))
-                .map(move |offset| async move {
-                    offset
-                        .schedule(STREAM_DATE, move || async move {
-                            AppChannel::Poe1
-                                .say(
-                                    ctx,
-                                    &announce::with_emojis(&format!(
-                                        " Stream starts in {}! ",
-                                        offset.label()
-                                    )),
-                                )
-                                .await;
-                        })
-                        .await;
-                }),
-        ),
     );
 }
