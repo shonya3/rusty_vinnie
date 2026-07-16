@@ -49,9 +49,15 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
                 .map(move |offset| async move {
                     offset
                         .schedule(STREAM_DATE, move || async move {
-                            let (e1, e2) = announce::generate_emojis();
-                            let msg = format!("{e1} Stream starts in {}! {e2}", offset.label());
-                            AppChannel::Poe1.say(ctx, &msg).await;
+                            AppChannel::Poe1
+                                .say(
+                                    ctx,
+                                    &announce::with_emojis(&format!(
+                                        " Stream starts in {}! ",
+                                        offset.label()
+                                    )),
+                                )
+                                .await;
                         })
                         .await;
                 }),

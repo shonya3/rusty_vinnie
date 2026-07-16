@@ -119,3 +119,9 @@ pub fn generate_emojis() -> (String, String) {
         format!("{}{}{}", pick(), pick(), pick()),
     )
 }
+
+/// Add 6 unique emojis (3 to start, 3 to end).
+pub fn with_emojis(s: &str) -> String {
+    let (e1, e2) = generate_emojis();
+    format!("{e1}{s}{e2}")
+}
