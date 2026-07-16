@@ -1,12 +1,11 @@
-use chrono::{DateTime, NaiveDate, Utc};
-
 use crate::{
-    announce::{self, Announcer},
+    announce::{with_emojis, Announcer},
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status},
     Data, SerenityContext,
 };
+use chrono::{DateTime, NaiveDate, Utc};
 use std::time::Duration;
 
 pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
@@ -32,7 +31,7 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         Utc,
     ))
     .announcement(AppChannel::Poe1, |offset| {
-        announce::with_emojis(&format!(" Stream starts in {}! ", offset.label()))
+        with_emojis(&format!(" Stream starts in {}! ", offset.label()))
     })
     .start(ctx);
 
@@ -44,7 +43,7 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
         Utc,
     ))
     .announcement(AppChannel::Poe1, |offset| {
-        announce::with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
+        with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
     })
     .presence(true)
     .start(ctx);
