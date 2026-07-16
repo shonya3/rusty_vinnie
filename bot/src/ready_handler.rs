@@ -2,7 +2,7 @@ use crate::{
     announce::{with_emojis, Announcer},
     channel::AppChannel,
     newsletter::Newsletter,
-    status::{get_kroiya_status, watch_status},
+    status::{get_kroiya_status, watch_status, Status},
     Data, SerenityContext,
 };
 use chrono::{DateTime, NaiveDate, Utc};
@@ -53,8 +53,10 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
         league,
         watch_status(
             || get_kroiya_status(ctx),
-            || AppChannel::General.say(ctx, ":rabbit: пришел"),
-            || AppChannel::General.say(ctx, ":rabbit: ушел"),
+            |status| match status {
+                Status::Online => AppChannel::General.say(ctx, ":rabbit: пришел"),
+                Status::Offline => AppChannel::General.say(ctx, ":rabbit: ушел"),
+            },
         ),
         data.newsletters.poe1.start(ctx, AppChannel::Poe1),
         data.newsletters.poe2.start(ctx, AppChannel::Poe2),

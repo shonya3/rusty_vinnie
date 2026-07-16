@@ -2,14 +2,10 @@ use crate::SerenityContext;
 use poise::serenity_prelude::{GuildId, UserId};
 use std::{future::Future, time::Duration};
 
-pub async fn watch_status<On, Off, Fut>(
-    get_status: impl Fn() -> Status,
-    on_online: On,
-    on_offline: Off,
-) where
+pub async fn watch_status<F, Fut>(get_status: impl Fn() -> Status, on_status_change: F)
+where
     Fut: Future<Output = ()> + Send,
-    On: Fn() -> Fut,
-    Off: Fn() -> Fut,
+    F: Fn(Status) -> Fut,
 {
     let mut status = get_status();
     let mut interval = tokio::time::interval(Duration::from_secs(30));
@@ -19,14 +15,14 @@ pub async fn watch_status<On, Off, Fut>(
         if status != new_status {
             match new_status {
                 Status::Online => {
-                    status = new_status;
-                    on_online().await;
+                    status = Status::Online;
+                    on_status_change(status).await;
                 }
                 Status::Offline => {
                     tokio::time::sleep(Duration::from_secs(600)).await;
                     if let Status::Offline = get_status() {
                         status = Status::Offline;
-                        on_offline().await;
+                        on_status_change(status).await;
                     }
                 }
             }
@@ -34,7 +30,7 @@ pub async fn watch_status<On, Off, Fut>(
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Status {
     Online,
     Offline,
