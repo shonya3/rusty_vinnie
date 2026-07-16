@@ -184,7 +184,7 @@ impl Announcer {
     }
 
     #[allow(unused)]
-    pub fn with_announcement(
+    pub fn announcement(
         self,
         channel: AppChannel,
         format: impl Fn(Offset) -> String + Send + 'static,

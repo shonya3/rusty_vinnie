@@ -31,7 +31,7 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
             .unwrap(),
         Utc,
     ))
-    .with_announcement(AppChannel::Poe1, |offset| {
+    .announcement(AppChannel::Poe1, |offset| {
         announce::with_emojis(&format!(" Stream starts in {}! ", offset.label()))
     })
     .start(ctx);
@@ -43,7 +43,7 @@ async fn set_watchers(ctx: &SerenityContext, data: &Data) {
             .unwrap(),
         Utc,
     ))
-    .with_announcement(AppChannel::Poe1, |offset| {
+    .announcement(AppChannel::Poe1, |offset| {
         announce::with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
     })
     .presence(true)
