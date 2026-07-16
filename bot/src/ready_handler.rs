@@ -19,10 +19,10 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
     }
 
     println!("Set watchers");
-    set_watchers(ctx, data).await;
+    start_watchers(ctx, data).await;
 }
 
-async fn set_watchers(ctx: &SerenityContext, data: &Data) {
+async fn start_watchers(ctx: &SerenityContext, data: &Data) {
     let stream = Announcer::new(DateTime::from_naive_utc_and_offset(
         NaiveDate::from_ymd_opt(2026, 7, 16)
             .unwrap()
