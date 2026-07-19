@@ -23,18 +23,6 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
-    let stream = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 7, 16)
-            .unwrap()
-            .and_hms_opt(20, 0, 0)
-            .unwrap(),
-        Utc,
-    ))
-    .announcement(AppChannel::Poe1, |offset| {
-        with_emojis(&format!(" Stream starts in {}! ", offset.label()))
-    })
-    .start(ctx);
-
     let league = Announcer::new(DateTime::from_naive_utc_and_offset(
         NaiveDate::from_ymd_opt(2026, 7, 24)
             .unwrap()
@@ -49,7 +37,6 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
     .start(ctx);
 
     tokio::join!(
-        stream,
         league,
         watch_status(
             || get_kroiya_status(ctx),
