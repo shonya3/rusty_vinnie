@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset, Utc};
-use playwright::{Playwright, api::Page};
+use playwright_rs::{Playwright, protocol::page::{GotoOptions, WaitUntil}};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
@@ -87,11 +87,11 @@ fn extract_current_tiers(content: &str) -> Option<u32> {
 
 /// Connects to Chrome via CDP and extracts challenge progress from PoE profile pages.
 pub struct ChallengeExtractor<'a> {
-    page: &'a playwright::api::Page,
+    page: &'a playwright_rs::protocol::Page,
 }
 
 impl<'a> ChallengeExtractor<'a> {
-    pub fn new(page: &'a Page) -> Self {
+    pub fn new(page: &'a playwright_rs::protocol::Page) -> Self {
         Self { page }
     }
 
@@ -101,47 +101,39 @@ impl<'a> ChallengeExtractor<'a> {
     }
 
     /// Reloads the page.
-    pub async fn refresh(&self) -> Result<(), playwright::Error> {
+    pub async fn refresh(&self) -> Result<(), playwright_rs::Error> {
         self.page
-            .reload_builder()
-            .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
-            .reload()
-            .await
-            .map_err(playwright::Error::from)
-            .map(|_| ())
+            .reload(Some(GotoOptions::new().wait_until(WaitUntil::DomContentLoaded)))
+            .await?;
+        Ok(())
     }
 
     /// Navigates to challenges page.
-    pub async fn navigate(&self) -> Result<(), playwright::Error> {
+    pub async fn navigate(&self) -> Result<(), playwright_rs::Error> {
         let url = "https://www.pathofexile.com/account/view-profile/Frxtl-5064/challenges";
         self.page
-            .goto_builder(url)
-            .wait_until(playwright::api::DocumentLoadState::DomContentLoaded)
-            .goto()
-            .await
-            .map_err(playwright::Error::from)
-            .map(|_| ())
+            .goto(url, Some(GotoOptions::new().wait_until(WaitUntil::DomContentLoaded)))
+            .await?;
+        Ok(())
     }
 
     /// Returns the raw HTML content of the page.
-    pub async fn content(&self) -> std::result::Result<String, playwright::Error> {
-        self.page.content().await.map_err(playwright::Error::from)
+    pub async fn content(&self) -> std::result::Result<String, playwright_rs::Error> {
+        self.page.content().await
     }
 }
 
 async fn connect_and_extract() -> Result<(), Box<dyn std::error::Error>> {
-    let playwright = Playwright::initialize().await?;
-    playwright.install_chromium()?;
+    let playwright = Playwright::launch().await?;
 
     let browser = playwright
         .chromium()
-        .connect_over_cdp_builder("http://localhost:9222")
-        .connect_over_cdp()
+        .connect_over_cdp("http://localhost:9222", None)
         .await?;
 
-    let contexts = browser.contexts()?;
+    let contexts = browser.contexts();
     let context = contexts.first().ok_or("No browser context")?;
-    let pages = context.pages()?;
+    let pages = context.pages();
 
     let page = if pages.is_empty() {
         context.new_page().await?
