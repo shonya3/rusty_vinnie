@@ -1,5 +1,5 @@
 use crate::{
-    announce::{with_emojis, Announcer},
+    announce::{self, with_emojis, Announcer, Offset},
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status, Status},
@@ -33,6 +33,7 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
     .announcement(AppChannel::Poe1, |offset| {
         with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
     })
+    .offsets(announce::event_offsets().chain((35..=105).step_by(5).map(Offset::Hours)))
     .presence(true)
     .start(ctx);
 
