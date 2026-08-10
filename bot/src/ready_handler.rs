@@ -6,9 +6,14 @@ use crate::{
     Data, SerenityContext,
 };
 use chrono::{DateTime, NaiveDate, Utc};
+use std::sync::atomic::Ordering;
 use std::time::Duration;
 
 pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
+    if data.ready_handled.swap(true, Ordering::SeqCst) {
+        println!("Ready already handled, skipping");
+        return;
+    }
     println!("Bot is ready");
 
     let secs = 60;

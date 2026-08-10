@@ -2,7 +2,11 @@ use ::ea_live_updates::LiveUpdate;
 use dotenv::dotenv;
 use futures::lock::Mutex;
 use poise::serenity_prelude::{self as serenity};
-use std::{collections::HashSet, sync::Arc};
+use std::{
+    collections::HashSet,
+    sync::atomic::AtomicBool,
+    sync::Arc,
+};
 
 mod announce;
 mod challenges;
@@ -52,6 +56,7 @@ pub struct Data {
     pub db: Arc<DbClient>,
     pub published_live_updates: Arc<Mutex<HashSet<LiveUpdate>>>,
     pub newsletters: Arc<newsletters::AppNewsletters>,
+    pub ready_handled: Arc<AtomicBool>,
 }
 
 #[tokio::main]
@@ -87,7 +92,8 @@ async fn main() {
                 Ok(Data {
                     db: Arc::new(db),
                     published_live_updates: Default::default(),
-                    newsletters: Arc::new(newsletters::AppNewsletters::new())
+                    newsletters: Arc::new(newsletters::AppNewsletters::new()),
+                    ready_handled: Arc::new(AtomicBool::new(false)),
                 })
             })
         })
