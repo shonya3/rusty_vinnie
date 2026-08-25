@@ -1,5 +1,5 @@
 use crate::{
-    announce::{self, with_emojis, Announcer, Offset},
+    announce::{self, with_emojis, Announcer},
     channel::AppChannel,
     newsletter::Newsletter,
     status::{get_kroiya_status, watch_status, Status},
@@ -16,7 +16,7 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
     }
     println!("Bot is ready");
 
-    let secs = 60;
+    let secs = 0;
     println!("\nWatchers will start in {secs} seconds");
     for i in (1..=secs).rev() {
         println!("{i}...");
@@ -28,22 +28,22 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
-    let league = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 7, 24)
+    let stream_055 = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 8, 27)
             .unwrap()
-            .and_hms_opt(20, 0, 0)
+            .and_hms_opt(19, 30, 0)
             .unwrap(),
         Utc,
     ))
-    .announcement(AppChannel::Poe1, |offset| {
-        with_emojis(&format!(" 3.29 League starts in {}! ", offset.label()))
+    .announcement(AppChannel::Poe2, |offset| {
+        with_emojis(&format!(" 0.5.5 stream starts in {}! ", offset.label()))
     })
-    .offsets(announce::event_offsets().chain((35..=105).step_by(5).map(Offset::Hours)))
+    .offsets(announce::event_offsets())
     .presence(true)
     .start(ctx);
 
     tokio::join!(
-        league,
+        stream_055,
         watch_status(
             || get_kroiya_status(ctx),
             |status| match status {

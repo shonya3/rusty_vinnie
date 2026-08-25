@@ -77,29 +77,31 @@ pub async fn start_presence_updater(ctx: &SerenityContext, target: DateTime<Utc>
 }
 
 pub fn event_offsets() -> impl Iterator<Item = Offset> {
-    (2..20).map(|d| Offset::Days(d as i64)).chain([
-        Offset::Hours(30),
-        Offset::Hours(27),
-        Offset::Hours(24),
-        Offset::Hours(20),
-        Offset::Hours(16),
-        Offset::Hours(12),
-        Offset::Hours(10),
-        Offset::Hours(8),
-        Offset::Hours(6),
-        Offset::Hours(5),
-        Offset::Hours(4),
-        Offset::Hours(3),
-        Offset::Hours(2),
-        Offset::Hours(1),
-        Offset::Minutes(45),
-        Offset::Minutes(30),
-        Offset::Minutes(15),
-        Offset::Minutes(10),
-        Offset::Minutes(5),
-        Offset::Minutes(2),
-        Offset::Minutes(1),
-    ])
+    (2..20)
+        .map(|d| Offset::Days(d as i64))
+        .chain((30..=105).step_by(5).map(Offset::Hours))
+        .chain([
+            Offset::Hours(27),
+            Offset::Hours(24),
+            Offset::Hours(20),
+            Offset::Hours(16),
+            Offset::Hours(12),
+            Offset::Hours(10),
+            Offset::Hours(8),
+            Offset::Hours(6),
+            Offset::Hours(5),
+            Offset::Hours(4),
+            Offset::Hours(3),
+            Offset::Hours(2),
+            Offset::Hours(1),
+            Offset::Minutes(45),
+            Offset::Minutes(30),
+            Offset::Minutes(15),
+            Offset::Minutes(10),
+            Offset::Minutes(5),
+            Offset::Minutes(2),
+            Offset::Minutes(1),
+        ])
 }
 
 pub fn generate_emojis() -> (String, String) {
