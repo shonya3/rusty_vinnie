@@ -28,22 +28,22 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
-    let stream_055 = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 8, 27)
+    let start_055 = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 9, 4)
             .unwrap()
-            .and_hms_opt(19, 30, 0)
+            .and_hms_opt(20, 0, 0)
             .unwrap(),
         Utc,
     ))
     .announcement(AppChannel::Poe2, |offset| {
-        with_emojis(&format!(" 0.5.5 stream starts in {}! ", offset.label()))
+        with_emojis(&format!(" 0.5.5 starts in {}! ", offset.label()))
     })
     .offsets(announce::event_offsets())
     .presence(true)
     .start(ctx);
 
     tokio::join!(
-        stream_055,
+        start_055,
         watch_status(
             || get_kroiya_status(ctx),
             |status| match status {
