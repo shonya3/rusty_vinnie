@@ -452,12 +452,12 @@ dependencies = [
 
 [[package]]
 name = "diablo"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "html-escape",
  "html2md",
- "http 0.1.0",
+ "http 1.0.0",
  "regex",
  "serde",
  "serde_json",
@@ -531,9 +531,9 @@ dependencies = [
 
 [[package]]
 name = "ea_live_updates"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
- "http 0.1.0",
+ "http 1.0.0",
  "regex",
  "reqwest 0.12.15",
  "serde",
@@ -909,13 +909,6 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.1.0"
-dependencies = [
- "reqwest 0.12.15",
-]
-
-[[package]]
-name = "http"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "601cbb57e577e2f5ef5be8e7b83f0f63994f25aa94d673e54a92d5c516d101f1"
@@ -923,6 +916,13 @@ dependencies = [
  "bytes",
  "fnv",
  "itoa",
+]
+
+[[package]]
+name = "http"
+version = "1.0.0"
+dependencies = [
+ "reqwest 0.12.15",
 ]
 
 [[package]]
@@ -1342,11 +1342,11 @@ dependencies = [
 
 [[package]]
 name = "last_epoch_forum"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "futures",
- "http 0.1.0",
+ "http 1.0.0",
  "markdown",
  "reqwest 0.12.15",
  "scraper",
@@ -1515,7 +1515,7 @@ checksum = "c41e0c4fef86961ac6d6f8a82609f55f31b05e4fce149ac5710e439df7619ba4"
 
 [[package]]
 name = "markdown"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "scraper",
 ]
@@ -1925,7 +1925,7 @@ dependencies = [
 
 [[package]]
 name = "poe_challenge_extractor"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "playwright-rs",
@@ -1936,10 +1936,10 @@ dependencies = [
 
 [[package]]
 name = "poe_forum"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
- "http 0.1.0",
+ "http 1.0.0",
  "markdown",
  "reqwest 0.12.15",
  "scraper",
@@ -1949,9 +1949,9 @@ dependencies = [
 
 [[package]]
 name = "poe_teasers"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
- "http 0.1.0",
+ "http 1.0.0",
  "reqwest 0.12.15",
  "scraper",
  "serde",
@@ -2487,14 +2487,14 @@ checksum = "955d28af4278de8121b7ebeb796b6a45735dc01436d898801014aced2773a3d6"
 
 [[package]]
 name = "rusty_vinnie"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "diablo",
  "dotenv",
  "ea_live_updates",
  "futures",
- "http 0.1.0",
+ "http 1.0.0",
  "last_epoch_forum",
  "libsql",
  "poe_challenge_extractor",
