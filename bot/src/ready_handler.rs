@@ -28,22 +28,25 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
-    let start_055 = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 9, 4)
+    let last_epoch_05_announcement = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 10, 1)
             .unwrap()
-            .and_hms_opt(20, 0, 0)
+            .and_hms_opt(16, 0, 0)
             .unwrap(),
         Utc,
     ))
     .announcement(AppChannel::Poe2, |offset| {
-        with_emojis(&format!(" 0.5.5 starts in {}! ", offset.label()))
+        with_emojis(&format!(
+            " Season 5: Rage of the Frostborn starts in {}! ",
+            offset.label()
+        ))
     })
     .offsets(announce::event_offsets())
     .presence(true)
     .start(ctx);
 
     tokio::join!(
-        start_055,
+        last_epoch_05_announcement,
         watch_status(
             || get_kroiya_status(ctx),
             |status| match status {
