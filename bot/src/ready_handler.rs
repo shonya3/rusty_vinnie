@@ -35,7 +35,7 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
             .unwrap(),
         Utc,
     ))
-    .announcement(AppChannel::Poe2, |offset| {
+    .announcement(AppChannel::LastEpoch, |offset| {
         with_emojis(&format!(
             " Season 5: Rage of the Frostborn starts in {}! ",
             offset.label()
