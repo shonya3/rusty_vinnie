@@ -28,16 +28,16 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 }
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
-    let last_epoch_05_announcement = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 10, 1)
+    let exilecon_livestream = Announcer::new(DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(2026, 11, 6)
             .unwrap()
-            .and_hms_opt(16, 0, 0)
+            .and_hms_opt(20, 30, 0)
             .unwrap(),
         Utc,
     ))
     .announcement(AppChannel::LastEpoch, |offset| {
         with_emojis(&format!(
-            " Season 5: Rage of the Frostborn starts in {}! ",
+            " Экзаилкон стрим стартует через {}! ",
             offset.label()
         ))
     })
@@ -46,7 +46,7 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
     .start(ctx);
 
     tokio::join!(
-        last_epoch_05_announcement,
+        exilecon_livestream,
         watch_status(
             || get_kroiya_status(ctx),
             |status| match status {
