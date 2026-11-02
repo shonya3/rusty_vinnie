@@ -35,7 +35,7 @@ async fn start_watchers(ctx: &SerenityContext, data: &Data) {
             .unwrap(),
         Utc,
     ))
-    .announcement(AppChannel::LastEpoch, |offset| {
+    .announcement(AppChannel::Poe2, |offset| {
         with_emojis(&format!(
             " Экзаилкон стрим стартует через {}! ",
             offset.label()
