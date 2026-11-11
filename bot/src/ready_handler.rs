@@ -29,17 +29,14 @@ pub async fn handle_ready(ctx: &SerenityContext, data: &Data) {
 
 async fn start_watchers(ctx: &SerenityContext, data: &Data) {
     let exilecon_livestream = Announcer::new(DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(2026, 11, 6)
+        NaiveDate::from_ymd_opt(2026, 11, 13)
             .unwrap()
-            .and_hms_opt(20, 30, 0)
+            .and_hms_opt(19, 0, 0)
             .unwrap(),
         Utc,
     ))
-    .announcement(AppChannel::Poe2, |offset| {
-        with_emojis(&format!(
-            " Экзаилкон стрим стартует через {}! ",
-            offset.label()
-        ))
+    .announcement(AppChannel::Poe1, |offset| {
+        with_emojis(&format!(" 3.30 стартует через {}! ", offset.label()))
     })
     .offsets(announce::event_offsets())
     .presence(true)
